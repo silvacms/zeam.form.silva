@@ -1,9 +1,9 @@
 import Acquisition
 
 from five import grok
-from zeam.form import base
+from megrok import pagetemplate as pt
+from zeam.form import base, composed
 from zeam.form.ztk.actions import EditAction, CancelAction
-from zope.container.interfaces import IAdding
 from zope.i18n.interfaces import IUserPreferredLanguages
 from zope.i18n.locales import locales, LoadLocaleError
 from zope.i18nmessageid import MessageFactory
@@ -70,3 +70,24 @@ class SilvaForm(SilvaFormData, Acquisition.Explicit):
             self.request.locale = find_locale(self.request)
         convert_request_form_to_unicode(self.request.form)
         return super(SilvaForm, self).__call__()
+
+
+
+class ZMIForm(SilvaForm, base.Form):
+    """Regular ZMI forms.
+    """
+    grok.baseclass()
+
+
+class ZMIFormTemplate(pt.PageTemplate):
+    pt.view(ZMIForm)
+
+
+class ZMIComposedForm(SilvaForm, composed.ComposedForm):
+    """ZMI Composed forms.
+    """
+    grok.baseclass()
+
+
+class ZMIComposedFormTemplate(pt.PageTemplate):
+    pt.view(ZMIComposedForm)
