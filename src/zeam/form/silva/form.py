@@ -1,5 +1,3 @@
-import Acquisition
-
 from five import grok
 from megrok import pagetemplate as pt
 from zeam.form import base, composed
@@ -54,7 +52,7 @@ class SilvaFormData(object):
         return self.request.get('LANGUAGE', 'en')
 
 
-class SilvaForm(SilvaFormData, Acquisition.Explicit):
+class SilvaForm(SilvaFormData):
     """Form in Silva.
     """
     grok.baseclass()
