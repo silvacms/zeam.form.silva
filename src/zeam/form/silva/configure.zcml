@@ -8,6 +8,7 @@
   <include package="zeam.form.base" />
   <include package="zeam.form.ztk" />
   <include package="zeam.form.composed" />
+  <include package="zeam.form.layout" />
   <include package="five.grok" />
 
   <grok:grok package=".meta" />

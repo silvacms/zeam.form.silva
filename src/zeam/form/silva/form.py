@@ -1,10 +1,12 @@
 from five import grok
 from megrok import pagetemplate as pt
-from zeam.form import base, composed
+from zeam.form import base, composed, layout
 from zeam.form.ztk.actions import EditAction, CancelAction
 from zope.i18n.interfaces import IUserPreferredLanguages
 from zope.i18n.locales import locales, LoadLocaleError
 from zope.i18nmessageid import MessageFactory
+
+from silva.core.smi.interfaces import ISMILayer
 
 
 def find_locale(request):
@@ -89,3 +91,10 @@ class ZMIComposedForm(SilvaForm, composed.ComposedForm):
 
 class ZMIComposedFormTemplate(pt.PageTemplate):
     pt.view(ZMIComposedForm)
+
+
+class SMIForm(SilvaForm, layout.Form):
+    """Regular SMI form.
+    """
+    grok.baseclass()
+    grok.layer(ISMILayer)
