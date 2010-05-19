@@ -1,12 +1,18 @@
+from Acquisition import aq_base
+
 from five import grok
 from megrok import pagetemplate as pt
 from zeam.form import base, composed, layout
+from zeam.form.base.datamanager import BaseDataManager
 from zeam.form.ztk.actions import EditAction, CancelAction
 from zope.i18n.interfaces import IUserPreferredLanguages
 from zope.i18n.locales import locales, LoadLocaleError
 from zope.i18nmessageid import MessageFactory
 
 from silva.core.smi.interfaces import ISMILayer
+from silva.core.interfaces.content import IVersionedContent
+
+_ = MessageFactory("silva")
 
 
 def find_locale(request):
@@ -72,6 +78,26 @@ class SilvaForm(SilvaFormData):
         return super(SilvaForm, self).__call__()
 
 
+class SilvaDataManager(BaseDataManager):
+    """Try to use in priority set_ and get_ methods when setting and
+    getting values on an object, paying attention to the Acquisition.
+    """
+
+    def get(self, identifier):
+        if hasattr(aq_base(self.content), 'get_%s' % identifier):
+            getter = getattr(self.content, 'get_%s' % identifier)
+            return getter()
+        if not hasattr(aq_base(self.content), identifier):
+            raise KeyError(identifier)
+        return getattr(self.content, identifier)
+
+    def set(self, identifier, value):
+        if hasattr(aq_base(self.content), 'set_%s' % identifier):
+            setter = getattr(self.content, 'set_%s' % identifier)
+            return setter(value)
+        return setattr(self.content, identifier, value)
+
+
 
 class ZMIForm(SilvaForm, base.Form):
     """Regular ZMI forms.
@@ -98,3 +124,29 @@ class SMIForm(SilvaForm, layout.Form):
     """
     grok.baseclass()
     grok.layer(ISMILayer)
+
+
+class SMIFormTemplate(pt.PageTemplate):
+    pt.view(SMIForm)
+
+
+class SMIEditForm(SMIForm):
+    """SMI Edit form.
+    """
+    grok.baseclass()
+    grok.name('tab_edit')
+    grok.require('silva.ChangeSilvaContent')
+
+    tab = 'edit'
+    tab_name = 'tab_edit'
+
+    dataManager = SilvaDataManager
+    ignoreContent = False
+    actions = base.Actions(
+        EditAction(_(u"save")),
+        CancelAction(_(u"cancel")))
+
+    def setContentData(self, content):
+        if IVersionedContent.providedBy(content):
+            content = content.get_editable()
+        super(SMIEditForm, self).setContentData(content)
