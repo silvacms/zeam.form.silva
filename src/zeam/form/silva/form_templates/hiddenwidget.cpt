@@ -1,0 +1,6 @@
+<input type="hidden" id="#" name="#" class="#" value="#"
+       tal:attributes="name widget.identifier;
+                       id widget.htmlId();
+                       class widget.htmlClass();
+                       value widget.inputValue()" />
+

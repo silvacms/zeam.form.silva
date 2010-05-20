@@ -11,7 +11,5 @@
   <include package="zeam.form.layout" />
   <include package="five.grok" />
 
-  <grok:grok package=".meta" />
-  <grok:grok package=".form" />
-
+  <grok:grok package="." />
 </configure>

@@ -3,14 +3,26 @@ from Acquisition import aq_base
 from five import grok
 from megrok import pagetemplate as pt
 from zeam.form import base, composed, layout
+from zeam.form.base import FAILURE
+from zeam.form.base.actions import Action
 from zeam.form.base.datamanager import BaseDataManager
+from zeam.form.base.fields import Field, Fields
+from zeam.form.base.interfaces import IWidget, IForm, IField
+from zeam.form.base.widgets import FieldWidget
 from zeam.form.ztk.actions import EditAction, CancelAction
+from zeam.form.ztk.fields import InterfaceSchemaFieldFactory
+from zeam.form.silva.interfaces import IDefaultAddFields
+
+from zope.configuration.name import resolve
 from zope.i18n.interfaces import IUserPreferredLanguages
 from zope.i18n.locales import locales, LoadLocaleError
 from zope.i18nmessageid import MessageFactory
 
-from silva.core.smi.interfaces import ISMILayer
+from silva.core.conf.utils import getFactoryName
 from silva.core.interfaces.content import IVersionedContent
+from silva.core.smi.interfaces import ISMILayer
+from Products.Silva.ExtensionRegistry import extensionRegistry
+
 
 _ = MessageFactory("silva")
 
@@ -98,7 +110,6 @@ class SilvaDataManager(BaseDataManager):
         return setattr(self.content, identifier, value)
 
 
-
 class ZMIForm(SilvaForm, base.Form):
     """Regular ZMI forms.
     """
@@ -128,6 +139,93 @@ class SMIForm(SilvaForm, layout.Form):
 
 class SMIFormTemplate(pt.PageTemplate):
     pt.view(SMIForm)
+
+
+class AddAction(Action):
+
+    def add(self, parent, data, form):
+        """Purely create the object. This method can be overriden to
+        support custom creation needs.
+        """
+        addable = filter(lambda a: a['name'] == form.__name__,
+                         extensionRegistry.get_addables())
+        if len(addable) != 1:
+            raise ValueError, "Content cannot be found. " \
+               "Check that the name of add is the meta type of your content."
+        addable = addable[0]
+        factory = getattr(resolve(addable['instance'].__module__),
+                          getFactoryName(addable['instance']))
+        # Build the content
+        obj_id = str(data['id'])
+        factory(parent, obj_id, data['title'])
+        obj = getattr(parent, obj_id)
+        #now move to position, if 'add_object_position' is in the request
+        position = form.request.get('add_object_position', None)
+        if position:
+            try:
+                position = int(position)
+                if position >= 0:
+                    parent.move_to([obj_id], position)
+            except ValueError:
+                pass
+        return obj
+
+    def __call__(self, form):
+        data, errors = form.extractData()
+        if form.errors:
+            return FAILURE
+        parent = form.context.aq_inner
+        obj = self.add(parent, data, form)
+        form.setContentData(obj)
+        editable_obj = obj.get_editable()
+        for key, value in data.iteritems():
+            if key not in IDefaultAddFields:
+                setattr(editable_obj, key, value)
+        form.redirect(self.nextURL(form, obj))
+
+    def nextURL(self, form, content):
+        return '%s/edit' % content.aq_parent.absolute_url()
+
+
+class AddAndEditAction(AddAction):
+
+    def nextURL(self, form, content):
+        return '%s/edit' % content.absolute_url()
+
+
+class MetaTypeField(Field):
+    mode = 'hidden'
+    ignoreContent = True
+
+    def __init__(self, name, value, identifier=None):
+        super(MetaTypeField, self).__init__(name, identifier=identifier)
+        self.defaultValue = value
+
+
+class HiddenWidget(FieldWidget):
+    grok.implements(IWidget)
+    grok.adapts(IField, IForm, None)
+    grok.name('hidden')
+
+
+class SMIAddForm(SMIForm):
+    """ SMI add form
+    """
+    grok.baseclass()
+    grok.require('silva.ChangeSilvaContent')
+
+    template = grok.PageTemplate(filename="form_templates/smiaddform.cpt")
+
+    tab = 'edit'
+    tab_name = 'tab_edit'
+
+    fields = Fields(IDefaultAddFields, factory=InterfaceSchemaFieldFactory)
+    dataManager = SilvaDataManager
+    ignoreContent = True
+    actions = base.Actions(
+        AddAction(_(u'save')),
+        AddAndEditAction(_(u'save + edit')),
+        CancelAction(_(u'cancel')),)
 
 
 class SMIEditForm(SMIForm):
