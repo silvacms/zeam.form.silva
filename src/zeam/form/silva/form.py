@@ -193,21 +193,6 @@ class AddAndEditAction(AddAction):
         return '%s/edit' % content.absolute_url()
 
 
-class MetaTypeField(Field):
-    mode = 'hidden'
-    ignoreContent = True
-
-    def __init__(self, name, value, identifier=None):
-        super(MetaTypeField, self).__init__(name, identifier=identifier)
-        self.defaultValue = value
-
-
-class HiddenWidget(FieldWidget):
-    grok.implements(IWidget)
-    grok.adapts(IField, IForm, None)
-    grok.name('hidden')
-
-
 class SMIAddForm(SMIForm):
     """ SMI add form
     """
