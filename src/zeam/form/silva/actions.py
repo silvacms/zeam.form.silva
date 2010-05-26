@@ -43,7 +43,7 @@ class AddAction(Action):
         data, errors = form.extractData()
         if form.errors:
             return FAILURE
-        parent = form.context.aq_inner
+        parent = form.context.aq_inner.aq_parent
         obj = self.add(parent, data, form)
         form.setContentData(obj)
         editable_obj = obj.get_editable()
@@ -53,7 +53,7 @@ class AddAction(Action):
         form.redirect(self.nextURL(form, obj))
 
     def nextURL(self, form, content):
-        return '%s/edit' % content.aq_parent.absolute_url()
+        return '%s/edit' % content.aq_inner.aq_parent.absolute_url()
 
 
 class AddAndEditAction(AddAction):

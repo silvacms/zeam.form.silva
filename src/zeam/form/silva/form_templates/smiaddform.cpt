@@ -1,5 +1,6 @@
 <form action="." tal:attributes="action request/URL" method="post"
       enctype="multipart/form-data"
+      name="add_object"
       i18n:domain="silva">
   <input type="hidden" name="meta_type"
       tal:attributes="value python:request.get('meta_type')" />
