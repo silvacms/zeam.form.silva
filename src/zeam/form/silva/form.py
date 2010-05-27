@@ -5,6 +5,7 @@ from megrok import pagetemplate as pt
 from zeam.form import base, composed, layout
 from zeam.form.base.datamanager import BaseDataManager
 from zeam.form.base.fields import Fields
+from zeam.form.base.markers import DISPLAY
 
 from zeam.form.ztk.actions import EditAction
 from zeam.form.ztk.fields import InterfaceSchemaFieldFactory
@@ -171,7 +172,22 @@ class SMIEditForm(SMIForm):
         EditAction(_(u"save")),
         CancelEditAction(_(u"cancel")))
 
+    def update(self):
+        """ If we have a versioned content and it has a published/approved
+        version, the we set the form in display mode.
+        """
+        super(SMIEditForm, self).update()
+        if IVersionedContent.providedBy(self.context):
+            if not self.context.get_editable():
+                self.mode = DISPLAY
+                self.actions = base.Actions()
+
     def setContentData(self, content):
-        if IVersionedContent.providedBy(content):
-            content = content.get_editable()
+        original_content = content
+        if IVersionedContent.providedBy(original_content):
+            content = original_content.get_editable()
+            if content is None:
+                content = original_content.get_previewable()
         super(SMIEditForm, self).setContentData(content)
+
+
