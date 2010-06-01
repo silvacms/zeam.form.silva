@@ -7,8 +7,8 @@ from zeam.form.silva.interfaces import IDefaultAddFields
 from zeam.form.base.actions import Action
 from zeam.form.base import FAILURE
 
-
 from Products.Silva.ExtensionRegistry import extensionRegistry
+
 
 class AddAction(Action):
 
@@ -37,19 +37,18 @@ class AddAction(Action):
                     parent.move_to([obj_id], position)
             except ValueError:
                 pass
+        editable_obj = obj.get_editable()
+        for key, value in data.iteritems():
+            if key not in IDefaultAddFields:
+                setattr(editable_obj, key, value)
         return obj
 
     def __call__(self, form):
         data, errors = form.extractData()
         if form.errors:
             return FAILURE
-        parent = form.context.aq_inner.aq_parent
-        obj = self.add(parent, data, form)
+        obj = self.add(form.context, data, form)
         form.setContentData(obj)
-        editable_obj = obj.get_editable()
-        for key, value in data.iteritems():
-            if key not in IDefaultAddFields:
-                setattr(editable_obj, key, value)
         form.redirect(self.nextURL(form, obj))
 
     def nextURL(self, form, content):
