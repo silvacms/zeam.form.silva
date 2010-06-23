@@ -33,6 +33,8 @@ setup(name='zeam.form.silva',
         'zeam.form.composed',
         'zeam.form.ztk',
         'zeam.form.layout',
+        'zeam.form.viewlet',
+        'silva.core.smi',
         'zope.i18n',
         ],
       )

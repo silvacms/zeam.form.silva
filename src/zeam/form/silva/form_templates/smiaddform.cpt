@@ -1,3 +1,4 @@
+<div class="focus-rectangle">
 <form action="." tal:attributes="action request/URL" method="post"
       enctype="multipart/form-data"
       name="add_object"
@@ -80,3 +81,4 @@
       </tr>
   </table>
 </form>
+</div>

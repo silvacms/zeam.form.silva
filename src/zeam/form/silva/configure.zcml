@@ -9,6 +9,7 @@
   <include package="zeam.form.ztk" />
   <include package="zeam.form.composed" />
   <include package="zeam.form.layout" />
+  <include package="zeam.form.viewlet" />
   <include package="five.grok" />
 
   <grok:grok package="." />

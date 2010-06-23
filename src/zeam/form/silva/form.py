@@ -2,6 +2,7 @@ from Acquisition import aq_base
 
 from five import grok
 from megrok import pagetemplate as pt
+from zope.component import getUtility
 from zeam.form import base, composed, layout
 from zeam.form.base.datamanager import BaseDataManager
 from zeam.form.base.fields import Fields
@@ -10,13 +11,15 @@ from zeam.form.base.markers import DISPLAY
 from zeam.form.ztk.actions import EditAction
 from zeam.form.ztk.fields import InterfaceSchemaFieldFactory
 from zeam.form.silva.actions import *
+from zeam.form.viewlet import form as viewletform
 
 from zope.i18n.interfaces import IUserPreferredLanguages
 from zope.i18n.locales import locales, LoadLocaleError
 from zope.i18nmessageid import MessageFactory
 
 from silva.core.interfaces.content import IVersionedContent
-from silva.core.smi.interfaces import ISMILayer
+from silva.core.smi.interfaces import ISMILayer, ISMINavigationOff
+from silva.core.messages.interfaces import IMessageService
 
 
 _ = MessageFactory("silva")
@@ -65,6 +68,10 @@ class SilvaFormData(object):
     @property
     def i18nLanguage(self):
         return self.request.get('LANGUAGE', 'en')
+
+    def send_message(self, message, type=u""):
+        service = getUtility(IMessageService)
+        service.send(message, self.request, namespace=type)
 
 
 class SilvaForm(SilvaFormData):
@@ -140,6 +147,7 @@ class SMIAddForm(SMIForm):
     """ SMI add form
     """
     grok.baseclass()
+    grok.implements(ISMINavigationOff)
     grok.require('silva.ChangeSilvaContent')
 
     template = grok.PageTemplate(filename="form_templates/smiaddform.cpt")
@@ -190,4 +198,15 @@ class SMIEditForm(SMIForm):
                 content = original_content.get_previewable()
         super(SMIEditForm, self).setContentData(content)
 
+
+class SMIViewletForm(viewletform.ViewletForm, SilvaFormData):
+    """ Base form in viewlet
+    """
+    grok.baseclass()
+
+    def available(self):
+        for action in self.actions:
+            if action.available(self):
+                return True
+        return False
 
