@@ -2,12 +2,11 @@ from Acquisition import aq_base
 
 from five import grok
 from megrok import pagetemplate as pt
-from zope.component import getUtility
+
 from zeam.form import base, composed
 from zeam.form.base.datamanager import BaseDataManager
 from zeam.form.base.fields import Fields
 from zeam.form.base.markers import DISPLAY
-
 from zeam.form.ztk.actions import EditAction
 from zeam.form.ztk.fields import InterfaceSchemaFieldFactory
 from zeam.form.silva.actions import *
@@ -16,6 +15,7 @@ from zeam.form.viewlet import form as viewletform
 from infrae.layout.interfaces import IPage, ILayoutFactory
 
 from zope import component
+from zope.cachedescriptors.property import CachedProperty
 from zope.i18n.interfaces import IUserPreferredLanguages
 from zope.i18n.locales import locales, LoadLocaleError
 from zope.i18nmessageid import MessageFactory
@@ -74,7 +74,7 @@ class SilvaFormData(object):
         return self.request.get('LANGUAGE', 'en')
 
     def send_message(self, message, type=u""):
-        service = getUtility(IMessageService)
+        service = component.getUtility(IMessageService)
         service.send(message, self.request, namespace=type)
 
 
@@ -208,10 +208,66 @@ class SMIAddForm(SMIForm):
     fields = Fields(IDefaultAddFields, factory=InterfaceSchemaFieldFactory)
     dataManager = SilvaDataManager
     ignoreContent = True
-    actions = base.Actions(
-        AddAction(_(u'save')),
-        AddAndEditAction(_(u'save + edit')),
-        CancelAddAction(_(u'cancel')),)
+    actions = base.Actions(CancelAddAction(_(u'cancel')))
+
+    def _add(self, parent, data):
+        """Purely create the object. This method can be overriden to
+        support custom creation needs.
+        """
+        addable = filter(lambda a: a['name'] == self.__name__,
+                         extensionRegistry.get_addables())
+        if len(addable) != 1:
+            raise ValueError, "Content cannot be found. " \
+               "Check that the name of add is the meta type of your content."
+        addable = addable[0]
+        factory = getattr(resolve(addable['instance'].__module__),
+                          getFactoryName(addable['instance']))
+        # Build the content
+        obj_id = str(data['id'])
+        factory(parent, obj_id, data['title'])
+        obj = getattr(parent, obj_id)
+        #now move to position, if 'add_object_position' is in the request
+        position = self.request.get('add_object_position', None)
+        if position:
+            try:
+                position = int(position)
+                if position >= 0:
+                    parent.move_to([obj_id], position)
+            except ValueError:
+                pass
+        editable_obj = obj.get_editable()
+        for key, value in data.iteritems():
+            if key not in IDefaultAddFields:
+                setattr(editable_obj, key, value)
+        return obj
+
+    def _extract_and_create(self):
+        data, errors = self.extractData()
+        if self.errors:
+            return FAILURE
+        obj = self._add(self.context, data)
+        self.setContentData(obj)
+        self.send_message(_(u'Added ${meta_type}',
+                            mapping={'meta_type': self.meta_type}))
+        return obj
+
+    @base.action(_(u'save'))
+    def save(self):
+        self._extract_and_create()
+        self.redirect(self.url(name="edit"))
+
+    @base.action(_(u'save + edit'), identifier=u'save_edit')
+    def save_edit(self):
+        obj = self._extract_and_create()
+        self.redirect(self.url(obj, name="edit"))
+
+    @CachedProperty
+    def meta_type(self):
+        return grok.name.bind().get(self)
+
+    def get_title(self):
+        return _(u"create ${meta_type}",
+                 mapping={'meta_type': self.meta_type})
 
 
 class SMIEditForm(SMIForm):

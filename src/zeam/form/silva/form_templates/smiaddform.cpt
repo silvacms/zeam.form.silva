@@ -4,13 +4,13 @@
       name="add_object"
       i18n:domain="silva">
   <input type="hidden" name="meta_type"
-      tal:attributes="value python:request.get('meta_type')" />
+      tal:attributes="value view/meta_type" />
   <table class="listing">
     <thead>
       <tr>
         <td class="top" colspan="2">
           <h2>
-            <span tal:replace="request/meta_type" />
+            <span tal:replace="view/get_title" />
           </h2>
         </td>
       </tr>
@@ -37,7 +37,7 @@
       <tal:repeat tal:repeat="widget view/fieldWidgets">
         <tr class="#"
             tal:define="odd   repeat/widget/odd;
-                        idx          repeat/widget/index"
+                        idx   repeat/widget/index"
             tal:attributes="class python:odd and ('odd' + ' row' + str(idx))
                             or ('even' + ' row' + str(idx)) + (widget.error and ' field-error' or '')">
           <td class="designator">
