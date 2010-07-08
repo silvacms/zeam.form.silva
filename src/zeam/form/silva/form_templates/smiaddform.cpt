@@ -4,13 +4,15 @@
       name="add_object"
       i18n:domain="silva">
   <input type="hidden" name="meta_type"
-      tal:attributes="value view/meta_type" />
+      tal:attributes="value view/__name__" />
   <table class="listing">
     <thead>
       <tr>
         <td class="top" colspan="2">
-          <h2>
-            <span tal:replace="view/get_title" />
+          <h2 i18n:translate="">
+            <img i18n:name="icon"
+                 tal:replace="structure python: context.render_icon_by_meta_type(view.__name__)" />
+            create <span i18n:name="meta_type" tal:replace="view/__name__" />
           </h2>
         </td>
       </tr>
@@ -55,10 +57,11 @@
             </p>
           </td>
           <td class="field">
-            <tal:error tal:condition="widget/error"
-                       tal:content="structure widget/error/title">
+            <div class="error"
+                 tal:condition="widget/error"
+                 tal:content="structure widget/error/title">
               Validation error.
-            </tal:error>
+            </div>
             <tal:widget tal:content="structure widget/render">
               Widget.
             </tal:widget>

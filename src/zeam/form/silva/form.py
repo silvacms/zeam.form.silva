@@ -4,9 +4,10 @@ from five import grok
 from megrok import pagetemplate as pt
 
 from zeam.form import base, composed
+from zeam.form.base.actions import DecoratedAction
 from zeam.form.base.datamanager import BaseDataManager
 from zeam.form.base.fields import Fields
-from zeam.form.base.markers import DISPLAY
+from zeam.form.base.markers import DISPLAY, SUCCESS, FAILURE
 from zeam.form.ztk.actions import EditAction
 from zeam.form.ztk.fields import InterfaceSchemaFieldFactory
 from zeam.form.silva.actions import *
@@ -22,6 +23,7 @@ from zope.i18nmessageid import MessageFactory
 from zope.publisher.publish import mapply
 
 from silva.core.interfaces.content import IVersionedContent
+from silva.core.conf.interfaces import ITitledContent
 from silva.core.smi.interfaces import ISMILayer, ISMINavigationOff
 from silva.core.messages.interfaces import IMessageService
 
@@ -67,6 +69,18 @@ def convert_request_form_to_unicode(form):
 
 
 
+class ExtractedDecoratedAction(DecoratedAction):
+
+    def __call__(self, form):
+        data, errors = form.extractData()
+        if errors:
+            assert isinstance(form, SilvaFormData)
+            form.send_message(_(u"There were errors."), type=u"error")
+            return FAILURE
+        # We directly give data.
+        return super(ExtractedDecoratedAction, self).__call__(data)
+
+
 class SilvaFormData(object):
 
     @property
@@ -76,6 +90,18 @@ class SilvaFormData(object):
     def send_message(self, message, type=u""):
         service = component.getUtility(IMessageService)
         service.send(message, self.request, namespace=type)
+
+    @apply
+    def status():
+        def get(self):
+            try:
+                return self.__status
+            except AttributeError:
+                return u''
+        def set(self, value):
+            self.send_message(value, type=u"feedback")
+            self.__status = value
+        return property(get, set)
 
 
 class ZopeForm(object):
@@ -205,7 +231,7 @@ class SMIAddForm(SMIForm):
     tab = 'edit'
     tab_name = 'tab_edit'
 
-    fields = Fields(IDefaultAddFields, factory=InterfaceSchemaFieldFactory)
+    fields = Fields(ITitledContent)
     dataManager = SilvaDataManager
     ignoreContent = True
     actions = base.Actions(CancelAddAction(_(u'cancel')))
@@ -214,6 +240,7 @@ class SMIAddForm(SMIForm):
         """Purely create the object. This method can be overriden to
         support custom creation needs.
         """
+        # Search for an addable and a factory
         addable = filter(lambda a: a['name'] == self.__name__,
                          extensionRegistry.get_addables())
         if len(addable) != 1:
@@ -222,52 +249,46 @@ class SMIAddForm(SMIForm):
         addable = addable[0]
         factory = getattr(resolve(addable['instance'].__module__),
                           getFactoryName(addable['instance']))
+
         # Build the content
-        obj_id = str(data['id'])
-        factory(parent, obj_id, data['title'])
-        obj = getattr(parent, obj_id)
-        #now move to position, if 'add_object_position' is in the request
-        position = self.request.get('add_object_position', None)
+        identifier = str(data['id'])
+        factory(parent, identifier, data['title'])
+        content = getattr(parent, identifier)
+
+        # Now move to position, if 'add_object_position' is in the request
+        position = self.request.form.get('add_object_position', None)
         if position:
             try:
                 position = int(position)
                 if position >= 0:
-                    parent.move_to([obj_id], position)
+                    parent.move_to([identifier], position)
             except ValueError:
                 pass
-        editable_obj = obj.get_editable()
+
+        # Set from value
+        editable_content = self.dataManager(content.get_editable())
         for key, value in data.iteritems():
-            if key not in IDefaultAddFields:
-                setattr(editable_obj, key, value)
-        return obj
+            if key not in ITitledContent:
+                editable_content.set(key, value)
+        return content
 
-    def _extract_and_create(self):
-        data, errors = self.extractData()
-        if self.errors:
-            return FAILURE
-        obj = self._add(self.context, data)
-        self.setContentData(obj)
-        self.send_message(_(u'Added ${meta_type}',
-                            mapping={'meta_type': self.meta_type}))
-        return obj
+    @base.action(_(u'save + edit'),
+                 identifier=u'save_edit',
+                 factory=ExtractedDecoratedAction)
+    def save_edit(self, data):
+        content = self._add(self.context, data)
+        self.status = _(u'Added ${meta_type}',
+                        mapping={'meta_type': self.__name__})
+        self.redirect(self.url(content, name="edit"))
+        return SUCCESS
 
-    @base.action(_(u'save'))
-    def save(self):
-        self._extract_and_create()
+    @base.action(_(u'save'), factory=ExtractedDecoratedAction)
+    def save(self, data):
+        self._add(self.context, data)
+        self.status = _(u'Added ${meta_type}',
+                        mapping={'meta_type': self.__name__})
         self.redirect(self.url(name="edit"))
-
-    @base.action(_(u'save + edit'), identifier=u'save_edit')
-    def save_edit(self):
-        obj = self._extract_and_create()
-        self.redirect(self.url(obj, name="edit"))
-
-    @CachedProperty
-    def meta_type(self):
-        return grok.name.bind().get(self)
-
-    def get_title(self):
-        return _(u"create ${meta_type}",
-                 mapping={'meta_type': self.meta_type})
+        return SUCCESS
 
 
 class SMIEditForm(SMIForm):
