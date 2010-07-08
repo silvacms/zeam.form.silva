@@ -42,4 +42,9 @@ setup(name='zeam.form.silva',
         'zope.i18n',
         'zope.interface',
         ],
+      entry_points="""
+      # -*- Entry points: -*-
+      [zeam.form.components]
+      file = zeam.form.silva.widgets:register
+      """,
       )
