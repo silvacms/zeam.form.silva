@@ -78,7 +78,7 @@ class ExtractedDecoratedAction(DecoratedAction):
             form.send_message(_(u"There were errors."), type=u"error")
             return FAILURE
         # We directly give data.
-        return super(ExtractedDecoratedAction, self).__call__(data)
+        return super(ExtractedDecoratedAction, self).__call__(form, data)
 
 
 class SilvaFormData(object):
