@@ -52,10 +52,11 @@
             </p>
           </td>
           <td class="field">
-            <tal:error tal:condition="widget/error"
-                       tal:content="structure widget/error/title">
+            <div class="error"
+                 tal:condition="widget/error"
+                 tal:content="structure widget/error/title">
               Validation error.
-            </tal:error>
+            </div>
             <tal:widget tal:content="structure widget/render">
               Widget.
             </tal:widget>
