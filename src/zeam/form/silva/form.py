@@ -7,7 +7,7 @@ from zeam.form import base, composed
 from zeam.form.base.actions import DecoratedAction
 from zeam.form.base.datamanager import BaseDataManager
 from zeam.form.base.fields import Fields
-from zeam.form.base.markers import DISPLAY, SUCCESS, FAILURE
+from zeam.form.base.markers import DISPLAY, SUCCESS, FAILURE, NO_VALUE
 from zeam.form.ztk.actions import EditAction
 from zeam.form.ztk.fields import InterfaceSchemaFieldFactory
 from zeam.form.silva.actions import *
@@ -268,7 +268,7 @@ class SMIAddForm(SMIForm):
         # Set from value
         editable_content = self.dataManager(content.get_editable())
         for key, value in data.iteritems():
-            if key not in ITitledContent:
+            if key not in ITitledContent and value is not NO_VALUE:
                 editable_content.set(key, value)
         return content
 
