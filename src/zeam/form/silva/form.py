@@ -26,9 +26,7 @@ from silva.core.interfaces.content import IVersionedContent
 from silva.core.conf.interfaces import ITitledContent
 from silva.core.smi.interfaces import ISMILayer, ISMINavigationOff
 from silva.core.messages.interfaces import IMessageService
-
-
-_ = MessageFactory("silva")
+from silva.translations import translate as _
 
 
 def find_locale(request):
