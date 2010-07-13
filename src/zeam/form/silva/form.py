@@ -219,6 +219,26 @@ class SMIFormTemplate(pt.PageTemplate):
     pt.view(SMIForm)
 
 
+class SMIComposedForm(SilvaForm, composed.ComposedForm):
+    """SMI Composed forms.
+    """
+    grok.baseclass()
+
+
+class SMIComposedFormTemplate(pt.PageTemplate):
+    pt.view(SMIComposedForm)
+
+
+class SMISubForm(SilvaFormData, composed.SubForm):
+    """SMI Sub forms.
+    """
+    grok.baseclass()
+
+
+class SMISubFormTemplate(pt.PageTemplate):
+    pt.view(SMISubForm)
+
+
 class SMIAddForm(SMIForm):
     """ SMI add form
     """
