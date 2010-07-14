@@ -6,7 +6,7 @@ from zope.interface import Interface
 
 from silva.core.conf import schema as silvaschema
 
-from zeam.form.base.markers import DISPLAY, INPUT, NO_VALUE
+from zeam.form.base.markers import INPUT, NO_VALUE
 from zeam.form.base.widgets import WidgetExtractor
 from zeam.form.ztk.fields import SchemaField, SchemaFieldWidget
 from zeam.form.ztk.fields import registerSchemaField
