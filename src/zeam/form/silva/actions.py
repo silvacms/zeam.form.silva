@@ -1,21 +1,33 @@
 
 from Acquisition import aq_inner, aq_parent
 
+from five import grok
+from zope.interface import Interface
 from silva.core.interfaces import IRoot
 
-from zeam.form.base.actions import Action
 from zeam.form.base import SUCCESS
+from zeam.form.base.actions import Action
+from zeam.form.base.interfaces import IFormData
+from zeam.form.base.widgets import ActionWidget
 
 
+class CancelAction(Action):
+    """A action to cancel
+    """
 
-class CancelAddAction(Action):
+
+class CancelAddAction(CancelAction):
+    """Cancel an add action.
+    """
 
     def __call__(self, form):
         form.redirect(form.url(name="edit"))
         return SUCCESS
 
 
-class CancelEditAction(Action):
+class CancelEditAction(CancelAction):
+    """Cancel an edit action.
+    """
 
     def __call__(self, form):
         content = form.context
@@ -25,3 +37,8 @@ class CancelEditAction(Action):
         return SUCCESS
 
 
+class CancelWidget(ActionWidget):
+    grok.adapts(CancelAction, IFormData, Interface)
+
+    def htmlClass(self):
+        return 'canceler'
