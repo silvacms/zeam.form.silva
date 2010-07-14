@@ -7,22 +7,26 @@ from zeam.form import base, composed
 from zeam.form.base.actions import DecoratedAction
 from zeam.form.base.datamanager import BaseDataManager
 from zeam.form.base.fields import Fields
-from zeam.form.base.markers import SUCCESS, FAILURE, NO_VALUE
+from zeam.form.base.markers import DISPLAY, SUCCESS, FAILURE, NO_VALUE
 from zeam.form.ztk.actions import EditAction
-from zeam.form.silva.actions import *
+from zeam.form.silva.actions import CancelAddAction, CancelEditAction
 from zeam.form.viewlet import form as viewletform
 
 from infrae.layout.interfaces import IPage, ILayoutFactory
 
+from Products.Silva.ExtensionRegistry import extensionRegistry
+
 from zope import component
+from zope.configuration.name import resolve
 from zope.i18n.interfaces import IUserPreferredLanguages
 from zope.i18n.locales import locales, LoadLocaleError
 from zope.publisher.publish import mapply
 
-from silva.core.interfaces.content import IVersionedContent
+from silva.core.conf.utils import getFactoryName
 from silva.core.conf.interfaces import ITitledContent
-from silva.core.smi.interfaces import ISMILayer, ISMINavigationOff
+from silva.core.interfaces.content import IVersionedContent
 from silva.core.messages.interfaces import IMessageService
+from silva.core.smi.interfaces import ISMILayer, ISMINavigationOff
 from silva.translations import translate as _
 
 
