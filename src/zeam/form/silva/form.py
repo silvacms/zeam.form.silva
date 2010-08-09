@@ -13,6 +13,7 @@ from zeam.form.silva.actions import CancelAddAction, CancelEditAction
 from zeam.form.viewlet import form as viewletform
 
 from infrae.layout.interfaces import IPage, ILayoutFactory
+from grokcore.view.meta.views import default_view_name
 
 from Products.Silva.ExtensionRegistry import extensionRegistry
 
@@ -213,6 +214,10 @@ class SMIForm(SilvaForm, base.Form):
     grok.baseclass()
     grok.layer(ISMILayer)
 
+    @property
+    def tab_name(self):
+        return grok.name.bind().get(self, default=default_view_name)
+
 
 class SMIFormTemplate(pt.PageTemplate):
     pt.view(SMIForm)
@@ -318,7 +323,6 @@ class SMIEditForm(SMIForm):
     grok.require('silva.ChangeSilvaContent')
 
     tab = 'edit'
-    tab_name = 'tab_edit'
 
     dataManager = SilvaDataManager
     ignoreContent = False
@@ -355,4 +359,3 @@ class SMIViewletForm(viewletform.ViewletForm, SilvaFormData):
             if action.available(self):
                 return True
         return False
-
