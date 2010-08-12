@@ -1,16 +1,23 @@
+# Copyright (c) 2010 Infrae. All rights reserved.
+# See also LICENSE.txt
+# $Id$
+
 from Acquisition import aq_base
 
 from five import grok
 from megrok import pagetemplate as pt
 
-from zeam.form import base, composed
-from zeam.form.base.actions import DecoratedAction
+from zeam.form import base, composed, table, viewlet
 from zeam.form.base.datamanager import BaseDataManager
 from zeam.form.base.fields import Fields
-from zeam.form.base.markers import DISPLAY, SUCCESS, FAILURE, NO_VALUE
+from zeam.form.base.markers import DISPLAY, SUCCESS, NO_VALUE
 from zeam.form.ztk.actions import EditAction
-from zeam.form.silva.actions import CancelAddAction, CancelEditAction
-from zeam.form.viewlet import form as viewletform
+
+from zeam.form.silva.interfaces import ISilvaFormData
+from zeam.form.silva.utils import find_locale, convert_request_form_to_unicode
+from zeam.form.silva.actions import (
+    CancelAddAction, CancelEditAction, ExtractedDecoratedAction)
+
 
 from infrae.layout.interfaces import IPage, ILayoutFactory
 from grokcore.view.meta.views import default_view_name
@@ -19,8 +26,6 @@ from Products.Silva.ExtensionRegistry import extensionRegistry
 
 from zope import component
 from zope.configuration.name import resolve
-from zope.i18n.interfaces import IUserPreferredLanguages
-from zope.i18n.locales import locales, LoadLocaleError
 from zope.publisher.publish import mapply
 
 from silva.core.conf.utils import getFactoryName
@@ -31,57 +36,8 @@ from silva.core.smi.interfaces import ISMILayer, ISMINavigationOff
 from silva.translations import translate as _
 
 
-def find_locale(request):
-    envadapter = IUserPreferredLanguages(request, None)
-    if envadapter is None:
-        return None
-
-    langs = envadapter.getPreferredLanguages()
-    for httplang in langs:
-        parts = (httplang.split('-') + [None, None])[:3]
-        try:
-            return locales.getLocale(*parts)
-        except LoadLocaleError:
-            # Just try the next combination
-            pass
-    else:
-        # No combination gave us an existing locale, so use the default,
-        # which is guaranteed to exist
-        return locales.getLocale(None, None, None)
-
-
-def decode_to_unicode(string):
-    if not isinstance(string, str):
-        return string
-    try:
-        return string.decode('utf-8')
-    except UnicodeDecodeError:
-        # Log
-        return string
-
-
-def convert_request_form_to_unicode(form):
-    for key, value in form.iteritems():
-        if isinstance(value, list):
-            form[key] = [decode_to_unicode(i) for i in value]
-        else:
-            form[key] = decode_to_unicode(value)
-
-
-
-class ExtractedDecoratedAction(DecoratedAction):
-
-    def __call__(self, form):
-        data, errors = form.extractData()
-        if errors:
-            assert isinstance(form, SilvaFormData)
-            form.send_message(_(u"There were errors."), type=u"error")
-            return FAILURE
-        # We directly give data.
-        return super(ExtractedDecoratedAction, self).__call__(form, data)
-
-
 class SilvaFormData(object):
+    grok.implements(ISilvaFormData)
 
     @property
     def i18nLanguage(self):
@@ -136,6 +92,10 @@ class SilvaForm(SilvaFormData):
         super(SilvaForm, self).__init__(context, request)
         self.__name__ = self.__view_name__
         self.layout = None
+
+    @property
+    def tab_name(self):
+        return grok.name.bind().get(self, default=default_view_name)
 
     def default_namespace(self):
         namespace = super(SilvaForm, self).default_namespace()
@@ -213,10 +173,7 @@ class SMIForm(SilvaForm, base.Form):
     """
     grok.baseclass()
     grok.layer(ISMILayer)
-
-    @property
-    def tab_name(self):
-        return grok.name.bind().get(self, default=default_view_name)
+    grok.require('silva.ChangeSilvaContent')
 
 
 class SMIFormTemplate(pt.PageTemplate):
@@ -227,6 +184,7 @@ class SMIComposedForm(SilvaForm, composed.ComposedForm):
     """SMI Composed forms.
     """
     grok.baseclass()
+    grok.require('silva.ChangeSilvaContent')
 
 
 class SMIComposedFormTemplate(pt.PageTemplate):
@@ -241,6 +199,16 @@ class SMISubForm(SilvaFormData, composed.SubForm):
 
 class SMISubFormTemplate(pt.PageTemplate):
     pt.view(SMISubForm)
+
+
+class SMISubTableForm(SilvaFormData, table.SubTableForm):
+    """SMI Sub table forms.
+    """
+    grok.baseclass()
+
+
+class SMISubTableFormTemplate(pt.PageTemplate):
+    pt.view(SMISubTableForm)
 
 
 class SMIAddForm(SMIForm):
@@ -268,8 +236,9 @@ class SMIAddForm(SMIForm):
         addable = filter(lambda a: a['name'] == self.__name__,
                          extensionRegistry.get_addables())
         if len(addable) != 1:
-            raise ValueError, "Content cannot be found. " \
-               "Check that the name of add is the meta type of your content."
+            raise ValueError(
+                u"Content cannot be found. "
+                u"Check that the name of add is the meta type of your content.")
         addable = addable[0]
         factory = getattr(resolve(addable['instance'].__module__),
                           getFactoryName(addable['instance']))
@@ -349,7 +318,7 @@ class SMIEditForm(SMIForm):
         super(SMIEditForm, self).setContentData(content)
 
 
-class SMIViewletForm(viewletform.ViewletForm, SilvaFormData):
+class SMIViewletForm(viewlet.ViewletForm, SilvaFormData):
     """ Base form in viewlet
     """
     grok.baseclass()

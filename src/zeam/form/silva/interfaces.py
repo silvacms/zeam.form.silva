@@ -5,11 +5,17 @@
 
 from zope import schema
 from zope.interface import Interface
+
 from silva.core.conf import schema as silvaschema
 from silva.translations import translate as _
 
 
 # Silva forms
+
+class ISilvaFormData(Interface):
+    """A form data in Silva.
+    """
+
 
 class IDefaultAddFields(Interface):
     """Default fields used in a add form. You don't have to defines

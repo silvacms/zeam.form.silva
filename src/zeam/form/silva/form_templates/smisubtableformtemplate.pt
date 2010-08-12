@@ -1,0 +1,49 @@
+<form action="." tal:attributes="action request/URL" method="post"
+      name="edit_object"
+      enctype="multipart/form-data"
+      i18n:domain="silva">
+  <table class="listing"
+         tal:define="columns python:len(view.fields) + 1">
+    <thead>
+      <tr class="top-controls" tal:condition="view/label">
+        <td colspan="#"
+            tal:attributes="colspan columns">
+          <h3 tal:content="view/label">label</h3>
+        </td>
+      </tr>
+      <tr class="odd" tal:condition="view/description">
+        <td class="designator" colspan="#"
+            tal:attributes="colspan columns"
+            tal:content="structure view/description">
+        </td>
+      </tr>
+      <tr>
+        <th width="2%"></th>
+        <th tal:repeat="field view/fields"
+            tal:content="field/title">
+          Title
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tal:line tal:repeat="line view/lineWidgets">
+        <tr class="#"
+            tal:define="odd repeat/line/odd;"
+            tal:attributes="class python:odd and 'odd' or 'even'">
+          <td tal:repeat="widget line"
+              tal:content="structure widget/render">
+          </td>
+        </tr>
+      </tal:line>
+    </tbody>
+    <tfoot tal:condition="view/actionWidgets">
+      <tr class="controls">
+        <td colspan="3"
+            tal:attributes="colspan columns">
+          <input tal:repeat="widget view/actionWidgets"
+                 tal:replace="structure widget/render" />
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+</form>

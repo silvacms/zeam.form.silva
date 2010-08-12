@@ -8,3 +8,4 @@ from zeam.form.ztk import *
 from zeam.form.silva.form import ZMIForm, ZMIComposedForm
 from zeam.form.silva.form import SMIForm, SMIAddForm, SMIEditForm
 from zeam.form.silva.form import SMIComposedForm, SMISubForm
+from zeam.form.silva.form import SMISubTableForm

@@ -70,5 +70,6 @@
                  tal:replace="structure widget/render" />
         </td>
       </tr>
+    </tfoot>
   </table>
 </form>
