@@ -3,7 +3,7 @@
       enctype="multipart/form-data"
       i18n:domain="silva">
   <table class="listing"
-         tal:define="columns python:len(view.fields) + 1">
+         tal:define="columns python:len(view.tableFields) + 1">
     <thead>
       <tr class="top-controls" tal:condition="view/label">
         <td colspan="#"
@@ -19,7 +19,7 @@
       </tr>
       <tr>
         <th width="2%"></th>
-        <th tal:repeat="field view/fields"
+        <th tal:repeat="field view/tableFields"
             tal:content="field/title">
           Title
         </th>
@@ -28,7 +28,7 @@
     <tbody>
       <tal:line tal:repeat="line view/lineWidgets">
         <tr class="#"
-            tal:define="odd repeat/line/odd;"
+            tal:define="odd repeat/line/odd"
             tal:attributes="class python:odd and 'odd' or 'even'">
           <td tal:repeat="widget line"
               tal:content="structure widget/render">
@@ -40,6 +40,26 @@
       <tr class="controls">
         <td colspan="3"
             tal:attributes="colspan columns">
+
+          <span tal:repeat="widget view/fieldWidgets">
+            <label tal:attributes="for widget/htmlId"
+                   tal:content="widget/title">
+              Field Name
+            </label>
+            <span class="required"
+                  tal:condition="widget/required">
+              *
+            </span>
+            <span class="error"
+                 tal:condition="widget/error"
+                 tal:content="structure widget/error/title">
+              Validation error.
+            </span>
+            <tal:widget tal:content="structure widget/render">
+              Widget.
+            </tal:widget>
+          </span>
+
           <input tal:repeat="widget view/actionWidgets"
                  tal:replace="structure widget/render" />
         </td>

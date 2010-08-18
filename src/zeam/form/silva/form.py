@@ -184,6 +184,7 @@ class SMIComposedForm(SilvaForm, composed.ComposedForm):
     """SMI Composed forms.
     """
     grok.baseclass()
+    grok.layer(ISMILayer)
     grok.require('silva.ChangeSilvaContent')
 
 

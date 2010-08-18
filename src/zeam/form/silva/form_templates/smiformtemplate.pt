@@ -65,7 +65,7 @@
       </tal:repeat>
     </tbody>
     <tfoot>
-      <tr tal:condition="view/fieldWidgets">
+      <tr tal:condition="view/haveRequiredFields">
         <th i18n:translate="">
           * required
         </th>
