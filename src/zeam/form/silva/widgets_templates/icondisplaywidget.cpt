@@ -1,0 +1,4 @@
+<tal:icon>
+  <img src="${widget.icon_url}" alt="icon" />
+  <span tal:replace="widget.inputValue()" />
+</tal:icon>
