@@ -219,8 +219,6 @@ class SMIAddForm(SMIForm):
     grok.implements(ISMINavigationOff)
     grok.require('silva.ChangeSilvaContent')
 
-    template = grok.PageTemplate(filename="form_templates/smiaddform.cpt")
-
     tab = 'edit'
     tab_name = 'tab_edit'
 
@@ -283,6 +281,10 @@ class SMIAddForm(SMIForm):
                         mapping={'meta_type': self.__name__})
         self.redirect(self.url(name="edit"))
         return SUCCESS
+
+
+class SMIAddFormTemplate(pt.PageTemplate):
+    pt.view(SMIAddForm)
 
 
 class SMIEditForm(SMIForm):
