@@ -26,6 +26,7 @@ class CancelAction(Action):
 class CancelAddAction(CancelAction):
     """Cancel an add action.
     """
+    description = _(u"go back to the folder view without adding the content")
 
     def __call__(self, form):
         form.redirect(form.url(name="edit"))
@@ -35,6 +36,7 @@ class CancelAddAction(CancelAction):
 class CancelEditAction(CancelAction):
     """Cancel an edit action.
     """
+    description = _(u"go back to the folder view without editing the content")
 
     def __call__(self, form):
         content = form.context

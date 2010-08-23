@@ -264,9 +264,11 @@ class SMIAddForm(SMIForm):
                 editable_content.set(key, value)
         return content
 
-    @base.action(_(u'save + edit'),
-                 identifier=u'save_edit',
-                 factory=ExtractedDecoratedAction)
+    @base.action(
+        _(u'save + edit'),
+        identifier='save_edit',
+        description=_(u"create the content and go on its edit view"),
+        factory=ExtractedDecoratedAction)
     def save_edit(self, data):
         content = self._add(self.context, data)
         self.status = _(u'Added ${meta_type}',
@@ -274,7 +276,10 @@ class SMIAddForm(SMIForm):
         self.redirect(self.url(content, name="edit"))
         return SUCCESS
 
-    @base.action(_(u'save'), factory=ExtractedDecoratedAction)
+    @base.action(
+        _(u'save'),
+        description=_(u"create the content and go back to the folder view"),
+        factory=ExtractedDecoratedAction)
     def save(self, data):
         self._add(self.context, data)
         self.status = _(u'Added ${meta_type}',
