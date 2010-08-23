@@ -168,6 +168,16 @@ class ZMIComposedFormTemplate(pt.PageTemplate):
     pt.view(ZMIComposedForm)
 
 
+class ZMISubForm(composed.SubForm):
+    """ZMI Composed forms.
+    """
+    grok.baseclass()
+
+
+class ZMISubFormTemplate(pt.PageTemplate):
+    pt.view(ZMISubForm)
+
+
 class SMIForm(SilvaForm, base.Form):
     """Regular SMI form.
     """

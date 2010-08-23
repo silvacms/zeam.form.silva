@@ -8,15 +8,15 @@
       <form action="." tal:attributes="action request/URL" method="post"
             enctype="multipart/form-data">
 
-        <h1 tal:condition="view/label"
-            tal:content="view/label">Label</h1>
+        <p class="system-msg"
+           tal:condition="view/status"
+           tal:content="view/status">Status</p>
+
+        <h2 tal:condition="view/label"
+            tal:content="view/label">Label</h2>
 
         <p tal:condition="view/description"
            tal:content="view/description">Description</p>
-
-        <p class="form-status"
-           tal:condition="view/status"
-           tal:content="view/status">Status</p>
 
         <p class="form-error"
            tal:condition="view/errors">
@@ -30,16 +30,16 @@
         <div class="fields"
              tal:condition="view/fieldWidgets">
           <div class="field" tal:repeat="widget view/fieldWidgets">
-            <label class="field-label" for="#"
+            <label class="form-label" for="#"
                    tal:attributes="for widget/htmlId"
                    tal:content="widget/title">
               Label
             </label>
-            <span class="field-required"
+            <span class="form-optional"
                   tal:condition="widget/required">(required)</span>
             <br />
             <tal:description tal:condition="widget/description">
-              <span class="field-description"
+              <span class="form-help"
                     tal:content="widget/description">
               </span><br />
             </tal:description>

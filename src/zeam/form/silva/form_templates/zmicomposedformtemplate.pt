@@ -6,8 +6,8 @@
   <body>
     <div metal:fill-slot="body">
 
-      <h1 tal:condition="view/label"
-          tal:content="view/label">Label</h1>
+      <h2 tal:condition="view/label"
+          tal:content="view/label">Label</h2>
 
       <p tal:condition="view/description"
          tal:content="view/description">Description</p>
@@ -15,10 +15,9 @@
       <p class="form-error"
          tal:condition="view/errors">
         There were errors:
-        <tal:error tal:define="formError view/submissionError"
-                   tal:condition="formError">
+        <tal:error tal:repeat="error view/formErrors">
           <br />
-          <span tal:replace="formError/title" />
+          <span tal:replace="error/title" />
         </tal:error>
       </p>
 
