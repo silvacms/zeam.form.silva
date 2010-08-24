@@ -3,6 +3,7 @@
 # $Id$
 
 from Acquisition import aq_base
+from zExceptions import Redirect
 
 from five import grok
 from megrok import pagetemplate as pt
@@ -347,3 +348,8 @@ class SMIViewletForm(viewlet.ViewletForm, SilvaFormData):
             if action.available(self):
                 return True
         return False
+
+    def redirect(self, url):
+        # Raise redirect exception to be not to render the current
+        # page anymore.
+        raise Redirect(url)
