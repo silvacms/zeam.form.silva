@@ -27,6 +27,8 @@ from Products.Silva.ExtensionRegistry import extensionRegistry
 from zope import component
 from zope.configuration.name import resolve
 from zope.publisher.publish import mapply
+from zope.i18n.interfaces import IUserPreferredLanguages
+
 
 from silva.core.conf.utils import getFactoryName
 from silva.core.conf.interfaces import ITitledContent
@@ -42,7 +44,11 @@ class SilvaFormData(object):
 
     @property
     def i18nLanguage(self):
-        return self.request.get('LANGUAGE', 'en')
+        adapter = IUserPreferredLanguages(self.request)
+        languages = adapter.getPreferredLanguages()
+        if languages:
+            return languages[0]
+        return 'en'
 
     def send_message(self, message, type=u""):
         service = component.getUtility(IMessageService)
@@ -68,7 +74,11 @@ class ZopeForm(object):
 
     @property
     def i18nLanguage(self):
-        return self.request.get('LANGUAGE', 'en')
+        adapter = IUserPreferredLanguages(self.request)
+        languages = adapter.getPreferredLanguages()
+        if languages:
+            return languages[0]
+        return 'en'
 
     def __init__(self, context, request):
         super(ZopeForm, self).__init__(context, request)
@@ -338,7 +348,7 @@ class SMIEditForm(SMIForm):
         super(SMIEditForm, self).setContentData(content)
 
 
-class SMIViewletForm(viewlet.ViewletForm, SilvaFormData):
+class SMIViewletForm(SilvaFormData, viewlet.ViewletForm):
     """ Base form in viewlet
     """
     grok.baseclass()
