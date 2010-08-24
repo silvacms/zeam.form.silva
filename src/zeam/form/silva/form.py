@@ -335,7 +335,8 @@ class SMIEditForm(SMIForm):
         """
         super(SMIEditForm, self).update()
         if IVersionedContent.providedBy(self.context):
-            if not self.context.get_editable():
+            if ((not self.context.get_editable()) or
+                self.context.is_version_approval_requested()):
                 self.mode = DISPLAY
                 self.actions = base.Actions()
 
