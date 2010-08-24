@@ -11,12 +11,11 @@ from zeam.form import base, composed, table, viewlet
 from zeam.form.base.datamanager import BaseDataManager
 from zeam.form.base.fields import Fields
 from zeam.form.base.markers import DISPLAY, SUCCESS, NO_VALUE
-from zeam.form.ztk.actions import EditAction
 
 from zeam.form.silva.interfaces import ISilvaFormData
 from zeam.form.silva.utils import find_locale, convert_request_form_to_unicode
-from zeam.form.silva.actions import (
-    CancelAddAction, CancelEditAction, ExtractedDecoratedAction)
+from zeam.form.silva.actions import CancelAddAction, CancelEditAction
+from zeam.form.silva.actions import EditAction, ExtractedDecoratedAction
 
 
 from infrae.layout.interfaces import IPage, ILayoutFactory

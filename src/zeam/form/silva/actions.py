@@ -14,8 +14,15 @@ from zeam.form.base import SUCCESS, FAILURE
 from zeam.form.base.actions import Action, DecoratedAction
 from zeam.form.base.interfaces import IFormData
 from zeam.form.base.widgets import ActionWidget
+from zeam.form.ztk.actions import EditAction as BaseEditAction
 
 from zeam.form.silva.interfaces import ISilvaFormData
+
+
+class EditAction(BaseEditAction):
+    """Edit action
+    """
+    description = _(u"save content modifications")
 
 
 class CancelAction(Action):
