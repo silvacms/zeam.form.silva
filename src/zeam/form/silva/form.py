@@ -32,6 +32,7 @@ from silva.core.conf.utils import getFactoryName
 from silva.core.conf.interfaces import ITitledContent
 from silva.core.interfaces.content import IVersionedContent
 from silva.core.messages.interfaces import IMessageService
+from silva.core.smi.interfaces import IEditTab, ISMITabIndex
 from silva.core.smi.interfaces import ISMILayer, ISMINavigationOff
 from silva.translations import translate as _
 
@@ -226,7 +227,7 @@ class SMIAddForm(SMIForm):
     """ SMI add form
     """
     grok.baseclass()
-    grok.implements(ISMINavigationOff)
+    grok.implements(IEditTab, ISMINavigationOff)
     grok.require('silva.ChangeSilvaContent')
 
     tab = 'edit'
@@ -308,6 +309,7 @@ class SMIEditForm(SMIForm):
     grok.baseclass()
     grok.name('tab_edit')
     grok.require('silva.ChangeSilvaContent')
+    grok.implements(IEditTab, ISMITabIndex)
 
     tab = 'edit'
 
