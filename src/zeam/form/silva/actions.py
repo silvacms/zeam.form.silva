@@ -22,12 +22,19 @@ from zeam.form.silva.interfaces import ISilvaFormData
 class EditAction(BaseEditAction):
     """Edit action
     """
+    title = _(u"save changes")
     description = _(u"save content modifications")
 
 
 class CancelAction(Action):
     """A action to cancel
     """
+    title = _(u"cancel")
+    description = _(u"go back to the folder view")
+
+    def __call__(self, form):
+        form.redirect(form.url(name="edit"))
+        return SUCCESS
 
 
 class CancelAddAction(CancelAction):

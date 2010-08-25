@@ -241,12 +241,15 @@ class SMIAddForm(SMIForm):
     grok.require('silva.ChangeSilvaContent')
 
     tab = 'edit'
-    tab_name = 'tab_edit'
 
     fields = Fields(ITitledContent)
     dataManager = SilvaDataManager
     ignoreContent = True
-    actions = base.Actions(CancelAddAction(_(u'cancel')))
+    actions = base.Actions(CancelAddAction())
+
+    @property
+    def tab_name(self):
+        return '+/' + self.__name__
 
     def _add(self, parent, data):
         """Purely create the object. This method can be overriden to
@@ -268,22 +271,16 @@ class SMIAddForm(SMIForm):
         factory(parent, identifier, data['title'])
         content = getattr(parent, identifier)
 
-        # Now move to position, if 'add_object_position' is in the request
-        position = self.request.form.get('add_object_position', None)
-        if position:
-            try:
-                position = int(position)
-                if position >= 0:
-                    parent.move_to([identifier], position)
-            except ValueError:
-                pass
+        self._edit(parent, content, data)
+        return content
 
+    def _edit(self, parent, content, data):
         # Set from value
         editable_content = self.dataManager(content.get_editable())
         for key, value in data.iteritems():
             if key not in ITitledContent and value is not NO_VALUE:
                 editable_content.set(key, value)
-        return content
+
 
     @base.action(
         _(u'save + edit'),
@@ -326,8 +323,8 @@ class SMIEditForm(SMIForm):
     dataManager = SilvaDataManager
     ignoreContent = False
     actions = base.Actions(
-        EditAction(_(u"save")),
-        CancelEditAction(_(u"cancel")))
+        EditAction(),
+        CancelEditAction())
 
     def update(self):
         """ If we have a versioned content and it has a published/approved
