@@ -7,9 +7,13 @@
       <tr>
         <td class="top" colspan="2">
           <h2 i18n:translate="">
-            <img i18n:name="icon"
-                 tal:replace="structure python: context.render_icon_by_meta_type(view.__name__)" />
-            create <span i18n:name="meta_type" tal:replace="view/__name__" />
+            <img src="#" alt="#"
+                 i18n:name="icon"
+                 tal:attributes="src view/icon_url;
+                                 alt view/__name__" />
+            create
+            &#xab;<span i18n:name="meta_type"
+                        tal:replace="view/__name__" />&#xbb;
           </h2>
         </td>
       </tr>

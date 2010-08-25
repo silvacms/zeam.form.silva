@@ -22,6 +22,7 @@ from zeam.form.silva.actions import EditAction, ExtractedDecoratedAction
 from infrae.layout.interfaces import IPage, ILayoutFactory
 from grokcore.view.meta.views import default_view_name
 
+from Products.Silva.icon import get_icon_url, get_meta_type_icon_url
 from Products.Silva.ExtensionRegistry import extensionRegistry
 
 from zope import component
@@ -34,8 +35,8 @@ from silva.core.conf.utils import getFactoryName
 from silva.core.conf.interfaces import ITitledContent
 from silva.core.interfaces.content import IVersionedContent
 from silva.core.messages.interfaces import IMessageService
-from silva.core.smi.interfaces import IEditTab, ISMITabIndex
-from silva.core.smi.interfaces import ISMILayer, ISMINavigationOff
+from silva.core.smi.interfaces import IAddingTab, IEditTabIndex
+from silva.core.smi.interfaces import ISMILayer
 from silva.translations import translate as _
 
 
@@ -196,6 +197,10 @@ class SMIForm(SilvaForm, base.Form):
     grok.layer(ISMILayer)
     grok.require('silva.ChangeSilvaContent')
 
+    @property
+    def icon_url(self):
+        return get_icon_url(self.context, self.request)
+
 
 class SMIFormTemplate(pt.PageTemplate):
     pt.view(SMIForm)
@@ -237,7 +242,7 @@ class SMIAddForm(SMIForm):
     """ SMI add form
     """
     grok.baseclass()
-    grok.implements(IEditTab, ISMINavigationOff)
+    grok.implements(IAddingTab)
     grok.require('silva.ChangeSilvaContent')
 
     tab = 'edit'
@@ -250,6 +255,10 @@ class SMIAddForm(SMIForm):
     @property
     def tab_name(self):
         return '+/' + self.__name__
+
+    @property
+    def icon_url(self):
+        return get_meta_type_icon_url(self.__name__, self.request)
 
     def _add(self, parent, data):
         """Purely create the object. This method can be overriden to
@@ -285,7 +294,9 @@ class SMIAddForm(SMIForm):
     @base.action(
         _(u'save + edit'),
         identifier='save_edit',
-        description=_(u"create the content and go on its edit view"),
+        description=_(
+            u"create the content and go on its edit view: alt-e"),
+        accesskey=u'e',
         factory=ExtractedDecoratedAction)
     def save_edit(self, data):
         content = self._add(self.context, data)
@@ -296,7 +307,9 @@ class SMIAddForm(SMIForm):
 
     @base.action(
         _(u'save'),
-        description=_(u"create the content and go back to the folder view"),
+        description=_(
+            u"create the content and go back to the folder view: alt-s"),
+        accesskey=u's',
         factory=ExtractedDecoratedAction)
     def save(self, data):
         self._add(self.context, data)
@@ -316,7 +329,7 @@ class SMIEditForm(SMIForm):
     grok.baseclass()
     grok.name('tab_edit')
     grok.require('silva.ChangeSilvaContent')
-    grok.implements(IEditTab, ISMITabIndex)
+    grok.implements(IEditTabIndex)
 
     tab = 'edit'
 

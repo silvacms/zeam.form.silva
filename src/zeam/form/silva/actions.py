@@ -23,14 +23,16 @@ class EditAction(BaseEditAction):
     """Edit action
     """
     title = _(u"save changes")
-    description = _(u"save content modifications")
+    description = _(u"save content modifications: alt-s")
+    accesskey = u's'
 
 
 class CancelAction(Action):
     """A action to cancel
     """
     title = _(u"cancel")
-    description = _(u"go back to the folder view")
+    description = _(u"go back to the folder view: alt-c")
+    accesskey = u'c'
 
     def __call__(self, form):
         form.redirect(form.url(name="edit"))
@@ -40,7 +42,8 @@ class CancelAction(Action):
 class CancelAddAction(CancelAction):
     """Cancel an add action.
     """
-    description = _(u"go back to the folder view without adding the content")
+    description = _(
+        u"go back to the folder view without adding the content: alt-c")
 
     def __call__(self, form):
         form.redirect(form.url(name="edit"))
@@ -50,7 +53,8 @@ class CancelAddAction(CancelAction):
 class CancelEditAction(CancelAction):
     """Cancel an edit action.
     """
-    description = _(u"go back to the folder view without editing the content")
+    description = _(
+        u"go back to the folder view without editing the content: alt-c")
 
     def __call__(self, form):
         content = form.context
