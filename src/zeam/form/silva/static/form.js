@@ -12,11 +12,9 @@ RemoteZeamForm.prototype.update = function (data) {
 
     this.popup.dialog('option', 'title', data['label']);
     this.popup.empty();
-    form.append(data['widgets']);
     this.popup.append(form);
-    buttons['cancel'] = function() {
-        $(this).dialog('close');
-    };
+    form.append(data['widgets']);
+    form.children('.field-required:first').trigger('focus');
     for (var i=0; i < data['actions'].length; i++) {
         var action_label = data['actions'][i]['label'];
         var action_name = data['actions'][i]['name'];
@@ -31,6 +29,9 @@ RemoteZeamForm.prototype.update = function (data) {
                 self.update(data);
             });
         };
+    };
+    buttons['cancel'] = function() {
+        $(this).dialog('close');
     };
     this.popup.dialog('option', 'buttons', buttons);
 };
@@ -53,8 +54,8 @@ $(document).ready(function() {
         popup.dialog({
             autoOpen: false,
             modal: true,
-            height: 500,
-            width: 600,
+            height: 400,
+            width: 800,
         });
         var form = new RemoteZeamForm(popup, url);
         form.display()

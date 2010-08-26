@@ -26,10 +26,10 @@ from Products.Silva.icon import get_icon_url, get_meta_type_icon_url
 from Products.Silva.ExtensionRegistry import extensionRegistry
 
 from zope import component
+from zope.cachedescriptors.property import CachedProperty
 from zope.configuration.name import resolve
-from zope.publisher.publish import mapply
 from zope.i18n.interfaces import IUserPreferredLanguages
-
+from zope.publisher.publish import mapply
 
 from silva.core.conf.utils import getFactoryName
 from silva.core.conf.interfaces import ITitledContent
@@ -43,7 +43,7 @@ from silva.translations import translate as _
 class SilvaFormData(object):
     grok.implements(ISilvaFormData)
 
-    @property
+    @CachedProperty
     def i18nLanguage(self):
         adapter = IUserPreferredLanguages(self.request)
         languages = adapter.getPreferredLanguages()
@@ -73,7 +73,7 @@ class ZopeForm(object):
     """
     grok.baseclass()
 
-    @property
+    @CachedProperty
     def i18nLanguage(self):
         adapter = IUserPreferredLanguages(self.request)
         languages = adapter.getPreferredLanguages()

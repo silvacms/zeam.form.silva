@@ -6,6 +6,7 @@
 from five import grok
 from megrok import pagetemplate as pt
 from infrae import rest
+from zope.i18n import translate
 
 from zeam.form.base.form import FormCanvas
 from zeam.form.silva.form import SilvaFormData
@@ -23,9 +24,13 @@ class RESTForm(SilvaFormData, rest.REST, FormCanvas):
         rest.REST.__init__(self, context, request)
         FormCanvas.__init__(self, context, request)
 
+    def __translate(self, message):
+        return translate(
+            message, target_language=self.i18nLanguage, context=self.request)
+
     def renderActions(self):
         def renderAction(action):
-            return {'label': action.title,
+            return {'label': self.__translate(action.title),
                     'name': action.identifier}
         return map(renderAction, self.actionWidgets)
 
@@ -33,7 +38,7 @@ class RESTForm(SilvaFormData, rest.REST, FormCanvas):
         self.updateActions()
         self.updateWidgets()
         return self.json_response(
-            {'label': self.label,
+            {'label': self.__translate(self.label),
              'widgets': self.render(),
              'actions': self.renderActions()})
 
