@@ -1,5 +1,6 @@
 <configure
    xmlns="http://namespaces.zope.org/zope"
+   xmlns:browser="http://namespaces.zope.org/browser"
    xmlns:grok="http://namespaces.zope.org/grok">
 
   <include package="five.grok" />
@@ -9,9 +10,17 @@
   <include package="zeam.form.composed" />
   <include package="zeam.form.viewlet" />
   <include package="zeam.form.table" />
- 
- <include package="infrae.layout" />
+
+  <include package="infrae.rest" />
+  <include package="infrae.layout" />
+
+  <include package="silva.core.smi" />
 
   <grok:grok package="." />
+
+  <browser:resourceInclude
+     layer="silva.core.smi.interfaces.ISMILayer"
+     include="form.js"
+     base="zeam.form.silva" />
 
 </configure>
