@@ -1,4 +1,4 @@
-<div>
+<div i18n:domain="silva">
   <tal:replace tal:replace="structure provider:smimessages" />
   <table class="listing zeam-form">
     <thead>

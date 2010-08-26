@@ -3,30 +3,25 @@
 # See also LICENSE.txt
 # $Id$
 
-from zope import schema
 from zope.interface import Interface
-
-from silva.core.conf import schema as silvaschema
-from silva.translations import translate as _
+from zeam.form.base.interfaces import IAction
 
 
-# Silva forms
-
+# Integrate a form in Silva.
 class ISilvaFormData(Interface):
     """A form data in Silva.
     """
 
-
-class IDefaultAddFields(Interface):
-    """Default fields used in a add form. You don't have to defines
-    this fields.
+# Define categories of actions for RESTForm.
+class IRESTAction(IAction):
+    """Action design to be used with a RESTForm, that have a special
+    meaning.
     """
 
-    id = silvaschema.ID(
-        title=_(u"id"),
-        description=_(u"No spaces or special characters besides ‘_’ or ‘-’ or ‘.’"),
-        required=True)
-    title = schema.TextLine(
-        title=_(u"title"),
-        description=_(u"The title will be publicly visible, and is used for the link in indexes."),
-        required=True)
+class IRESTCloseAction(IRESTAction):
+    """Do not call the action callback, just close the RESTForm.
+    """
+
+class IRESTCloseOnSuccessAction(IRESTCloseAction):
+    """Call the action callback, and close the rest Form upon success.
+    """

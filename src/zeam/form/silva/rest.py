@@ -8,9 +8,17 @@ from megrok import pagetemplate as pt
 from infrae import rest
 from zope.i18n import translate
 
+from zeam.form.base.markers import SUCCESS
 from zeam.form.base.form import FormCanvas
 from zeam.form.silva.form import SilvaFormData
+from zeam.form.silva import interfaces
 from zeam.form.silva.utils import convert_request_form_to_unicode
+
+
+REST_ACTIONS_TO_TOKEN = [
+    (interfaces.IRESTCloseOnSuccessAction, 'close_on_success'),
+    (interfaces.IRESTCloseAction, 'close'),
+    (interfaces.IAction, 'send')]
 
 
 class RESTForm(SilvaFormData, rest.REST, FormCanvas):
@@ -30,15 +38,20 @@ class RESTForm(SilvaFormData, rest.REST, FormCanvas):
 
     def renderActions(self):
         def renderAction(action):
+            for rest_action, action_type in REST_ACTIONS_TO_TOKEN:
+                if rest_action.providedBy(action.component):
+                    break
             return {'label': self.__translate(action.title),
-                    'name': action.identifier}
+                    'name': action.identifier,
+                    'action': action_type}
         return map(renderAction, self.actionWidgets)
 
     def processForm(self):
-        self.updateActions()
+        status = self.updateActions()
         self.updateWidgets()
         return self.json_response(
-            {'label': self.__translate(self.label),
+            {'success': status == SUCCESS,
+             'label': self.__translate(self.label),
              'widgets': self.render(),
              'actions': self.renderActions()})
 

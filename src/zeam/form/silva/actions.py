@@ -16,20 +16,29 @@ from zeam.form.base.interfaces import IFormData
 from zeam.form.base.widgets import ActionWidget
 from zeam.form.ztk.actions import EditAction as BaseEditAction
 
-from zeam.form.silva.interfaces import ISilvaFormData
+from zeam.form.silva import interfaces
 
 
 class EditAction(BaseEditAction):
     """Edit action
     """
+    grok.implements(interfaces.IRESTCloseOnSuccessAction)
     title = _(u"save changes")
     description = _(u"save content modifications: alt-s")
     accesskey = u's'
+
+    def __call__(self, form):
+        status = super(EditAction, self).__call__(form)
+        if status is FAILURE:
+            assert interfaces.ISilvaFormData.providedBy(form)
+            form.send_message(_(u"There were errors."), type=u"error")
+        return status
 
 
 class CancelAction(Action):
     """A action to cancel
     """
+    grok.implements(interfaces.IRESTCloseAction)
     title = _(u"cancel")
     description = _(u"go back to the folder view: alt-c")
     accesskey = u'c'
@@ -81,7 +90,7 @@ class ExtractedDecoratedAction(DecoratedAction):
     def __call__(self, form):
         data, errors = form.extractData()
         if errors:
-            assert ISilvaFormData.providedBy(form)
+            assert interfaces.ISilvaFormData.providedBy(form)
             form.send_message(_(u"There were errors."), type=u"error")
             return FAILURE
         # We directly give data.

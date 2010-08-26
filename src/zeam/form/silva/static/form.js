@@ -5,20 +5,13 @@ var RemoteZeamForm = function(popup, url) {
     this.url = url;
 };
 
-RemoteZeamForm.prototype.update = function (data) {
-    var form = $('<form></form>');
-    var buttons = {}
+RemoteZeamForm.prototype._buildButton = function (form, data) {
     var self = this;
-
-    this.popup.dialog('option', 'title', data['label']);
-    this.popup.empty();
-    this.popup.append(form);
-    form.append(data['widgets']);
-    form.children('.field-required:first').trigger('focus');
-    for (var i=0; i < data['actions'].length; i++) {
-        var action_label = data['actions'][i]['label'];
-        var action_name = data['actions'][i]['name'];
-        buttons[action_label] = function() {
+    var action_label = data['label'];
+    var action_name = data['name'];
+    var action_type = data['action'];
+    return function() {
+        if (action_type == 'send' || action_type == 'close_on_success') {
             var form_array = form.serializeArray();
             var form_data = {};
             form_data[action_name] = action_label;
@@ -26,12 +19,32 @@ RemoteZeamForm.prototype.update = function (data) {
                 form_data[form_array[j]['name']] = form_array[j]['value'];
             };
             $.getJSON(self.url, form_data, function(data) {
-                self.update(data);
+                if (action_type == 'close_on_success' && data['success']) {
+                    self.popup.dialog('close');
+                }
+                else {
+                    self.update(data);
+                };
             });
         };
+        if (action_type == 'close') {
+            self.popup.dialog('close');
+        };
     };
-    buttons['cancel'] = function() {
-        $(this).dialog('close');
+};
+
+RemoteZeamForm.prototype.update = function (data) {
+    var form = $('<form></form>');
+    var buttons = {}
+
+    this.popup.dialog('option', 'title', data['label']);
+    this.popup.empty();
+    this.popup.append(form);
+    form.append(data['widgets']);
+    form.children('.field-required:first').trigger('focus');
+    for (var i=0; i < data['actions'].length; i++) {
+        var label = data['actions'][i]['label'];
+        buttons[label] = this._buildButton(form, data['actions'][i]);
     };
     this.popup.dialog('option', 'buttons', buttons);
 };
@@ -54,7 +67,6 @@ $(document).ready(function() {
         popup.dialog({
             autoOpen: false,
             modal: true,
-            height: 400,
             width: 800,
         });
         var form = new RemoteZeamForm(popup, url);
