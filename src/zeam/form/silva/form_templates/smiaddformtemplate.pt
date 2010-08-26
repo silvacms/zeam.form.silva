@@ -1,5 +1,5 @@
 <form action="#" method="post" enctype="multipart/form-data"
-      name="add_object"
+      name="add_object" class="zeam-form"
       tal:attributes="action request/URL"
       i18n:domain="silva">
   <table class="listing">

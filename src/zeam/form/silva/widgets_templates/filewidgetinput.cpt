@@ -1,3 +1,4 @@
 <input id="#" name="#" value="" type="file"
        tal:attributes="name widget.identifier;
+                       class widget.htmlClass();
                        id widget.htmlId()" />
