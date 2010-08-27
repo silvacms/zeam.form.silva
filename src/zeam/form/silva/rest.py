@@ -24,9 +24,6 @@ REST_ACTIONS_TO_TOKEN = [
 class RESTForm(SilvaFormData, rest.REST, FormCanvas):
     grok.baseclass()
 
-    # Post form are not supported
-    postOnly = False
-
     def __init__(self, context, request):
         # XXX I loved super
         rest.REST.__init__(self, context, request)
@@ -47,13 +44,17 @@ class RESTForm(SilvaFormData, rest.REST, FormCanvas):
         return map(renderAction, self.actionWidgets)
 
     def processForm(self):
-        status = self.updateActions()
+        action, status = self.updateActions()
         self.updateWidgets()
-        return self.json_response(
-            {'success': status == SUCCESS,
-             'label': self.__translate(self.label),
-             'widgets': self.render(),
-             'actions': self.renderActions()})
+        info = {}
+        info['success'] = status == SUCCESS
+        success_only = interfaces.IRESTCloseOnSuccessAction.providedBy(action)
+        if not (success_only and status == SUCCESS):
+            info.update({
+                    'label': self.__translate(self.label),
+                    'widgets': self.render(),
+                    'actions': self.renderActions()})
+        return self.json_response(info)
 
     def GET(self):
         convert_request_form_to_unicode(self.request.form)
@@ -62,10 +63,6 @@ class RESTForm(SilvaFormData, rest.REST, FormCanvas):
     def POST(self):
         convert_request_form_to_unicode(self.request.form)
         return self.processForm()
-
-    def PUT(self):
-        convert_request_form_to_unicode(self.request.form)
-        self.updateActions()
 
 
 class RESTFormTemplate(pt.PageTemplate):

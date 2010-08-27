@@ -39,10 +39,8 @@
     <tbody>
       <tal:repeat tal:repeat="widget view/fieldWidgets">
         <tr class="#"
-            tal:define="odd   repeat/widget/odd;
-                        idx   repeat/widget/index"
-            tal:attributes="class python:odd and ('odd' + ' row' + str(idx))
-                            or ('even' + ' row' + str(idx)) + (widget.error and ' field-error' or '')">
+            tal:define="odd repeat/widget/odd"
+            tal:attributes="class python:(odd and 'odd' or 'even') + (widget.error and ' field-error' or '')">
           <td class="designator">
             <label tal:attributes="for widget/htmlId"
                    tal:content="widget/title">
@@ -57,7 +55,7 @@
               Description
             </p>
           </td>
-          <td class="field">
+          <td class="element">
             <div class="error"
                  tal:condition="widget/error"
                  tal:content="structure widget/error/title">
