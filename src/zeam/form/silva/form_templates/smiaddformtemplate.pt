@@ -1,6 +1,7 @@
 <form action="#" method="post" enctype="multipart/form-data"
-      name="add_object" class="zeam-form"
-      tal:attributes="action request/URL"
+      name="#" class="zeam-form zeam-inline-validation"
+      tal:attributes="action view/@@absolute_url;
+                      name view/prefix"
       i18n:domain="silva">
   <table class="listing">
     <thead>
@@ -40,7 +41,7 @@
       <tal:repeat tal:repeat="widget view/fieldWidgets">
         <tr class="#"
             tal:define="odd repeat/widget/odd"
-            tal:attributes="class python:(odd and 'odd' or 'even') + (widget.error and ' field-error' or '')">
+            tal:attributes="class python:odd and 'odd' or 'even'">
           <td class="designator">
             <label tal:attributes="for widget/htmlId"
                    tal:content="widget/title">

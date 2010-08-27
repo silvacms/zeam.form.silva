@@ -3,7 +3,7 @@
     <thead>
       <tr tal:condition="view/label">
         <td class="top">
-          <h2 tal:attributes="title string:id: ${context/getId}">
+          <h2>
             <img tal:replace="structure python:context.render_icon(context)" />
             <tal:inline tal:content="view/label"
                         i18n:translate="">table label</tal:inline>

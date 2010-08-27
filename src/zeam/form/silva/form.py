@@ -33,11 +33,12 @@ from zope.publisher.publish import mapply
 
 from silva.core.conf.utils import getFactoryName
 from silva.core.conf.interfaces import ITitledContent
-from silva.core.interfaces.content import IVersionedContent
+from silva.core.interfaces.content import ISilvaObject, IVersionedContent
 from silva.core.messages.interfaces import IMessageService
 from silva.core.smi.interfaces import IAddingTab, IEditTabIndex
 from silva.core.smi.interfaces import ISMILayer
 from silva.translations import translate as _
+from silva.core.views.views import HTTPHeaderView
 
 
 class SilvaFormData(object):
@@ -94,7 +95,7 @@ class ZopeForm(object):
         return super(ZopeForm, self).__call__()
 
 
-class SilvaForm(SilvaFormData):
+class SilvaForm(HTTPHeaderView, SilvaFormData):
     """Form in Silva.
     """
     grok.baseclass()
@@ -118,6 +119,7 @@ class SilvaForm(SilvaFormData):
         return self.render()
 
     def __call__(self):
+        self.setHTTPHeaders()
         if not hasattr(self.request, 'locale'):
             # This is not pretty, but no choice.
             self.request.locale = find_locale(self.request)
@@ -226,6 +228,16 @@ class SMISubForm(SilvaFormData, composed.SubForm):
 
 class SMISubFormTemplate(pt.PageTemplate):
     pt.view(SMISubForm)
+
+
+class SMISubFormGroup(SilvaFormData, composed.SubFormGroup):
+    """SMI sub form group.
+    """
+    grok.baseclass()
+
+
+class SMISubFormGroupTemplate(pt.PageTemplate):
+    pt.view(SMISubFormGroup)
 
 
 class SMISubTableForm(SilvaFormData, table.SubTableForm):

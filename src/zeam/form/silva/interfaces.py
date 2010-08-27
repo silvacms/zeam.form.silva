@@ -3,12 +3,12 @@
 # See also LICENSE.txt
 # $Id$
 
-from zope.interface import Interface
+from zope import interface
 from zeam.form.base.interfaces import IAction
 
 
 # Integrate a form in Silva.
-class ISilvaFormData(Interface):
+class ISilvaFormData(interface.Interface):
     """A form data in Silva.
     """
 
@@ -18,10 +18,19 @@ class IRESTAction(IAction):
     meaning.
     """
 
+class IRESTSuccessAction(IRESTAction):
+    """Action just send success on success.
+    """
+
 class IRESTCloseAction(IRESTAction):
     """Do not call the action callback, just close the RESTForm.
     """
 
-class IRESTCloseOnSuccessAction(IRESTCloseAction):
+class IRESTCloseOnSuccessAction(IRESTCloseAction, IRESTSuccessAction):
     """Call the action callback, and close the rest Form upon success.
     """
+
+class IRESTRefreshAction(IRESTAction):
+    """Trigger the refresh of a form component on the main view.
+    """
+    refresh = interface.Attribute(u'Identifier to refresh')

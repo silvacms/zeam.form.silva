@@ -1,6 +1,8 @@
 <form action="#" method="post" enctype="multipart/form-data"
-      name="edit_object" class="zeam-form"
-      tal:attributes="action request/URL"
+      name="#" class="zeam-form"
+      tal:define="form view/getComposedForm"
+      tal:attributes="action form/@@absolute_url;
+                      name view/prefix"
       i18n:domain="silva">
   <table class="listing"
          tal:define="columns python:len(view.tableFields) + 1">

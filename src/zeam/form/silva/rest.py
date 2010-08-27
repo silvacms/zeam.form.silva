@@ -10,7 +10,8 @@ from zope.i18n import translate
 
 from zeam.form.base.markers import SUCCESS
 from zeam.form.base.form import FormCanvas
-from zeam.form.silva.form import SilvaFormData
+from zeam.form.base.widgets import getWidgetExtractor
+from zeam.form.silva.form import SilvaFormData, SMIForm, SMIComposedForm
 from zeam.form.silva import interfaces
 from zeam.form.silva.utils import convert_request_form_to_unicode
 
@@ -21,7 +22,65 @@ REST_ACTIONS_TO_TOKEN = [
     (interfaces.IAction, 'send')]
 
 
-class RESTForm(SilvaFormData, rest.REST, FormCanvas):
+class RESTValidatorForm(SilvaFormData, rest.REST):
+    grok.name('form-validate')
+    grok.context(SMIForm)
+
+    def __translate(self, message):
+        return translate(
+            message, target_language=self.i18nLanguage, context=self.request)
+
+    def validateField(self, name, value):
+        # XXX dirty a bit
+        self.request.form[name] = unicode(value)
+        info = {'success': True}
+
+        # Look for extractor, extract and validate value.
+        for field in self.context.fields:
+            extractor = getWidgetExtractor(field, self.context, self.request)
+            if extractor is not None:
+                if extractor.identifier == name:
+                    value, error = extractor.extract()
+                    if error is None:
+                        error = field.validate(value, self.context.context)
+                    if error is not None:
+                        info['success'] = False
+                        info['error'] = self.__translate(error)
+                    break
+        return self.json_response(info)
+
+    def GET(self, name, value):
+        return self.validateField(name, value)
+
+    def POST(self, name, value):
+        return self.validateField(name, value)
+
+
+class RESTRefreshForm(rest.REST):
+    grok.name('form-refresh')
+    grok.context(SMIComposedForm)
+
+    def processForm(self, identifier):
+        form = self.context.getSubForm(identifier)
+        if form is None:
+            self.response.setStatus(404)
+            return ''
+        action, status = form.updateActions()
+        form.updateWidgets()
+        return self.json_response(
+            {'form': form.render(),
+             'success': status == SUCCESS})
+
+    def GET(self, identifier):
+        convert_request_form_to_unicode(self.request.form)
+        return self.processForm(identifier)
+
+    def POST(self, identifier):
+        convert_request_form_to_unicode(self.request.form)
+        return self.processForm(identifier)
+
+
+class RESTPopupForm(SilvaFormData, rest.REST, FormCanvas):
     grok.baseclass()
 
     def __init__(self, context, request):
@@ -48,7 +107,9 @@ class RESTForm(SilvaFormData, rest.REST, FormCanvas):
         self.updateWidgets()
         info = {}
         info['success'] = status == SUCCESS
-        success_only = interfaces.IRESTCloseOnSuccessAction.providedBy(action)
+        if interfaces.IRESTRefreshAction.providedBy(action):
+            info['refresh'] = action.refresh
+        success_only = interfaces.IRESTSuccessAction.providedBy(action)
         if not (success_only and status == SUCCESS):
             info.update({
                     'label': self.__translate(self.label),
@@ -66,4 +127,4 @@ class RESTForm(SilvaFormData, rest.REST, FormCanvas):
 
 
 class RESTFormTemplate(pt.PageTemplate):
-    pt.view(RESTForm)
+    pt.view(RESTPopupForm)
