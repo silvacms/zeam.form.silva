@@ -20,13 +20,30 @@ var InlineZeamValidator = function(input) {
     this.value = input.attr('value');
 };
 
+
+InlineZeamValidator.prototype.available = function () {
+    // Says if the functionality is available or not. We only do it on
+    // what we know we can serialize.
+    var input_type = this.input.attr('type');
+    if (input_type == 'text' || input_type == 'url' ||
+        input_type == 'email' || input_type == 'tel' ||
+        input_type == 'number') {
+        return true;
+    };
+    return false;
+};
+
 InlineZeamValidator.prototype.validate = function () {
+    if (!this.available()) {
+        return false;
+    }
     var self = this;
     var info = {};
+    var form_url = this.input.closest('form').attr('action');
     info['name'] = this.name;
     info['value'] = this.value;
     $.ajax({
-        url: document.location + '/++rest++form-validate',
+        url: form_url + '/++rest++form-validate',
         type: 'POST',
         dataType: 'json',
         data: info,
@@ -132,6 +149,7 @@ PopupZeamForm.prototype.update = function(data) {
     this.popup.dialog('option', 'title', data['label']);
     this.popup.empty();
     this.popup.append(form);
+    form.attr('action', this.url);
     form.append(data['widgets']);
     for (var i=0; i < data['actions'].length; i++) {
         var label = data['actions'][i]['label'];
@@ -157,7 +175,7 @@ $(document).ready(function() {
     // Focus form field
     zeam_focus_field($('.zeam-form'));
     // Inline validation
-    $('.zeam-inline-validation').find('.field').bind('change', function() {
+    $('.zeam-inline-validation').find('.field').live('change', function() {
         var validator = new InlineZeamValidator($(this));
         validator.validate();
     });
