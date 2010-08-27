@@ -64,16 +64,15 @@ var PopupZeamForm = function(popup, url) {
     this.url = url;
 };
 
-PopupZeamForm.prototype._postForm = function (form_data, callback) {
+PopupZeamForm.prototype._postForm = function(form_data, callback) {
     $.ajax({
-        url: self.url,
+        url: this.url,
         type: 'POST',
         dataType: 'json',
         data: form_data,
-        success: callback,
+        success: callback
     });
 };
-
 
 PopupZeamForm.prototype._refresh = function(identifier) {
     var self = this;
@@ -86,7 +85,7 @@ PopupZeamForm.prototype._refresh = function(identifier) {
         });
 };
 
-PopupZeamForm.prototype._buildButton = function (form, data) {
+PopupZeamForm.prototype._buildButton = function(form, data) {
     var self = this;
     var action_label = data['label'];
     var action_name = data['name'];
@@ -120,13 +119,13 @@ PopupZeamForm.prototype._buildButton = function (form, data) {
     };
 };
 
-PopupZeamForm.prototype.close = function () {
-    self.popup.dialog('close');
-    self.popup.empty();
+PopupZeamForm.prototype.close = function() {
+    this.popup.dialog('close');
+    this.popup.empty();
     $(document).trigger('zeam-popup-closed');
 };
 
-PopupZeamForm.prototype.update = function (data) {
+PopupZeamForm.prototype.update = function(data) {
     var form = $('<form></form>');
     var buttons = {}
 
@@ -146,8 +145,8 @@ PopupZeamForm.prototype.focus = function() {
 };
 
 PopupZeamForm.prototype.display = function() {
-    self = this;
-    $.getJSON(self.url, function(data) {
+    var self = this;
+    $.getJSON(this.url, function(data) {
         self.update(data);
         self.popup.dialog('open');
         self.focus();
@@ -169,10 +168,10 @@ $(document).ready(function() {
         popup.dialog({
             autoOpen: false,
             modal: true,
-            width: 800,
+            width: 800
         });
         var form = new PopupZeamForm(popup, url);
-        form.display()
+        form.display();
         return false;
     });
 });
