@@ -31,14 +31,15 @@ from zope.configuration.name import resolve
 from zope.i18n.interfaces import IUserPreferredLanguages
 from zope.publisher.publish import mapply
 
-from silva.core.conf.utils import getFactoryName
 from silva.core.conf.interfaces import ITitledContent
+from silva.core.conf.utils import getFactoryName
 from silva.core.interfaces.content import ISilvaObject, IVersionedContent
+from silva.core.layout.interfaces import ISilvaLayer
 from silva.core.messages.interfaces import IMessageService
 from silva.core.smi.interfaces import IAddingTab, IEditTabIndex
 from silva.core.smi.interfaces import ISMILayer
-from silva.translations import translate as _
 from silva.core.views.views import HTTPHeaderView
+from silva.translations import translate as _
 
 
 class SilvaFormData(object):
@@ -58,6 +59,7 @@ class SilvaFormData(object):
 
     @apply
     def status():
+        # XXX I think we should remove that
         def get(self):
             try:
                 return self.__status
@@ -108,6 +110,7 @@ class SilvaForm(HTTPHeaderView, SilvaFormData):
 
     @property
     def tab_name(self):
+        # XXX should only be available for SMI
         return grok.name.bind().get(self, default=default_view_name)
 
     def default_namespace(self):
@@ -206,6 +209,14 @@ class SMIForm(SilvaForm, base.Form):
 
 class SMIFormTemplate(pt.PageTemplate):
     pt.view(SMIForm)
+
+
+class PublicForm(SilvaForm, base.Form):
+    """Regular SMI form.
+    """
+    grok.baseclass()
+    grok.layer(ISilvaLayer)
+    grok.require('zope2.Public')
 
 
 class SMIComposedForm(SilvaForm, composed.ComposedForm):
