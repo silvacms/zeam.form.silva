@@ -102,7 +102,7 @@ PopupZeamForm.prototype._refresh = function(identifier) {
         });
 };
 
-PopupZeamForm.prototype._buildButton = function(form, data) {
+PopupZeamForm.prototype._buildButtonCallback = function(form, data) {
     var self = this;
     var action_label = data['label'];
     var action_name = data['name'];
@@ -133,6 +133,7 @@ PopupZeamForm.prototype._buildButton = function(form, data) {
         if (action_type == 'close') {
             self.close();
         };
+        return false;
     };
 };
 
@@ -143,7 +144,7 @@ PopupZeamForm.prototype.close = function() {
 };
 
 PopupZeamForm.prototype.update = function(data) {
-    var form = $('<form></form>');
+    var form = $('<form action="POST"></form>');
     var buttons = {}
 
     this.popup.dialog('option', 'title', data['label']);
@@ -153,7 +154,11 @@ PopupZeamForm.prototype.update = function(data) {
     form.append(data['widgets']);
     for (var i=0; i < data['actions'].length; i++) {
         var label = data['actions'][i]['label'];
-        buttons[label] = this._buildButton(form, data['actions'][i]);
+        var callback = this._buildButtonCallback(form, data['actions'][i]);
+        buttons[label] = callback;
+        if (data['actions'][i]['name'] == data['default_action']) {
+            form.bind('submit', callback);
+        };
     };
     this.popup.dialog('option', 'buttons', buttons);
 };
@@ -178,9 +183,18 @@ $(document).ready(function() {
     $('.zeam-inline-validation').find('.field').live('change', function() {
         var validator = new InlineZeamValidator($(this));
         validator.validate();
+        return true;
+    });
+    // Select all
+    $('.zeam-form').find('.zeam-select-all').live('change', function() {
+        var select = $(this);
+        var status = select.attr('checked');
+        $('.zeam-form').find('.' + select.attr('name')).each(function() {
+            $(this).attr('checked', status);
+        });
     });
     // Prepare REST forms
-    $('.link-popup-form').bind('click', function() {
+    $('.link-popup-form').live('click', function() {
         var url = $(this).attr('href');
         var popup = $('#remote-form-dialog');
         popup.dialog({

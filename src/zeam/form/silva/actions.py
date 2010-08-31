@@ -10,6 +10,7 @@ from zope.interface import Interface
 from silva.core.interfaces import IRoot
 from silva.translations import translate as _
 
+from zope.traversing.browser import absoluteURL
 from zeam.form.base import SUCCESS, FAILURE
 from zeam.form.base.actions import Action, DecoratedAction
 from zeam.form.base.interfaces import IFormData
@@ -33,6 +34,27 @@ class EditAction(BaseEditAction):
             assert interfaces.ISilvaFormData.providedBy(form)
             form.send_message(_(u"There were errors."), type=u"error")
         return status
+
+
+class PopupAction(Action):
+    """An action that opens a popup form.
+    """
+    action = None
+
+    def __call__(self, form):
+        # It should never be called actually.
+        return SUCCESS
+
+
+class PopupWidget(ActionWidget):
+    """Widget to style popup buttons
+    """
+    grok.adapts(PopupAction, IFormData, Interface)
+
+    def url(self):
+        return '/'.join(
+            (absoluteURL(self.form.context, self.request),
+             '++rest++' + self.component.action))
 
 
 class CancelAction(Action):

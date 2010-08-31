@@ -112,10 +112,12 @@ class RESTPopupForm(SilvaFormData, rest.REST, FormCanvas):
             info['refresh'] = action.refresh
         success_only = interfaces.IRESTSuccessAction.providedBy(action)
         if not (success_only and status == SUCCESS):
-            info.update({
-                    'label': self.__translate(self.label),
-                    'widgets': self.render(),
-                    'actions': self.renderActions()})
+            actions = self.renderActions()
+            info.update(
+                {'label': self.__translate(self.label),
+                 'widgets': self.render(),
+                 'actions': actions,
+                 'default_action': actions[0]['name'] if actions else None})
         return self.json_response(info)
 
     def GET(self):

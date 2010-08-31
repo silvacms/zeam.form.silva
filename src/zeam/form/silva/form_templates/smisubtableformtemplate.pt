@@ -19,8 +19,17 @@
             tal:content="structure view/description">
         </td>
       </tr>
-      <tr>
-        <th width="2%"></th>
+      <tr tal:condition="view/lineWidgets">
+        <th width="2%"
+            tal:define="name string:${view/htmlId}-select;
+                        checked python:request.form.get(name) and 'checked' or None">
+          <input name="#" checked="#"
+                 type="checkbox" title="select all"
+                 class="zeam-select-all"
+                 i18n:attributes="title"
+                 tal:attributes="name name;
+                                 checked checked" />
+        </th>
         <th tal:repeat="field view/tableFields"
             tal:content="field/title">
           Title
@@ -37,13 +46,24 @@
           </td>
         </tr>
       </tal:line>
+      <tr tal:condition="not: view/lineWidgets">
+        <td colspan="#"
+            tal:attributes="colspan columns"
+            tal:content="view/emptyDescription">
+          There is no items.
+        </td>
+      </tr>
     </tbody>
     <tfoot tal:condition="view/actionWidgets">
       <tr class="controls">
         <td colspan="3"
             tal:attributes="colspan columns">
 
-          <span tal:repeat="widget view/fieldWidgets">
+          <input tal:repeat="widget view/actionWidgets"
+                 tal:replace="structure widget/render" />
+
+          <span class="footer-fields"
+                tal:repeat="widget view/fieldWidgets">
             <label tal:attributes="for widget/htmlId"
                    tal:content="widget/title">
               Field Name
@@ -62,8 +82,6 @@
             </tal:widget>
           </span>
 
-          <input tal:repeat="widget view/actionWidgets"
-                 tal:replace="structure widget/render" />
         </td>
       </tr>
     </tfoot>

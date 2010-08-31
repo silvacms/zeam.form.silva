@@ -1,0 +1,8 @@
+<tal:button i18n:domain="silva">
+  <a href="${widget.url()}" class="popup-button link-popup-form"
+     tal:attributes="title widget.description;
+                     accesskey widget.accesskey"
+     tal:content="widget.title">
+    label
+  </a>
+</tal:button>
