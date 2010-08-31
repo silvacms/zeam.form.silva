@@ -144,7 +144,7 @@ PopupZeamForm.prototype.close = function() {
 };
 
 PopupZeamForm.prototype.update = function(data) {
-    var form = $('<form action="POST"></form>');
+    var form = $('<form method="post" enctype="multipart/form-data" />');
     var buttons = {}
 
     this.popup.dialog('option', 'title', data['label']);
@@ -152,6 +152,8 @@ PopupZeamForm.prototype.update = function(data) {
     this.popup.append(form);
     form.attr('action', this.url);
     form.append(data['widgets']);
+    // Add an empty input submit to activate form submission with enter
+    form.append($('<input type="submit" style="display: none" />'));
     for (var i=0; i < data['actions'].length; i++) {
         var label = data['actions'][i]['label'];
         var callback = this._buildButtonCallback(form, data['actions'][i]);
