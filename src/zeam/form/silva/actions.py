@@ -57,6 +57,15 @@ class PopupWidget(ActionWidget):
              '++rest++' + self.component.action))
 
 
+class RemoverWidget(ActionWidget):
+    """Widget in red.
+    """
+    grok.adapts(interfaces.IRemoverAction, IFormData, Interface)
+
+    def htmlClass(self):
+        return 'action remover'
+
+
 class CancelAction(Action):
     """A action to cancel
     """

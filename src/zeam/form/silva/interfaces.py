@@ -12,6 +12,11 @@ class ISilvaFormData(interface.Interface):
     """A form data in Silva.
     """
 
+# Define style for actions
+class IRemoverAction(IAction):
+    """An action that appear in red.
+    """
+
 # Define categories of actions for RESTForm.
 class IRESTAction(IAction):
     """Action design to be used with a RESTForm, that have a special
