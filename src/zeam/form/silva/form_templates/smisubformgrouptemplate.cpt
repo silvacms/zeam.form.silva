@@ -14,5 +14,4 @@
               tal:replace="structure form.render()">
   </tal:forms>
   <div class="fixed-clear">&nbsp;</div>
-
 </div>
