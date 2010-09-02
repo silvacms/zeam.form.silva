@@ -33,7 +33,7 @@ from zope.publisher.publish import mapply
 
 from silva.core.conf.interfaces import ITitledContent
 from silva.core.conf.utils import getFactoryName
-from silva.core.interfaces.content import ISilvaObject, IVersionedContent
+from silva.core.interfaces.content import IVersionedContent
 from silva.core.layout.interfaces import ISilvaLayer
 from silva.core.messages.interfaces import IMessageService
 from silva.core.smi.interfaces import IAddingTab, IEditTabIndex
@@ -225,6 +225,10 @@ class SMIComposedForm(SilvaForm, composed.ComposedForm):
     grok.baseclass()
     grok.layer(ISMILayer)
     grok.require('silva.ChangeSilvaContent')
+
+    @property
+    def icon_url(self):
+        return get_icon_url(self.context, self.request)
 
 
 class SMIComposedFormTemplate(pt.PageTemplate):
