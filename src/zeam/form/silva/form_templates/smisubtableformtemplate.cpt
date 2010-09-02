@@ -21,7 +21,7 @@
       </tr>
       <tr tal:condition="view.lineWidgets">
         <th width="2%"
-            tal:define="name string:${view.htmlId}-select;
+            tal:define="name string:${view.htmlId()}-select;
                         checked request.form.get(name) and 'checked' or None">
           <input name="#" checked="#"
                  type="checkbox" title="select all"
@@ -64,7 +64,7 @@
 
           <span class="footer-fields"
                 tal:repeat="widget view.fieldWidgets">
-            <label tal:attributes="for widget.htmlId"
+            <label tal:attributes="for widget.htmlId()"
                    tal:content="widget.title">
               Field Name
             </label>
