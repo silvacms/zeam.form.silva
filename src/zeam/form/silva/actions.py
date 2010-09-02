@@ -24,6 +24,7 @@ class EditAction(BaseEditAction):
     """Edit action
     """
     grok.implements(interfaces.IRESTCloseOnSuccessAction)
+    identifier = 'save'
     title = _(u"save changes")
     description = _(u"save content modifications: alt-s")
     accesskey = u's'
