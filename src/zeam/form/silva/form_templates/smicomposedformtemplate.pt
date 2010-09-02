@@ -3,12 +3,17 @@
     <thead>
       <tr tal:condition="view/label">
         <td class="top">
-          <h2 tal:define="title context/get_title_or_id">
+          <h2 tal:define="title context/get_title_or_id"
+              i18n:translate="">
             <img src="#" alt="#"
+                 i18n:name="icon"
                  tal:attributes="src view/icon_url;
                                  alt title" />
-            <span tal:replace="context/meta_type" />
-            &#xab;<span tal:replace="title"/>&#xbb;
+            <span tal:replace="view/label"
+                  i18n:name="title" />
+            in
+            &#xab;<span tal:replace="title"
+                        i18n:name="type" />&#xbb;
           </h2>
         </td>
       </tr>
