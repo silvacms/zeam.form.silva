@@ -1,0 +1,29 @@
+<tal:fields i18n:domain="silva">
+  <p tal:condition="view.description"
+     tal:content="structure view.description">
+    description
+  </p>
+  <div class="fieldblock" tal:repeat="widget view.fieldWidgets">
+    <label tal:attributes="for widget.htmlId()"
+           tal:content="widget.title">
+      Field Name
+    </label>
+    <span class="required"
+          tal:condition="widget.required">
+      *
+    </span>
+    <br />
+    <p tal:condition="widget.description"
+       tal:content="widget.description">
+      Description
+    </p>
+    <div class="error"
+         tal:condition="widget.error"
+         tal:content="structure widget.error.title">
+      Validation error.
+    </div>
+    <tal:widget tal:content="structure widget.render()">
+      Widget.
+    </tal:widget>
+  </div>
+</tal:fields>

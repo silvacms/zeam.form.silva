@@ -7,12 +7,14 @@ from five import grok
 from megrok import pagetemplate as pt
 from infrae import rest
 from zope.i18n import translate
+from silva.core.interfaces import IVersionedContent
 
 from zeam.form.base.markers import SUCCESS
 from zeam.form.base.form import FormCanvas
 from zeam.form.base.widgets import getWidgetExtractor
 from zeam.form.base.interfaces import IFormCanvas
 from zeam.form.silva.form import SilvaFormData, SMIComposedForm
+from zeam.form.silva.form import SilvaDataManager
 from zeam.form.silva import interfaces
 from zeam.form.silva.utils import convert_request_form_to_unicode
 
@@ -131,3 +133,23 @@ class RESTPopupForm(SilvaFormData, rest.REST, FormCanvas):
 
 class RESTFormTemplate(pt.PageTemplate):
     pt.view(RESTPopupForm)
+
+
+class RESTKupuEditProperties(RESTPopupForm):
+    grok.baseclass()
+    grok.name('kupu-properties')
+
+    ignoreContent = False
+    dataManager = SilvaDataManager
+
+    def setContentData(self, content):
+        original_content = content
+        if IVersionedContent.providedBy(original_content):
+            content = original_content.get_editable()
+            if content is None:
+                content = original_content.get_previewable()
+        super(RESTKupuEditProperties, self).setContentData(content)
+
+
+class RESTKupuTemplate(pt.PageTemplate):
+    pt.view(RESTKupuEditProperties)
