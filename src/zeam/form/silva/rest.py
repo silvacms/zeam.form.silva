@@ -4,10 +4,12 @@
 # $Id$
 
 from five import grok
-from megrok import pagetemplate as pt
 from infrae import rest
-from zope.i18n import translate
+from megrok import pagetemplate as pt
 from silva.core.interfaces import IVersionedContent
+from silva.core.smi.interfaces import ISMILayer
+from zope.i18n import translate
+from zope.interface import alsoProvides
 
 from zeam.form.base.markers import SUCCESS
 from zeam.form.base.form import FormCanvas
@@ -87,6 +89,8 @@ class RESTPopupForm(SilvaFormData, rest.REST, FormCanvas):
     grok.baseclass()
 
     def __init__(self, context, request):
+        # Our custom widgets are registered on ISMILayer. Apply it as well
+        alsoProvides(request, ISMILayer)
         # XXX I loved super
         rest.REST.__init__(self, context, request)
         FormCanvas.__init__(self, context, request)

@@ -15,9 +15,9 @@ var zeam_focus_field = function(form) {
 
 
 var InlineZeamValidator = function(input) {
-    this.input = input;
-    this.name = input.attr('name');
-    this.value = input.attr('value');
+    this.input = $(input);
+    this.name = this.input.attr('name');
+    this.value = this.input.attr('value');
 };
 
 
@@ -140,7 +140,7 @@ PopupZeamForm.prototype._buildButtonCallback = function(form, data) {
 PopupZeamForm.prototype.close = function() {
     this.popup.dialog('close');
     this.popup.empty();
-    $(document).trigger('zeam-popup-closed');
+    $(document).trigger('smi-refresh-feedback');
 };
 
 PopupZeamForm.prototype.update = function(data) {
@@ -162,6 +162,11 @@ PopupZeamForm.prototype.update = function(data) {
             form.bind('submit', callback);
         };
     };
+    form.find('.field-datetime').each(function(index) {
+        // Initialize form datetime widgets
+        var date_field = new ZeamDateField(this);
+        date_field.initialize();
+    });
     this.popup.dialog('option', 'buttons', buttons);
 };
 
@@ -178,12 +183,53 @@ PopupZeamForm.prototype.display = function() {
     });
 };
 
+
+var ZeamDateField = function(field) {
+    this.field = $(field);
+    var id = this.field.attr('id');
+    this.year = $('#' + id + '-year');
+    this.month = $('#' + id + '-month');
+    this.day = $('#' + id + '-day');
+    this.hour = $('#' + id + '-hour');
+    this.min = $('#' + id + '-min');
+};
+
+ZeamDateField.prototype.initialize = function () {
+    var number_reg = /^(\d)+$/;
+    var self = this;
+    this.field.datepicker(
+        {'showOn': 'button',
+         'showWeek': true,
+         'showOtherMonths': true,
+         'onSelect': function(date, picker) {
+             var parts = date.split('/');
+             self.day.val(parts[1]);
+             self.month.val(parts[0]);
+             self.year.val(parts[2]);
+             if (!self.hour.val()) {
+                 self.hour.val('00');
+             };
+             if (!self.min.val()) {
+                 self.min.val('00');
+             };
+         },
+         'beforeShow': function() {
+             var day = self.day.val();
+             var month = self.month.val();
+             var year = self.year.val();
+             if (day && month && year) {
+                 self.field.datepicker(
+                     'setDate', new Date(year, month - 1, day));
+             };
+         }});
+};
+
 $(document).ready(function() {
     // Focus form field
     zeam_focus_field($('.zeam-form'));
     // Inline validation
     $('.zeam-inline-validation').find('.field').live('change', function() {
-        var validator = new InlineZeamValidator($(this));
+        var validator = new InlineZeamValidator(this);
         validator.validate();
         return true;
     });
@@ -194,6 +240,11 @@ $(document).ready(function() {
         $('.zeam-form').find('.' + select.attr('name')).each(function() {
             $(this).attr('checked', status);
         });
+    });
+    // Datetime fields on the page
+    $('.zeam-form').find('.field-datetime').each(function(index) {
+        var date_field = new ZeamDateField($(this));
+        date_field.initialize();
     });
     // Prepare REST forms
     $('.link-popup-form').live('click', function() {
