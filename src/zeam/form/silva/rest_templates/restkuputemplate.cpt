@@ -3,7 +3,8 @@
      tal:content="structure view.description">
     description
   </p>
-  <div class="fieldblock" tal:repeat="widget view.fieldWidgets">
+  <div class="fieldblock zeam-inline-validation"
+       tal:repeat="widget view.fieldWidgets">
     <label tal:attributes="for widget.htmlId()"
            tal:content="widget.title">
       Field Name
