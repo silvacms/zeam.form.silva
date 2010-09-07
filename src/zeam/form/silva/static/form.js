@@ -192,36 +192,43 @@ var ZeamDateField = function(field) {
     this.day = $('#' + id + '-day');
     this.hour = $('#' + id + '-hour');
     this.min = $('#' + id + '-min');
+    this.lang = $(document).find('html').attr('lang');
 };
 
 ZeamDateField.prototype.initialize = function () {
     var number_reg = /^(\d)+$/;
     var self = this;
-    this.field.datepicker(
-        {'showOn': 'button',
-         'showWeek': true,
-         'showOtherMonths': true,
-         'onSelect': function(date, picker) {
-             var parts = date.split('/');
-             self.day.val(parts[1]);
-             self.month.val(parts[0]);
-             self.year.val(parts[2]);
-             if (!self.hour.val()) {
-                 self.hour.val('00');
-             };
-             if (!self.min.val()) {
-                 self.min.val('00');
-             };
-         },
-         'beforeShow': function() {
-             var day = self.day.val();
-             var month = self.month.val();
-             var year = self.year.val();
-             if (day && month && year) {
-                 self.field.datepicker(
-                     'setDate', new Date(year, month - 1, day));
-             };
-         }});
+    var settings = $.datepicker.regional[this.lang];
+    if (!settings) {
+        settings = {};
+    };
+    settings['showOn'] = 'button';
+    settings['buttonImage'] = '/++resource++silva.core.smi/calendar.gif';
+    settings['showWeek'] = true;
+    settings['showOtherMonths'] = true;
+    settings['dateFormat'] = 'yy/mm/dd';
+    settings['onSelect'] = function(date, picker) {
+        var parts = date.split('/');
+        self.day.val(parts[2]);
+        self.month.val(parts[1]);
+        self.year.val(parts[0]);
+        if (!self.hour.val()) {
+            self.hour.val('00');
+        };
+        if (!self.min.val()) {
+            self.min.val('00');
+        };
+    };
+    settings['beforeShow'] = function() {
+        var day = self.day.val();
+        var month = self.month.val();
+        var year = self.year.val();
+        if (day && month && year) {
+            self.field.datepicker(
+                'setDate', new Date(year, month - 1, day));
+        };
+    };
+    this.field.datepicker(settings);
 };
 
 $(document).ready(function() {
