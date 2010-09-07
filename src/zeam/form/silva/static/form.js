@@ -198,9 +198,13 @@ var ZeamDateField = function(field) {
 ZeamDateField.prototype.initialize = function () {
     var number_reg = /^(\d)+$/;
     var self = this;
-    var settings = $.datepicker.regional[this.lang];
-    if (!settings) {
-        settings = {};
+    var settings = {};
+    var lang_settings = $.datepicker.regional[this.lang];
+    if (!lang_settings) {
+        lang_settings = $.datepicker.regional[''];
+    };
+    for (key in lang_settings) {
+        settings[key] = lang_settings[key];
     };
     settings['showOn'] = 'button';
     settings['buttonImage'] = '/++resource++silva.core.smi/calendar.gif';
