@@ -318,7 +318,6 @@ class SMIAddForm(SMIForm):
             if key not in ITitledContent and value is not NO_VALUE:
                 editable_content.set(key, value)
 
-
     @base.action(
         _(u'save + edit'),
         identifier='save_edit',

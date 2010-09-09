@@ -14,9 +14,11 @@
   <include package="infrae.rest" />
   <include package="infrae.layout" />
 
+  <grok:grok package=".martiansupport" />
+
   <include package="silva.core.smi" />
 
-  <grok:grok package="." />
+  <grok:grok package="." exclude="martiansupport" />
 
   <browser:resourceInclude
      layer="silva.core.smi.interfaces.ISMILayer"

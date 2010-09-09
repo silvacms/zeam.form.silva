@@ -23,5 +23,3 @@ class AddFormGrokker(martian.ClassGrokker):
             callable = provideUtility,
             args = (form, IFactory, name))
         return True
-
-
