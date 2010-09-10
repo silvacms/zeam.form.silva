@@ -278,7 +278,7 @@ class SMIAddForm(SMIForm):
     fields = Fields(ITitledContent)
     dataManager = SilvaDataManager
     ignoreContent = True
-    actions = base.Actions(CancelAddAction())
+    actions = base.Actions()
 
     @property
     def tab_name(self):
@@ -344,6 +344,8 @@ class SMIAddForm(SMIForm):
                         mapping={'meta_type': self.__name__})
         self.redirect(self.url(name="edit"))
         return SUCCESS
+
+    actions.append(CancelAddAction())
 
 
 class SMIAddFormTemplate(pt.PageTemplate):
