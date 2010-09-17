@@ -10,19 +10,12 @@
   <include package="zeam.form.composed" />
   <include package="zeam.form.viewlet" />
   <include package="zeam.form.table" />
+  <include package="megrok.chameleon" />
+  <include package="megrok.pagetemplate" file="meta.zcml" />
 
   <include package="infrae.rest" />
   <include package="infrae.layout" />
 
-  <grok:grok package=".martiansupport" />
-
-  <include package="silva.core.smi" />
-
-  <grok:grok package="." exclude="martiansupport" />
-
-  <browser:resourceInclude
-     layer="silva.core.smi.interfaces.ISMILayer"
-     include="form.js"
-     base="zeam.form.silva" />
+  <grok:grok package="." />
 
 </configure>
