@@ -11,21 +11,19 @@
         <p class="system-msg"
            tal:condition="view/status"
            tal:content="view/status">Status</p>
+        <p class="system-msg"
+           tal:condition="view/errors">
+          <tal:error tal:repeat="error view/formErrors">
+            <span tal:replace="error/title" />
+            <br tal:condition="not:repeat/error/end" />
+          </tal:error>
+        </p>
 
         <h2 tal:condition="view/label"
             tal:content="view/label">Label</h2>
 
         <p tal:condition="view/description"
            tal:content="view/description">Description</p>
-
-        <p class="form-error"
-           tal:condition="view/errors">
-          There were errors:
-          <tal:error tal:repeat="error view/formErrors">
-            <br />
-            <span tal:replace="error/title" />
-          </tal:error>
-        </p>
 
         <div class="fields"
              tal:condition="view/fieldWidgets">
