@@ -31,8 +31,8 @@ class EditAction(BaseEditAction):
     def __call__(self, form):
         status = super(EditAction, self).__call__(form)
         if status is FAILURE:
-            assert interfaces.ISilvaFormData.providedBy(form)
-            form.send_message(_(u"There were errors."), type=u"error")
+            if interfaces.ISilvaFormData.providedBy(form):
+                form.send_message(_(u"There were errors."), type=u"error")
         return status
 
 
