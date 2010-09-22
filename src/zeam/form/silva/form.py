@@ -57,19 +57,6 @@ class SilvaFormData(object):
         service = component.getUtility(IMessageService)
         service.send(message, self.request, namespace=type)
 
-    @apply
-    def status():
-        # XXX I think we should remove that
-        def get(self):
-            try:
-                return self.__status
-            except AttributeError:
-                return u''
-        def set(self, value):
-            self.send_message(value, type=u"feedback")
-            self.__status = value
-        return property(get, set)
-
 
 class ZopeForm(object):
     """Simple Zope Form.
@@ -400,7 +387,32 @@ class SMIViewletForm(SilvaFormData, viewlet.ViewletForm):
                 return True
         return False
 
+    def update(self):
+        if not hasattr(self.request, 'locale'):
+            self.request.locale = find_locale(self.request)
+        convert_request_form_to_unicode(self.request.form)
+        return super(SMIViewletForm, self).update()
+
     def redirect(self, url):
         # Raise redirect exception to be not to render the current
         # page anymore.
         raise Redirect(url)
+
+PublicViewletForm = SMIViewletForm
+
+
+class SMIContentProviderForm(SilvaFormData, viewlet.ViewletManagerForm):
+    grok.baseclass()
+
+    def update(self):
+        if not hasattr(self.request, 'locale'):
+            self.request.locale = find_locale(self.request)
+        convert_request_form_to_unicode(self.request.form)
+        return super(SMIContentProviderForm, self).update()
+
+    def redirect(self, url):
+        # Raise redirect exception to be not to render the current
+        # page anymore.
+        raise Redirect(url)
+
+PublicContentProviderForm = SMIContentProviderForm

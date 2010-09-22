@@ -25,7 +25,7 @@ class EditAction(BaseEditAction):
     """
     grok.implements(interfaces.IRESTCloseOnSuccessAction)
     title = _(u"save changes")
-    description = _(u"save content modifications: alt-s")
+    description = _(u"save modifications: alt-s")
     accesskey = u's'
 
     def __call__(self, form):
