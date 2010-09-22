@@ -314,8 +314,9 @@ class SMIAddForm(SMIForm):
         factory=ExtractedDecoratedAction)
     def save_edit(self, data):
         content = self._add(self.context, data)
-        self.status = _(u'Added ${meta_type}',
-                        mapping={'meta_type': self.__name__})
+        self.send_message(
+            _(u'Added ${meta_type}.', mapping={'meta_type': self.__name__}),
+            type="feedback")
         self.redirect(self.url(content, name="edit"))
         return SUCCESS
 
@@ -327,8 +328,9 @@ class SMIAddForm(SMIForm):
         factory=ExtractedDecoratedAction)
     def save(self, data):
         self._add(self.context, data)
-        self.status = _(u'Added ${meta_type}',
-                        mapping={'meta_type': self.__name__})
+        self.send_message(
+            _(u'Added ${meta_type}.', mapping={'meta_type': self.__name__}),
+            type="feedback")
         self.redirect(self.url(name="edit"))
         return SUCCESS
 
