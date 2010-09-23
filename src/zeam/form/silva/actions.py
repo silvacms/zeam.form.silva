@@ -30,9 +30,11 @@ class EditAction(BaseEditAction):
 
     def __call__(self, form):
         status = super(EditAction, self).__call__(form)
-        if status is FAILURE:
-            if interfaces.ISilvaFormData.providedBy(form):
-                form.send_message(_(u"There were errors."), type=u"error")
+        if interfaces.ISilvaFormData.providedBy(form):
+            if status is FAILURE:
+                form.send_message(_(u"There were errors."), type="error")
+            else:
+                form.send_message(_(u"Changes saved."), type="feedbac")
         return status
 
 
