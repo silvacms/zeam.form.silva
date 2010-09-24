@@ -11,14 +11,15 @@ from silva.core.smi.interfaces import ISMILayer
 from zope.i18n import translate
 from zope.interface import alsoProvides
 
-from zeam.form.base.markers import SUCCESS
 from zeam.form.base.form import FormCanvas
-from zeam.form.base.widgets import getWidgetExtractor
 from zeam.form.base.interfaces import IFormCanvas
-from zeam.form.silva.form import SilvaFormData, SMIComposedForm
-from zeam.form.silva.form import SilvaDataManager
+from zeam.form.base.markers import SUCCESS
+from zeam.form.base.widgets import getWidgetExtractor
 from zeam.form.silva import interfaces
+from zeam.form.silva.form import SilvaDataManager
+from zeam.form.silva.form import SilvaFormData, SMIComposedForm
 from zeam.form.silva.utils import convert_request_form_to_unicode
+from zeam.form.ztk import validation
 
 
 REST_ACTIONS_TO_TOKEN = [
@@ -30,6 +31,7 @@ REST_ACTIONS_TO_TOKEN = [
 class RESTValidatorForm(SilvaFormData, rest.REST):
     grok.name('form-validate')
     grok.context(IFormCanvas)
+    dataValidators = [validation.InvariantsValidation]
 
     def __translate(self, message):
         return translate(
