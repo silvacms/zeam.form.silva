@@ -12,6 +12,7 @@ from zeam.form import base, composed, table, viewlet
 from zeam.form.base.datamanager import BaseDataManager
 from zeam.form.base.fields import Fields
 from zeam.form.base.markers import DISPLAY, SUCCESS, NO_VALUE
+from zeam.form.ztk import validation
 
 from zeam.form.silva.interfaces import ISilvaFormData
 from zeam.form.silva.utils import find_locale, convert_request_form_to_unicode
@@ -89,6 +90,7 @@ class SilvaForm(HTTPHeaderView, SilvaFormData):
     """
     grok.baseclass()
     grok.implements(IPage)
+    dataValidators = [validation.InvariantsValidation]
 
     def __init__(self, context, request):
         super(SilvaForm, self).__init__(context, request)

@@ -32,9 +32,10 @@ class EditAction(BaseEditAction):
         status = super(EditAction, self).__call__(form)
         if interfaces.ISilvaFormData.providedBy(form):
             if status is FAILURE:
-                form.send_message(_(u"There were errors."), type="error")
+                for error in form.formErrors:
+                    form.send_message(error.title, type="error")
             else:
-                form.send_message(_(u"Changes saved."), type="feedbac")
+                form.send_message(_(u"Changes saved."), type="feedback")
         return status
 
 
@@ -123,8 +124,9 @@ class ExtractedDecoratedAction(DecoratedAction):
     def __call__(self, form):
         data, errors = form.extractData()
         if errors:
-            assert interfaces.ISilvaFormData.providedBy(form)
-            form.send_message(_(u"There were errors."), type=u"error")
+            if interfaces.ISilvaFormData.providedBy(form):
+                for error in form.formErrors:
+                    form.send_message(error.title, type="error")
             return FAILURE
         # We directly give data.
         return super(ExtractedDecoratedAction, self).__call__(form, data)
