@@ -33,7 +33,7 @@ InlineZeamValidator.prototype.available = function () {
     return false;
 };
 
-InlineZeamValidator.prototype.validate = function () {
+InlineZeamValidator.prototype.initialize = function () {
     if (!this.available()) {
         return false;
     }
@@ -242,7 +242,7 @@ $('form').live('zeam-form-ready', function () {
     if (form.hasClass('zeam-inline-validation')) {
         form.find('.field').bind('change', function() {
             var validator = new InlineZeamValidator(this);
-            validator.validate();
+            validator.initialize();
             return true;
         });
     };
