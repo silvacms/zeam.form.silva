@@ -144,8 +144,9 @@ PopupZeamForm.prototype.close = function() {
 };
 
 PopupZeamForm.prototype.update = function(data) {
-    var form = $('<form method="post" enctype="multipart/form-data" />');
-    var buttons = {}
+    var form = $('<form method="post" enctype="multipart/form-data" ' +
+                 'class="zeam-form zeam-inline-validation" />');
+    var buttons = {};
 
     this.popup.dialog('option', 'title', data['label']);
     this.popup.empty();
@@ -162,11 +163,7 @@ PopupZeamForm.prototype.update = function(data) {
             form.bind('submit', callback);
         };
     };
-    form.find('.field-datetime').each(function(index) {
-        // Initialize form datetime widgets
-        var date_field = new ZeamDateField(this);
-        date_field.initialize();
-    });
+    form.trigger('zeam-form-ready');
     this.popup.dialog('option', 'buttons', buttons);
 };
 
@@ -235,28 +232,39 @@ ZeamDateField.prototype.initialize = function () {
     this.field.datepicker(settings);
 };
 
-$(document).ready(function() {
+
+$('form').live('zeam-form-ready', function () {
+    var form = $(this);
+
     // Focus form field
-    zeam_focus_field($('.zeam-form'));
+    zeam_focus_field(form);
     // Inline validation
-    $('.zeam-inline-validation').find('.field').live('change', function() {
-        var validator = new InlineZeamValidator(this);
-        validator.validate();
-        return true;
+    if (form.hasClass('zeam-inline-validation')) {
+        form.find('.field').bind('change', function() {
+            var validator = new InlineZeamValidator(this);
+            validator.validate();
+            return true;
+        });
+    };
+    // Datetime fields on the page
+    form.find('.field-datetime').each(function(index) {
+        var field = new ZeamDateField($(this));
+        field.initialize();
     });
     // Select all
-    $('.zeam-form').find('.zeam-select-all').live('change', function() {
+    form.find('.zeam-select-all').bind('change', function() {
         var select = $(this);
         var status = select.attr('checked');
-        $('.zeam-form').find('.' + select.attr('name')).each(function() {
+        form.find('.' + select.attr('name')).each(function() {
             $(this).attr('checked', status);
         });
     });
-    // Datetime fields on the page
-    $('.zeam-form').find('.field-datetime').each(function(index) {
-        var date_field = new ZeamDateField($(this));
-        date_field.initialize();
-    });
+});
+
+$(document).ready(function() {
+    // Send form init event
+    $('.zeam-form').trigger('zeam-form-ready');
+
     // Prepare REST forms
     $('.link-popup-form').live('click', function() {
         var url = $(this).attr('href');

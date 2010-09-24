@@ -1,6 +1,6 @@
 <div i18n:domain="silva">
   <tal:replace tal:replace="structure provider:smimessages" />
-  <table class="listing zeam-form zeam-inline-validation">
+  <table class="listing zeam-form">
     <thead>
       <tr class="odd" tal:condition="view.description">
         <td class="designator" colspan="2"
