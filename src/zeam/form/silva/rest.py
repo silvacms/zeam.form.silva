@@ -31,7 +31,6 @@ REST_ACTIONS_TO_TOKEN = [
 class RESTValidatorForm(SilvaFormData, rest.REST):
     grok.name('form-validate')
     grok.context(IFormCanvas)
-    dataValidators = [validation.InvariantsValidation]
 
     def __translate(self, message):
         return translate(
@@ -147,6 +146,7 @@ class RESTKupuEditProperties(RESTPopupForm):
 
     ignoreContent = False
     dataManager = SilvaDataManager
+    dataValidators = [validation.InvariantsValidation]
 
     def setContentData(self, content):
         original_content = content
