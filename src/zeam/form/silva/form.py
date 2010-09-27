@@ -259,7 +259,6 @@ class SMIAddForm(SMIForm):
     """
     grok.baseclass()
     grok.implements(IAddingTab)
-    grok.require('silva.ChangeSilvaContent')
 
     prefix = 'addform'
     tab = 'edit'
@@ -348,7 +347,6 @@ class SMIEditForm(SMIForm):
     """
     grok.baseclass()
     grok.name('tab_edit')
-    grok.require('silva.ChangeSilvaContent')
     grok.implements(IEditTabIndex)
 
     prefix = 'editform'
