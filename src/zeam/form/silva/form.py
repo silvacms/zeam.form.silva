@@ -158,6 +158,7 @@ class ZMIForm(ZopeForm, base.Form):
     """Regular ZMI forms.
     """
     grok.baseclass()
+    grok.require('zope2.ViewManagementScreens')
 
 
 class ZMIFormTemplate(pt.PageTemplate):
@@ -168,6 +169,7 @@ class ZMIComposedForm(ZopeForm, composed.ComposedForm):
     """ZMI Composed forms.
     """
     grok.baseclass()
+    grok.require('zope2.ViewManagementScreens')
 
 
 class ZMIComposedFormTemplate(pt.PageTemplate):
