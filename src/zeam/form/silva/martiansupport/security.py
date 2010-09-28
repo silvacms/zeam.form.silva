@@ -23,24 +23,22 @@ class SilvaAddFormSecurityGrokker(martian.ClassGrokker):
         if not name:
             raise GrokError(u"Add forms must have a name, the meta_type")
 
-        if grok.require.dotted_name() not in factory.__dict__:
-            # The grok.require permission have not been used. We
-            # define a permission for the add form and use it.
+        # We define a permission for the add form and use it. For the
+        # time being, there is no way to make it optional.
 
-            permission = Permission(
-                unicode('silva.add.' + name.replace(' ', '')),
-                unicode('Add %ss' % name))
+        permission = Permission(
+            unicode('silva.add.' + name.replace(' ', '')),
+            unicode('Add %ss' % name))
 
-            # Order is set to -1 to be done as soon as possible.
-            config.action(
-                discriminator=('utility', IPermission, permission.id),
-                callable=provideUtility,
-                args=(permission, IPermission, permission.id),
-                order=-1)
+        # Order is set to -1 to be done as soon as possible.
+        config.action(
+            discriminator=('utility', IPermission, permission.id),
+            callable=provideUtility,
+            args=(permission, IPermission, permission.id),
+            order=-1)
 
-            grok.require.set(factory, [permission.id])
-            return True
-        return False
+        grok.require.set(factory, [permission.id])
+        return True
 
 
 class SilvaFormSecurityGrokker(ViewSecurityGrokker):
