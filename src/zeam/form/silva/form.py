@@ -340,7 +340,7 @@ class SMIAddForm(SMIForm):
     def _move(self, parent, content):
         data, errors = self.extractData(self.optionFields)
         position = data.getWithDefault('position')
-        if position >= 0:
+        if position > 0:
             # XXX bug in Folder to have move_to(2) you actually need 1.
             parent.move_to([content.getId()], position - 1)
 
