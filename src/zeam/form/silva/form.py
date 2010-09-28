@@ -6,11 +6,13 @@ from Acquisition import aq_base
 from zExceptions import Redirect
 
 from five import grok
+from zope import interface, schema
 from megrok import pagetemplate as pt
 
 from zeam.form import base, composed, table, viewlet
 from zeam.form.base.datamanager import BaseDataManager
 from zeam.form.base.fields import Fields
+from zeam.form.base.widgets import Widgets
 from zeam.form.base.markers import DISPLAY, SUCCESS, NO_VALUE
 from zeam.form.ztk import validation
 
@@ -34,7 +36,7 @@ from zope.publisher.publish import mapply
 
 from silva.core.conf.interfaces import ITitledContent
 from silva.core.conf.utils import getFactoryName
-from silva.core.interfaces.content import IVersionedContent
+from silva.core.interfaces.content import IVersionedContent, IPublishable
 from silva.core.layout.interfaces import ISilvaLayer
 from silva.core.messages.interfaces import IMessageService
 from silva.core.smi.interfaces import IAddingTab, IEditTabIndex
@@ -256,6 +258,22 @@ class SMISubTableFormTemplate(pt.PageTemplate):
     pt.view(SMISubTableForm)
 
 
+class IAddOptions(interface.Interface):
+    position = schema.Int(
+        title=_(u"add position"),
+        description=_(
+            u"Position in the container to which the content will be added."),
+        default=0,
+        min=0)
+
+
+def add_position_available(form):
+    if  'addform.options.position' not in form.request.form:
+        return False
+    addable = extensionRegistry.get_addable(form.__name__)
+    return IPublishable.implementedBy(addable['instance'])
+
+
 class SMIAddForm(SMIForm):
     """ SMI add form
     """
@@ -269,6 +287,17 @@ class SMIAddForm(SMIForm):
     dataManager = SilvaDataManager
     ignoreContent = True
     actions = base.Actions()
+    optionFields = Fields(IAddOptions)
+    optionFields['position'].prefix = 'options'
+    optionFields['position'].mode = 'readonly'
+    optionFields['position'].available = add_position_available
+
+    def updateWidgets(self):
+        super(SMIAddForm, self).updateWidgets()
+        optionWidgets = Widgets(form=self, request=self.request)
+        optionWidgets.extend(self.optionFields)
+        optionWidgets.update()
+        self.fieldWidgets.extend(optionWidgets)
 
     @property
     def tab_name(self):
@@ -308,6 +337,13 @@ class SMIAddForm(SMIForm):
             if key not in ITitledContent and value is not NO_VALUE:
                 editable_content.set(key, value)
 
+    def _move(self, parent, content):
+        data, errors = self.extractData(self.optionFields)
+        position = data.getWithDefault('position')
+        if position >= 0:
+            # XXX bug in Folder to have move_to(2) you actually need 1.
+            parent.move_to([content.getId()], position - 1)
+
     @base.action(
         _(u'save + edit'),
         identifier='save_edit',
@@ -317,6 +353,7 @@ class SMIAddForm(SMIForm):
         factory=ExtractedDecoratedAction)
     def save_edit(self, data):
         content = self._add(self.context, data)
+        self._move(self.context, content)
         self.send_message(
             _(u'Added ${meta_type}.', mapping={'meta_type': self.__name__}),
             type="feedback")
@@ -330,7 +367,8 @@ class SMIAddForm(SMIForm):
         accesskey=u's',
         factory=ExtractedDecoratedAction)
     def save(self, data):
-        self._add(self.context, data)
+        content = self._add(self.context, data)
+        self._move(self.context, content)
         self.send_message(
             _(u'Added ${meta_type}.', mapping={'meta_type': self.__name__}),
             type="feedback")
