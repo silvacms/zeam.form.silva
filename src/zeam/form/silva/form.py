@@ -13,7 +13,7 @@ from zeam.form import base, composed, table, viewlet
 from zeam.form.base.datamanager import BaseDataManager
 from zeam.form.base.fields import Fields
 from zeam.form.base.widgets import Widgets
-from zeam.form.base.markers import DISPLAY, SUCCESS, NO_VALUE
+from zeam.form.base.markers import DISPLAY, SUCCESS, FAILURE, NO_VALUE
 from zeam.form.ztk import validation
 
 from zeam.form.silva.interfaces import ISilvaFormData
@@ -312,19 +312,17 @@ class SMIAddForm(SMIForm):
         support custom creation needs.
         """
         # Search for an addable and a factory
-        addable = filter(lambda a: a['name'] == self.__name__,
-                         extensionRegistry.get_addables())
-        if len(addable) != 1:
-            raise ValueError(
-                u"Content cannot be found. "
-                u"Check that the name of add is the meta type of your content.")
-        addable = addable[0]
-        factory = getattr(resolve(addable['instance'].__module__),
-                          getFactoryName(addable['instance']))
+        addable = extensionRegistry.get_addable(self.__name__)
+        if not addable:
+            raise ValueError(u"Content factory cannot be found. ")
+
+        factory = getattr(
+            resolve(addable['instance'].__module__),
+            getFactoryName(addable['instance']))
 
         # Build the content
-        identifier = str(data['id'])
-        factory(parent, identifier, data['title'])
+        identifier = str(data.getWithDefault('id'))
+        factory(parent, identifier, data.getWithDefault('title'))
         content = getattr(parent, identifier)
 
         self._edit(parent, content, data)
@@ -352,8 +350,12 @@ class SMIAddForm(SMIForm):
         accesskey=u'e',
         factory=ExtractedDecoratedAction)
     def save_edit(self, data):
-        content = self._add(self.context, data)
-        self._move(self.context, content)
+        try:
+            content = self._add(self.context, data)
+            self._move(self.context, content)
+        except ValueError, error:
+            self.send_message(error, type="error")
+            return FAILURE
         self.send_message(
             _(u'Added ${meta_type}.', mapping={'meta_type': self.__name__}),
             type="feedback")
@@ -367,8 +369,12 @@ class SMIAddForm(SMIForm):
         accesskey=u's',
         factory=ExtractedDecoratedAction)
     def save(self, data):
-        content = self._add(self.context, data)
-        self._move(self.context, content)
+        try:
+            content = self._add(self.context, data)
+            self._move(self.context, content)
+        except ValueError, error:
+            self.send_message(error.args[0], type=u"error")
+            return FAILURE
         self.send_message(
             _(u'Added ${meta_type}.', mapping={'meta_type': self.__name__}),
             type="feedback")
