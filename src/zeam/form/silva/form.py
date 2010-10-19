@@ -209,7 +209,7 @@ class PublicForm(SilvaForm, base.Form):
     """
     grok.baseclass()
     grok.layer(ISilvaLayer)
-    grok.require('zope2.Public')
+    grok.require('zope.Public')
 
 
 class SMIComposedForm(SilvaForm, composed.ComposedForm):
