@@ -1,6 +1,29 @@
 Changes
 =======
 
+1.1 (2010/10/27)
+----------------
+
+* Review security restriction on add forms and edit forms.
+
+* Add support for *add in position* in default add forms.
+
+* Various improvements in the form code (status feedback), default
+  form templates and i18n.
+
+* Add a datetime widget based on the JQueryUI datetime picker.
+
+* Add some Javascript helpers: inline validation via AJAX query on
+  simple form widgets. By default the first required field of a form
+  gets the focus.
+
+* Add support to create REST forms in a popup in SMI or included in
+  Kupu.
+
+* Add support for public forms.
+
+* Add support for zope.interfaces invariant by default in SMI forms.
+
 1.0 (2010/07/16)
 ----------------
 
