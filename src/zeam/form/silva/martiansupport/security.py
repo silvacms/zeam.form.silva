@@ -3,8 +3,9 @@
 # $Id$
 
 from five import grok
-from five.grok.meta import ViewSecurityGrokker, GrokError
+from five.grok.meta import ViewSecurityGrokker
 from grokcore.security.components import Permission
+from martian.error import GrokError
 from zeam.form.silva import form
 from zope.component import provideUtility
 from zope.security.interfaces import IPermission
