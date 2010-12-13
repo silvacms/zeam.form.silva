@@ -15,11 +15,15 @@ from silva.core.smi.interfaces import ISMILayer
 from silva.core.conf import schema as silvaschema
 from silva.translations import translate as _
 
+from zeam.form.base.interfaces import IWidget, IWidgetExtractor
 from zeam.form.base.markers import NO_VALUE
 from zeam.form.base.widgets import WidgetExtractor
 from zeam.form.ztk.fields import SchemaField, SchemaFieldWidget
 from zeam.form.ztk.fields import registerSchemaField
+from zeam.form.ztk.interfaces import ICollectionSchemaField
+from zeam.form.ztk.widgets.collection import newCollectionWidgetFactory
 from zeam.form.ztk.widgets.date import DatetimeSchemaField
+from zeam.form.ztk.widgets.textline import TextLineSchemaField
 
 def register():
     registerSchemaField(FileSchemaField, silvaschema.IBytes)
@@ -116,3 +120,47 @@ class IconDisplayWidget(SchemaFieldWidget):
         super(IconDisplayWidget, self).update()
         content = self.form.getContentData().getContent()
         self.icon_url = get_icon_url(content, self.request)
+
+
+grok.global_adapter(
+    newCollectionWidgetFactory(mode='lines'),
+    adapts=(ICollectionSchemaField, Interface, Interface),
+    provides=IWidget,
+    name='lines')
+
+
+grok.global_adapter(
+    newCollectionWidgetFactory(mode='lines', interface=IWidgetExtractor),
+    adapts=(ICollectionSchemaField, Interface, Interface),
+    provides=IWidgetExtractor,
+    name='lines')
+
+
+class LinesWidget(SchemaFieldWidget):
+    grok.adapts(ICollectionSchemaField, TextLineSchemaField, Interface, Interface)
+    grok.name('lines')
+
+    def __init__(self, field, value_field,form, request):
+        super(LinesWidget, self).__init__(field, form, request)
+        self.text_component = value_field
+
+    def valueToUnicode(self, value):
+        return u'\n'.join(value)
+
+
+class LinesWidgetExtractor(WidgetExtractor):
+    grok.adapts(ICollectionSchemaField, TextLineSchemaField, Interface, Interface)
+    grok.name('lines')
+
+    def __init__(self, field, value_field,form, request):
+        super(LinesWidgetExtractor, self).__init__(field, form, request)
+        self.text_component = value_field
+
+    def extract(self):
+        value, errors = super(LinesWidgetExtractor, self).extract()
+        if errors is None:
+            value = map(lambda s: s.strip('\r'), value.split('\n'))
+            if self.text_component.required:
+                value = filter(lambda v: v, value)
+            value = self.component.collectionType(value)
+        return (value, errors)
