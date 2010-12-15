@@ -159,8 +159,9 @@ class LinesWidgetExtractor(WidgetExtractor):
     def extract(self):
         value, errors = super(LinesWidgetExtractor, self).extract()
         if errors is None:
-            value = map(lambda s: s.strip('\r'), value.split('\n'))
-            if self.text_component.required:
-                value = filter(lambda v: v, value)
-            value = self.component.collectionType(value)
+            if value is not NO_VALUE:
+                value = self.component.collectionType(
+                    filter(lambda v: v,
+                           map(lambda s: s.strip('\r'),
+                               value.split('\n'))))
         return (value, errors)
