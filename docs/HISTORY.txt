@@ -1,10 +1,11 @@
 Changes
 =======
 
-1.2 (unreleased)
+1.2 (2010/12/20)
 ----------------
 
-* ...
+* Add a new textarea widget called ``lines`` able to edit collection
+  of textlines.
 
 1.1 (2010/10/27)
 ----------------
