@@ -36,7 +36,8 @@ from zope.publisher.publish import mapply
 
 from silva.core.conf.interfaces import ITitledContent
 from silva.core.conf.utils import getFactoryName
-from silva.core.interfaces.content import IVersionedContent, IPublishable
+from silva.core.interfaces.content import (IVersionedContent, IPublishable,
+                                           IVersionedAsset)
 from silva.core.layout.interfaces import ISilvaLayer
 from silva.core.messages.interfaces import IMessageService
 from silva.core.smi.interfaces import IAddingTab, IEditTabIndex
@@ -326,6 +327,12 @@ class SMIAddForm(SMIForm):
         content = getattr(parent, identifier)
 
         self._edit(parent, content, data)
+        #set these after, as they involve setting in the metdata,
+        # and specifically the description is set on the default document
+        # of containers (if present), so _edit (in FolderAddForm) needs
+        # to run first
+        self.set_short_title(parent, content, data)
+        self.set_description(parent, content, data)
         return content
 
     def _edit(self, parent, content, data):
@@ -334,6 +341,28 @@ class SMIAddForm(SMIForm):
         for key, value in data.iteritems():
             if key not in ITitledContent and value is not NO_VALUE:
                 editable_content.set(key, value)
+                
+    def set_short_title(self, parent, content, data):
+        #save shorttitle in metadata from form data
+        st = data.getWithDefault('shorttitle')
+        if st is not NO_VALUE:
+            editable_content = content.get_editable()
+            sm = content.get_root().service_metadata
+            sm_binding = sm.getMetadata(obj_editable)
+            sm_binding.setValues('silva-content', {'shorttitle': st})
+
+    def set_description(self, parent, content, data):
+        #set description in metadata from form data
+        d = data.getWithDefault('description')
+        if d is not NO_VALUE:
+            editable_content = content.get_editable()
+            # if this is a container add to default silva content (i.e. index, autoTOC)
+            if IContainer.providedBy(obj_editable):
+                default = obj_editable.get_default()
+                if default:
+                    editable = default.get_editable()
+                    sm_binding = sm.getMetadata(editable)
+            sm_binding.setValues('silva-extra', {'content_description': d})
 
     def _move(self, parent, content):
         data, errors = self.extractData(self.optionFields)
