@@ -35,7 +35,7 @@ class FileSchemaField(SchemaField):
 
 
 class FileWidgetInput(SchemaFieldWidget):
-    grok.adapts(FileSchemaField, Interface, ISMILayer)
+    grok.adapts(FileSchemaField, Interface, Interface)
     grok.name('input')
 
     def valueToUnicode(self, value):
@@ -43,7 +43,7 @@ class FileWidgetInput(SchemaFieldWidget):
 
 
 class FileWidgetExtractor(WidgetExtractor):
-    grok.adapts(FileSchemaField, Interface, ISMILayer)
+    grok.adapts(FileSchemaField, Interface, Interface)
 
     def extract(self):
         value = self.request.form.get(self.identifier, u'')
