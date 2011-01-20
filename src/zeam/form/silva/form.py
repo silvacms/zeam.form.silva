@@ -37,7 +37,7 @@ from zope.publisher.publish import mapply
 from silva.core.conf.interfaces import ITitledContent
 from silva.core.conf.utils import getFactoryName
 from silva.core.interfaces.content import (IVersionedContent, IPublishable,
-                                           IVersionedAsset)
+                                           IVersionedAsset, IContainer)
 from silva.core.layout.interfaces import ISilvaLayer
 from silva.core.messages.interfaces import IMessageService
 from silva.core.smi.interfaces import IAddingTab, IEditTabIndex
@@ -348,7 +348,7 @@ class SMIAddForm(SMIForm):
         if st is not NO_VALUE:
             editable_content = content.get_editable()
             sm = content.get_root().service_metadata
-            sm_binding = sm.getMetadata(obj_editable)
+            sm_binding = sm.getMetadata(editable_content)
             sm_binding.setValues('silva-content', {'shorttitle': st})
 
     def set_description(self, parent, content, data):
@@ -357,11 +357,12 @@ class SMIAddForm(SMIForm):
         if d is not NO_VALUE:
             editable_content = content.get_editable()
             # if this is a container add to default silva content (i.e. index, autoTOC)
-            if IContainer.providedBy(obj_editable):
-                default = obj_editable.get_default()
+            if IContainer.providedBy(editable_content):
+                default = editable_content.get_default()
                 if default:
-                    editable = default.get_editable()
-                    sm_binding = sm.getMetadata(editable)
+                    editable_content = default.get_editable()
+            sm = content.get_root().service_metadata
+            sm_binding = sm.getMetadata(editable_content)
             sm_binding.setValues('silva-extra', {'content_description': d})
 
     def _move(self, parent, content):
