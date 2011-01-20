@@ -5,8 +5,10 @@
       metal:use-macro="context/@@standard_macros/page">
   <body>
     <div metal:fill-slot="body">
-      <form action="." tal:attributes="action request/URL" method="post"
-            enctype="multipart/form-data">
+      <form action="#" name="#"
+            method="post" enctype="multipart/form-data"
+            tal:attributes="name view/prefix;
+                            action request/URL">
 
         <p class="system-msg"
            tal:condition="view/status"
