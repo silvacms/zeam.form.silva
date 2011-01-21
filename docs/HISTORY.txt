@@ -6,6 +6,12 @@ Changes
 
 * ...
 
+Bethel Changes
+--------------
+
+* add code to handle shorttitle and description processing (setting these
+  in metadata)
+
 1.2 (2010/12/20)
 ----------------
 
