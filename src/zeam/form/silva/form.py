@@ -331,8 +331,12 @@ class SMIAddForm(SMIForm):
         # and specifically the description is set on the default document
         # of containers (if present), so _edit (in FolderAddForm) needs
         # to run first
-        self.set_short_title(parent, content, data)
-        self.set_description(parent, content, data)
+        st = data.getWithDefault('shorttitle')
+        if st is not None:
+            self.set_short_title(parent, content, st)
+        desc = data.getWithDefault('description')
+        if desc is not None:
+            self.set_description(parent, content, desc)
         return content
 
     def _edit(self, parent, content, data):
@@ -342,28 +346,24 @@ class SMIAddForm(SMIForm):
             if key not in ITitledContent and value is not NO_VALUE:
                 editable_content.set(key, value)
                 
-    def set_short_title(self, parent, content, data):
+    def set_short_title(self, parent, content, shorttitle):
         #save shorttitle in metadata from form data
-        st = data.getWithDefault('shorttitle')
-        if st is not NO_VALUE:
-            editable_content = content.get_editable()
-            sm = content.get_root().service_metadata
-            sm_binding = sm.getMetadata(editable_content)
-            sm_binding.setValues('silva-content', {'shorttitle': st})
+        editable_content = content.get_editable()
+        sm = content.get_root().service_metadata
+        sm_binding = sm.getMetadata(editable_content)
+        sm_binding.setValues('silva-content', {'shorttitle': st})
 
-    def set_description(self, parent, content, data):
+    def set_description(self, parent, content, desc):
         #set description in metadata from form data
-        d = data.getWithDefault('description')
-        if d is not NO_VALUE:
-            editable_content = content.get_editable()
-            # if this is a container add to default silva content (i.e. index, autoTOC)
-            if IContainer.providedBy(editable_content):
-                default = editable_content.get_default()
-                if default:
-                    editable_content = default.get_editable()
-            sm = content.get_root().service_metadata
-            sm_binding = sm.getMetadata(editable_content)
-            sm_binding.setValues('silva-extra', {'content_description': d})
+        editable_content = content.get_editable()
+        # if this is a container add to default silva content (i.e. index, autoTOC)
+        if IContainer.providedBy(editable_content):
+            default = editable_content.get_default()
+            if default:
+                editable_content = default.get_editable()
+        sm = content.get_root().service_metadata
+        sm_binding = sm.getMetadata(editable_content)
+        sm_binding.setValues('silva-extra', {'content_description': d})
 
     def _move(self, parent, content):
         data, errors = self.extractData(self.optionFields)
