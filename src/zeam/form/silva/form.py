@@ -351,7 +351,7 @@ class SMIAddForm(SMIForm):
         editable_content = content.get_editable()
         sm = content.get_root().service_metadata
         sm_binding = sm.getMetadata(editable_content)
-        sm_binding.setValues('silva-content', {'shorttitle': st})
+        sm_binding.setValues('silva-content', {'shorttitle': shorttitle})
 
     def set_description(self, parent, content, desc):
         #set description in metadata from form data
@@ -363,7 +363,7 @@ class SMIAddForm(SMIForm):
                 editable_content = default.get_editable()
         sm = content.get_root().service_metadata
         sm_binding = sm.getMetadata(editable_content)
-        sm_binding.setValues('silva-extra', {'content_description': d})
+        sm_binding.setValues('silva-extra', {'content_description': desc})
 
     def _move(self, parent, content):
         data, errors = self.extractData(self.optionFields)
