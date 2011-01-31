@@ -468,6 +468,9 @@ class SMIComposedEditForm(SMIEditForm, SMIComposedForm):
     """
     grok.baseclass()
 
+class SMIComposedEditFormTemplate(pt.PageTemplate):
+    """this tempalte is a copy of smicomposedformtemplate.pt"""
+    pt.view(SMIComposedEditForm)
 
 class SMIViewletForm(SilvaFormData, viewlet.ViewletForm):
     """ Base form in viewlet

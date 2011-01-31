@@ -1,0 +1,52 @@
+<tal:composedform>
+  <table class="listing">
+    <thead>
+      <tr tal:condition="view/label">
+        <td class="top">
+          <h2 tal:define="title context/get_title_or_id"
+              i18n:translate="">
+            <img src="#" alt="#"
+                 i18n:name="icon"
+                 tal:attributes="src view/icon_url;
+                                 alt title" />
+            <span tal:replace="view/label"
+                  i18n:name="title" />
+            in
+            &#xab;<span tal:replace="title"
+                        i18n:name="type" />&#xbb;
+          </h2>
+        </td>
+      </tr>
+      <tr class="odd"
+          tal:condition="view/description | nothing">
+        <td class="designator"
+            tal:content="view/description">
+        </td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="top-controls"
+          tal:define="formlabel view/formlabel | nothing"
+          tal:condition="formlabel">
+        <td>
+          <h3 tal:content="formlabel"
+              i18n:translate="">
+            form label
+          </h3>
+        </td>
+      </tr>
+    </tbody>
+    <tfoot tal:condition="view/actionWidgets">
+      <tr class="controls" tal:condition="view/actionWidgets">
+        <td colspan="2">
+          <input tal:repeat="widget view/actionWidgets"
+                 tal:replace="structure widget/render" />
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+  <div class="fixed-clear">&nbsp;</div>
+  <tal:repeat tal:repeat="form view/subforms"
+              tal:replace="structure form/render">
+  </tal:repeat>
+</tal:composedform>
