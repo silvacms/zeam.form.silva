@@ -11,6 +11,9 @@ Bethel Changes
 
 * add code to handle shorttitle and description processing (setting these
   in metadata)
+  
+* adjust SilvaDataManager to smartly operate on VersionedContent and 
+  VersionedAssets
 
 1.2 (2010/12/20)
 ----------------

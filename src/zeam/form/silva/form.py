@@ -141,6 +141,15 @@ class SilvaDataManager(BaseDataManager):
     """Try to use in priority set_ and get_ methods when setting and
     getting values on an object, paying attention to the Acquisition.
     """
+    
+    def __init__(self, content):
+        #if it's versionedcontent(or asset), the data
+        # should be stored on the editable version NOT the content
+        if IVersionedContent.providedBy(content) or \
+           IVersionedAsset.providedBy(content):
+            self.content = content.get_editable()
+        else:
+            self.content = content
 
     def get(self, identifier):
         if hasattr(aq_base(self.content), 'get_%s' % identifier):
@@ -155,7 +164,6 @@ class SilvaDataManager(BaseDataManager):
             setter = getattr(self.content, 'set_%s' % identifier)
             return setter(value)
         return setattr(self.content, identifier, value)
-
 
 class ZMIForm(ZopeForm, base.Form):
     """Regular ZMI forms.
