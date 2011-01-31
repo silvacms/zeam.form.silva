@@ -15,6 +15,10 @@ Bethel Changes
 * adjust SilvaDataManager to smartly operate on VersionedContent and 
   VersionedAssets
 
+* add an SMIComposedEditForm, which is an SMIEditForm and an SMIComposedForm
+
+* make SMIEditForm.update() look at versionedassets also
+
 1.2 (2010/12/20)
 ----------------
 

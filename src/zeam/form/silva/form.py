@@ -447,7 +447,8 @@ class SMIEditForm(SMIForm):
         version, the we set the form in display mode.
         """
         super(SMIEditForm, self).update()
-        if IVersionedContent.providedBy(self.context):
+        if IVersionedContent.providedBy(self.context) or \
+           IVersionedAsset.providedBy(self.context):
             if ((not self.context.get_editable()) or
                 self.context.is_version_approval_requested()):
                 self.mode = DISPLAY
@@ -460,6 +461,11 @@ class SMIEditForm(SMIForm):
             if content is None:
                 content = original_content.get_previewable()
         super(SMIEditForm, self).setContentData(content)
+        
+class SMIComposedEditForm(SMIEditForm, SMIComposedForm):
+    """A composed SMI Edit form
+    """
+    grok.baseclass()
 
 
 class SMIViewletForm(SilvaFormData, viewlet.ViewletForm):
