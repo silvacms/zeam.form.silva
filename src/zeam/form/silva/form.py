@@ -456,7 +456,8 @@ class SMIEditForm(SMIForm):
 
     def setContentData(self, content):
         original_content = content
-        if IVersionedContent.providedBy(original_content):
+        if IVersionedContent.providedBy(original_content) or \
+           IVersionedAsset.providedBy(original_content):
             content = original_content.get_editable()
             if content is None:
                 content = original_content.get_previewable()
