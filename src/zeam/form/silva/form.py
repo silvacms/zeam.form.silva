@@ -462,15 +462,6 @@ class SMIEditForm(SMIForm):
             if content is None:
                 content = original_content.get_previewable()
         super(SMIEditForm, self).setContentData(content)
-        
-class SMIComposedEditForm(SMIEditForm, SMIComposedForm):
-    """A composed SMI Edit form
-    """
-    grok.baseclass()
-
-class SMIComposedEditFormTemplate(pt.PageTemplate):
-    """this tempalte is a copy of smicomposedformtemplate.pt"""
-    pt.view(SMIComposedEditForm)
 
 class SMIViewletForm(SilvaFormData, viewlet.ViewletForm):
     """ Base form in viewlet
