@@ -36,8 +36,8 @@ from zope.publisher.publish import mapply
 
 from silva.core.conf.interfaces import ITitledContent
 from silva.core.conf.utils import getFactoryName
-from silva.core.interfaces.content import (IVersionedContent, IPublishable,
-                                           IVersionedAsset, IContainer)
+from silva.core.interfaces.content import (IPublishable, IContainer,
+                                           IVersionable)
 from silva.core.layout.interfaces import ISilvaLayer
 from silva.core.messages.interfaces import IMessageService
 from silva.core.smi.interfaces import IAddingTab, IEditTabIndex
@@ -145,8 +145,7 @@ class SilvaDataManager(BaseDataManager):
     def __init__(self, content):
         #if it's versionedcontent(or asset), the data
         # should be stored on the editable version NOT the content
-        if IVersionedContent.providedBy(content) or \
-           IVersionedAsset.providedBy(content):
+        if IVersionable.providedBy(content):
             self.content = content.get_editable()
         else:
             self.content = content
@@ -447,8 +446,7 @@ class SMIEditForm(SMIForm):
         version, the we set the form in display mode.
         """
         super(SMIEditForm, self).update()
-        if IVersionedContent.providedBy(self.context) or \
-           IVersionedAsset.providedBy(self.context):
+        if IVersionable.providedBy(self.context)
             if ((not self.context.get_editable()) or
                 self.context.is_version_approval_requested()):
                 self.mode = DISPLAY
@@ -456,8 +454,7 @@ class SMIEditForm(SMIForm):
 
     def setContentData(self, content):
         original_content = content
-        if IVersionedContent.providedBy(original_content) or \
-           IVersionedAsset.providedBy(original_content):
+        if IVersionable.providedBy(original_content):
             content = original_content.get_editable()
             if content is None:
                 content = original_content.get_previewable()
