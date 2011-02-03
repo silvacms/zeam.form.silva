@@ -446,7 +446,7 @@ class SMIEditForm(SMIForm):
         version, the we set the form in display mode.
         """
         super(SMIEditForm, self).update()
-        if IVersionable.providedBy(self.context)
+        if IVersionable.providedBy(self.context):
             if ((not self.context.get_editable()) or
                 self.context.is_version_approval_requested()):
                 self.mode = DISPLAY
