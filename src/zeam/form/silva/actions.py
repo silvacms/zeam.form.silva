@@ -72,7 +72,7 @@ class RemoverWidget(ActionWidget):
 class CancelAction(Action):
     """A action to cancel
     """
-    grok.implements(interfaces.IRESTCloseAction)
+    grok.implements(interfaces.IRESTCloseAction, interfaces.ICancelerAction)
     title = _(u"cancel")
     description = _(u"go back to the folder view: alt-c")
     accesskey = u'c'
@@ -110,7 +110,7 @@ class CancelEditAction(CancelAction):
 class CancelWidget(ActionWidget):
     """Widget to style Cancel buttons
     """
-    grok.adapts(CancelAction, IFormData, Interface)
+    grok.adapts(interfaces.ICancelerAction, IFormData, Interface)
 
     def htmlClass(self):
         return 'canceler'
