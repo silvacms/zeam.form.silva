@@ -1,4 +1,4 @@
-# Copyright (c) 2009-2010 Infrae. All rights reserved.
+# Copyright (c) 2009-2011 Infrae. All rights reserved.
 # See also LICENSE.txt
 # $Id: addform.py 41849 2010-05-07 12:00:45Z sylvain $
 
