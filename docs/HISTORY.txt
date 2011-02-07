@@ -1,18 +1,24 @@
 Changes
 =======
 
-1.3 (unreleased)
+1.3 (2010-02-07)
 ----------------
 
-* ...
+* The FileWidget is now enabled for the ZMIForm as well.
 
-1.2 (2010/12/20)
+* Update ZMIForm template.
+
+* Make CancelButton widget reusable by other actions.
+
+* Fix some unicode issue in the inline validation.
+
+1.2 (2010-12-20)
 ----------------
 
 * Add a new textarea widget called ``lines`` able to edit collection
   of textlines.
 
-1.1 (2010/10/27)
+1.1 (2010-10-27)
 ----------------
 
 * Review security restriction on add forms and edit forms.
@@ -35,7 +41,7 @@ Changes
 
 * Add support for zope.interfaces invariant by default in SMI forms.
 
-1.0 (2010/07/16)
+1.0 (2010-07-16)
 ----------------
 
 * Initial release.
