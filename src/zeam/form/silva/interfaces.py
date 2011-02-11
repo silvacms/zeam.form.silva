@@ -17,6 +17,10 @@ class IRemoverAction(IAction):
     """An action that appear in red.
     """
 
+class ICancelerAction(IAction):
+    """An action that cancel something.
+    """
+
 # Define categories of actions for RESTForm.
 class IRESTAction(IAction):
     """Action design to be used with a RESTForm, that have a special

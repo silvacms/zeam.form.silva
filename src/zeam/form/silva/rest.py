@@ -37,8 +37,10 @@ class RESTValidatorForm(SilvaFormData, rest.REST):
             message, target_language=self.i18nLanguage, context=self.request)
 
     def validateField(self, name, value):
-        # XXX dirty a bit
-        self.request.form[name] = unicode(value)
+        # Inject the value in form with the correct name and decode it.
+        self.request.form[name] = value
+        convert_request_form_to_unicode(self.request.form)
+
         info = {'success': True}
 
         # Look for extractor, extract and validate value.

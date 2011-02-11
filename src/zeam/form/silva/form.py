@@ -66,6 +66,7 @@ class ZopeForm(object):
     """Simple Zope Form.
     """
     grok.baseclass()
+    dataValidators = [validation.InvariantsValidation]
 
     @CachedProperty
     def i18nLanguage(self):
