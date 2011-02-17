@@ -1,4 +1,13 @@
-<input id="#" name="#" value="" type="file"
+<div class="fileupload">
+  <div class="upload-popup" style="display:none">
+  </div>
+
+  <span class="display-value" i18n:translate="">not set</span>
+  <a href="#" i18n:translate=""
+     onclick="return false" class="open-upload-popup">upload</a>
+
+  <input id="#" name="#" value="" type="hidden"
        tal:attributes="name widget.identifier;
                        class widget.htmlClass();
                        id widget.htmlId()" />
+</div>

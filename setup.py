@@ -44,6 +44,7 @@ setup(name='zeam.form.silva',
         'zope.i18n',
         'zope.interface',
         'zope.schema',
+        'gp.fileupload',
         ],
       entry_points="""
       # -*- Entry points: -*-

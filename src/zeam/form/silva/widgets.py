@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2010 Infrae. All rights reserved.
 # See also LICENSE.txt
-
 from datetime import datetime
 from DateTime import DateTime
-
-from ZPublisher.HTTPRequest import FileUpload
-from Products.Silva.icon import get_icon_url
+import os.path
 
 from five import grok
-from zope.interface import Interface
+from zope.interface import Interface, alsoProvides
+from zope.publisher.interfaces.browser import IDefaultBrowserLayer
+
+from App.config import getConfiguration
 
 from silva.core.smi.interfaces import ISMILayer
 from silva.core.conf import schema as silvaschema
+from silva.core import conf as silvaconf
 from silva.translations import translate as _
 
 from zeam.form.base.interfaces import IWidget, IWidgetExtractor
@@ -25,8 +26,17 @@ from zeam.form.ztk.widgets.collection import newCollectionWidgetFactory
 from zeam.form.ztk.widgets.date import DatetimeSchemaField
 from zeam.form.ztk.widgets.textline import TextLineSchemaField
 
+from Products.Silva.icon import get_icon_url
+
+
 def register():
     registerSchemaField(FileSchemaField, silvaschema.IBytes)
+
+
+class IJQueryUploadFileRessources(IDefaultBrowserLayer):
+    silvaconf.resource('upload.js')
+    silvaconf.resource('jquery.uploadfile.js')
+    silvaconf.resource('uploadfile.css')
 
 
 class FileSchemaField(SchemaField):
@@ -38,18 +48,35 @@ class FileWidgetInput(SchemaFieldWidget):
     grok.adapts(FileSchemaField, Interface, Interface)
     grok.name('input')
 
+    def __init__(self, field, form, request):
+        alsoProvides(request, IJQueryUploadFileRessources)
+        super(FileWidgetInput, self).__init__(field, form, request)
+
     def valueToUnicode(self, value):
-        return u''
+        return unicode(value)
 
 
 class FileWidgetExtractor(WidgetExtractor):
     grok.adapts(FileSchemaField, Interface, Interface)
 
+    @classmethod
+    def upload_dir(cls):
+        if hasattr(cls, '_upload_dir_cache'):
+            return cls._upload_dir_cache
+        zconf = getattr(getConfiguration(), 'product_config', {})
+        config = zconf.get('zeam.form.silva', {})
+        upload_dir = config.get('upload-directory', None)
+        if upload_dir is None:
+            raise RuntimeError(
+                '(zeam.form.silva) upload directory no configured')
+        cls._upload_dir_cache = upload_dir
+        return upload_dir
+
     def extract(self):
         value = self.request.form.get(self.identifier, u'')
-        if not isinstance(value, FileUpload) or not value:
-            value = NO_VALUE
-        return value, None
+        if value:
+            return open(os.path.join(self.upload_dir(), value), 'r'), None
+        return NO_VALUE, None
 
 
 class DateTimeFieldWidget(SchemaFieldWidget):
