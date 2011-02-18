@@ -283,12 +283,16 @@ class SMIAddForm(SMIForm):
     ignoreContent = True
     actions = Actions()
 
+    @property
+    def _content_type(self):
+        return self.__name__.split('/')[1]
+
     def _add(self, parent, data):
         """Purely create the object. This method can be overriden to
         support custom creation needs.
         """
         # Search for an addable and a factory
-        addable = extensionRegistry.get_addable(self.__name__)
+        addable = extensionRegistry.get_addable(self._content_type)
         if not addable:
             raise ValueError(u"Content factory cannot be found. ")
 
@@ -322,7 +326,7 @@ class SMIAddForm(SMIForm):
             self.send_message(error.args[0], type=u"error")
             return FAILURE
         self.send_message(
-            _(u'Added ${meta_type}.', mapping={'meta_type': self.__name__}),
+            _(u'Added ${meta_type}.', mapping={'meta_type': self._content_type}),
             type="feedback")
         raise RedirectToPage(content)
 
