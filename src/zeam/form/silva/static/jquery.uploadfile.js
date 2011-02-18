@@ -27,7 +27,8 @@ $.fn.fileUpload = function(options) {
         success: function() {},
         error: function() {},
         action: action,
-        multiple: false
+        multiple: false,
+        dialogElement: null
     }, options);
 
     // console logging
@@ -76,16 +77,25 @@ $.fn.fileUpload = function(options) {
             if (empty && self.forms.length == 0 || self.settings.replace_existing_form) {
                 // show form
                 self.showNext();
-
-                // add submit
-                var submit = '<input class="fuButton" type="submit" ' +
-                                     'name="'+settings.hidden_submit_name+'" />';
-                $(submit)
-                    .appendTo(self.element)
-                    .val(self.settings.submit_label)
-                    .click(function() {
-                        self.submit();
-                    });
+                var label = self.settings.submit_label;
+                var callback = function(){ self.submit(); };
+                if (self.settings.dialog === null) {
+                    // add submit
+                    var submit = '<input type="submit" ' +
+                                         'name="'+settings.hidden_submit_name+'" />';
+                    $(submit)
+                        .appendTo(self.element)
+                        .val(label)
+                        .click(callback);
+                } else {
+                    var buttons = {};
+                    buttons[label] = function(event){
+                        callback();
+                        $(event.target).closest('.ui-button').button('disable');
+                    };
+                    self.settings.dialogElement.dialog(
+                        'option', 'buttons', buttons);
+                }
             }
         },
         showNext: function() {
@@ -156,14 +166,10 @@ $.fn.fileUpload = function(options) {
 
                     // add progress bar
                     var progress = '' +
-                        '<div class="fuWrapper">' +
-                            '<div class="fuFilename">'+filenames+'</div>' +
-                            '<div style="position:relative">' +
-                                '<span style="float:left;" ' +
-                                      'class="fuProgress">&nbsp;</span><br />' +
-                            '</div></div>';
-                    progress = $(progress).appendTo(item.wrapper.element);
-                    item.progress = $('.fuProgress', progress);
+                        '<div class="upload-progress"></div>';
+                    progress = $($(progress).appendTo(item.wrapper.element));
+                    progress.progressbar({value: 0});
+                    item.progress = progress;
 
                     if (self.settings.use_iframes) {
                         // add iframe
@@ -191,7 +197,7 @@ $.fn.fileUpload = function(options) {
                 var item = this.forms.shift();
                 if (item.submit) {
                     item.form.submit();
-                    item.setTimeout();
+                    item.setTimeout(30);
                     log.info('Form '+item.id+' submited');
                 } else {
                     log.info('Skipping form '+item.id);
@@ -234,7 +240,7 @@ $.fn.fileUpload = function(options) {
             .attr('action', action)
             .attr('method', 'POST')
             .attr('enctype', 'multipart/form-data')
-            .wrap('<div></div>');
+            .wrap('<div/>');
 
         // bind click on existing form
         $('input[type^="submit"]', form)
@@ -262,9 +268,7 @@ $.fn.fileUpload = function(options) {
                  success: function(response) {
                         if (response.state == -1) {
                             // upload failure
-                            self.progress.css('width','100%')
-                                         .addClass('fuProgressFailure')
-                                         .html(max_size_error);
+                            self.progress.html(max_size_error);
                             self.wrapper.submitNext();
                             return;
                         }
@@ -272,9 +276,8 @@ $.fn.fileUpload = function(options) {
                             // not started
                             self.retries += 1;
                             if (self.retries > self.max_retries) {
-                                self.progress.css('width','100%')
-                                             .addClass('fuProgressFailure')
-                                             .html('&nbsp;');
+                                self.progress.progressbar("destroy");
+                                self.progress.text('error.');
                                 self.wrapper.submitNext();
                             } else {
                                 self.setTimeout(300);
@@ -285,26 +288,22 @@ $.fn.fileUpload = function(options) {
                         }
                         if (response.percent >= 0 && response.percent < 100) {
                             // progress
-                            self.progress.css('width',response.percent+'%')
-                                         .html(response.percent+'%');
-                            self.setTimeout();
+                            self.progress.progressbar(
+                                "option", "value", response.percent);
+                            self.setTimeout(300);
                         }
                         if (response.percent == 100) {
                             // upload success
-                            self.progress.css('width','100%')
-                                         .addClass('fuProgressSuccess')
-                                         .html(response.percent+'%')
-                                         .removeClass('fuProgress');
+                            self.progress.progressbar("destroy");
+                            self.progress.text('finalizing...');
                             self.wrapper.submitNext();
                         }
                  },
                  error: function(response) {
                      self.retries += 1;
                      if (self.retries > 3) {
-                         self.progress.css('width','100%')
-                                      .addClass('fuProgressFailure')
-                                      .html('&nbsp;');
-                         self.wrapper.submitNext();
+                         self.progress.progressbar("destroy");
+                         self.progress.text('error.');
                      } else {
                         self.setTimeout(500);
                      }

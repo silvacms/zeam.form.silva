@@ -1,16 +1,18 @@
 $(document).ready(function() {
 
-  $('a.open-upload-popup').live('click', function(){
-      var popup = $('<div.upload-popup style="display:none" />');
+  var uploadButtons = $('a.open-upload-popup');
+  uploadButtons.button({ icons: {primary:'ui-icon-document'}});
+
+  uploadButtons.live('click', function(){
+      var popup = $('<div.upload-popup style="display:none"><p/></div>');
       popup.appendTo(document.body);
 
       var popupButtons = {};
 
       popup.dialog({
+          title: $(this).text(),
           autoOpen: false,
           modal: true,
-          height: 500,
-          width: 600,
           zIndex: 12001,
           buttons: popupButtons
       });
@@ -21,22 +23,23 @@ $(document).ready(function() {
                             'action="." >' +
                             '<input type="file" name="file" />' +
                          '</form>');
-      uploadForm.appendTo(popup);
+      uploadForm.appendTo(popup.children('p'));
 
       $(document).one('upload-finished', function(event, data){
           var path = data['paths'][0];
-          var filename = path.replace(/^.*\/(.*)$/, '$1');
+          var filename = path.replace(/^.*[\/\\](.*)$/, '$1');
           $(this).siblings('input:hidden').first().val(path);
-          $(this).siblings('span.display-value').first().text(filename);
+          $(this).siblings('.display-value').first().text(filename);
           popup.dialog('destroy');
       }.scope(this));
 
-      popup.fileUpload({
+      popup.children('p').fileUpload({
           submit_label: $(this).siblings('span.submit-label').text(),
           debug: true,
           action: action,
           replace_existing_form: true,
-          multiple: false
+          multiple: false,
+          dialogElement: popup
         });
       popup.dialog('open');
   });

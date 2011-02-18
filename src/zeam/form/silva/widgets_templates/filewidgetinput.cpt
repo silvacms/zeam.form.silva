@@ -1,13 +1,17 @@
 <div class="fileupload">
-  <div class="upload-popup" style="display:none">
-  </div>
-
+  <script type="text/javascript"
+    src="/++resource++zeam.form.silva/upload.js">
+  </script>
+  <script type="text/javascript"
+    src="/++resource++zeam.form.silva/jquery.uploadfile.js">
+  </script>
   <span style="display:none"
         class="submit-label"
         i18n:translate="">send file</span>
-  <span class="display-value"
+  <div class="display-value"
         tal:content="widget.displayValue()" />
-  <a href="#" i18n:translate=""
+  <a href="#"
+     i18n:translate=""
      onclick="return false" class="open-upload-popup">upload</a>
 
   <input id="#" name="#" value="${widget.inputValue()}" type="hidden"
