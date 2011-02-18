@@ -52,6 +52,12 @@ class FileWidgetInput(SchemaFieldWidget):
         alsoProvides(request, IJQueryUploadFileRessources)
         super(FileWidgetInput, self).__init__(field, form, request)
 
+    def displayValue(self):
+        value = self.inputValue
+        if value:
+            return unicode(os.path.basename(self.inputValue()))
+        return _(u'not set, please upload a file.')
+
     def valueToUnicode(self, value):
         return unicode(value)
 

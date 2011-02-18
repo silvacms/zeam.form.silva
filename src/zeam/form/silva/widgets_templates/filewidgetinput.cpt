@@ -2,11 +2,15 @@
   <div class="upload-popup" style="display:none">
   </div>
 
-  <span class="display-value" i18n:translate="">not set</span>
+  <span style="display:none"
+        class="submit-label"
+        i18n:translate="">send file</span>
+  <span class="display-value"
+        tal:content="widget.displayValue()" />
   <a href="#" i18n:translate=""
      onclick="return false" class="open-upload-popup">upload</a>
 
-  <input id="#" name="#" value="" type="hidden"
+  <input id="#" name="#" value="${widget.inputValue()}" type="hidden"
        tal:attributes="name widget.identifier;
                        class widget.htmlClass();
                        id widget.htmlId()" />
