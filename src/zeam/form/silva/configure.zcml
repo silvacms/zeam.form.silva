@@ -17,6 +17,8 @@
   <include package="infrae.layout" />
   <include package="silva.resourceinclude" />
 
+  <include package="silva.ui" />
+
   <grok:grok package="." />
 
 </configure>
