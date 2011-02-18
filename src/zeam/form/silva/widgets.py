@@ -8,6 +8,7 @@ import os.path
 from five import grok
 from zope.interface import Interface, alsoProvides
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
+from zope.traversing.browser import absoluteURL
 
 from App.config import getConfiguration
 
@@ -35,7 +36,6 @@ def register():
 
 class IJQueryUploadFileRessources(IDefaultBrowserLayer):
     silvaconf.resource('upload.js')
-    silvaconf.resource('jquery.uploadfile.js')
     silvaconf.resource('uploadfile.css')
 
 
@@ -51,6 +51,9 @@ class FileWidgetInput(SchemaFieldWidget):
     def __init__(self, field, form, request):
         alsoProvides(request, IJQueryUploadFileRessources)
         super(FileWidgetInput, self).__init__(field, form, request)
+
+    def uploadURL(self):
+        return absoluteURL(self.form.context, self.request) + '/++rest++upload'
 
     def displayValue(self):
         value = self.inputValue

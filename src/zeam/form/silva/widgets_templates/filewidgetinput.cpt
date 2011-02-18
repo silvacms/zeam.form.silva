@@ -1,21 +1,29 @@
-<div class="fileupload">
+<div class="upload-file">
   <script type="text/javascript"
     src="/++resource++zeam.form.silva/upload.js">
   </script>
-  <script type="text/javascript"
-    src="/++resource++zeam.form.silva/jquery.uploadfile.js">
-  </script>
-  <span style="display:none"
-        class="submit-label"
-        i18n:translate="">send file</span>
-  <div class="display-value"
-        tal:content="widget.displayValue()" />
-  <a href="#"
+  <div class="upload-popup" style="width: 100px; height:10px;">
+    <p></p>
+  </div>
+  <div class="upload-display"
+        tal:content="widget.displayValue()">
+      Display value
+  </div>
+  <div style="display:none"
+       class="upload-progress">
+  </div>
+  <iframe width="0"
+          height="0"
+          style="display:none"
+          src="about:blank"
+          class="upload-iframe"
+          name="${widget.htmlId()}-upload-iframe">
+  </iframe>
+  <a href="${widget.uploadURL()}"
      i18n:translate=""
-     onclick="return false" class="open-upload-popup">upload</a>
-
+     onclick="return false" class="upload-trigger">upload</a>
   <input id="#" name="#" value="${widget.inputValue()}" type="hidden"
        tal:attributes="name widget.identifier;
-                       class widget.htmlClass();
+                       class widget.htmlClass() + ' upload-input';
                        id widget.htmlId()" />
 </div>
