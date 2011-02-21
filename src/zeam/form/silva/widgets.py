@@ -6,12 +6,15 @@ from DateTime import DateTime
 import os.path
 
 from five import grok
-from zope.interface import Interface, alsoProvides
-from zope.publisher.interfaces.browser import IDefaultBrowserLayer
+from zope.interface import Interface
 from zope.traversing.browser import absoluteURL
+from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 
 from App.config import getConfiguration
 
+from js.jqueryui import jqueryui
+
+from silva.fanstatic import need
 from silva.core.smi.interfaces import ISMILayer
 from silva.core.conf import schema as silvaschema
 from silva.core import conf as silvaconf
@@ -34,14 +37,14 @@ def register():
     registerSchemaField(FileSchemaField, silvaschema.IBytes)
 
 
-class IJQueryUploadFileRessources(IDefaultBrowserLayer):
-    silvaconf.resource('upload.js')
-    silvaconf.resource('uploadfile.css')
-
-
 class FileSchemaField(SchemaField):
     """Field to upload a file.
     """
+
+
+class IUploadResources(IDefaultBrowserLayer):
+    silvaconf.resource(jqueryui)
+    silvaconf.resource('upload.js')
 
 
 class FileWidgetInput(SchemaFieldWidget):
@@ -49,7 +52,7 @@ class FileWidgetInput(SchemaFieldWidget):
     grok.name('input')
 
     def __init__(self, field, form, request):
-        alsoProvides(request, IJQueryUploadFileRessources)
+        need(IUploadResources)
         super(FileWidgetInput, self).__init__(field, form, request)
 
     def uploadURL(self):

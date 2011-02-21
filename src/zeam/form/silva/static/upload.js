@@ -45,13 +45,13 @@ $.extend(Uploader.prototype, {
     },
 
     finalize: function(filename) {
-        this.element.trigger('upload.finished', filename);
+        this.element.trigger('finished.upload', filename);
     },
 
     stop: function(message) {
         this._clearTimeout();
         this.progress = 100;
-        this.element.trigger('upload.failed', message);
+        this.element.trigger('failure.upload', message);
     },
 
     _clearTimeout: function() {
@@ -65,7 +65,7 @@ $.extend(Uploader.prototype, {
         var old = this.progress;
         if (value != old) {
             this.progress = value;
-            this.element.trigger('upload.progress', value);
+            this.element.trigger('finished.upload', value);
         }
     },
 
@@ -161,18 +161,17 @@ $(document).ready(function() {
       trigger.button({'icons': {'primary': 'ui-icon-document'}});
       trigger.bind('click', function(){ popup.dialog('open'); });
       progress.progressbar({value: 0});
-      element.bind('upload.progress', function(event, value){
-          console.log(value);
+      element.bind('progress.upload', function(event, value){
           progress.progressbar('option', 'value', value);
       });
-      element.bind('upload.finished', function(event, filename){
+      element.bind('finished.upload', function(event, filename){
           input.val(filename);
           progress.hide();
           display.text(filename.replace(/^.*[\/\\](.*)/, '$1'));
           trigger.button('enable');
           trigger.show();
       });
-      element.bind('upload.failure', function(event, message){
+      element.bind('failure.upload', function(event, message){
           input.val(oldValue);
           display.text(oldValue.replace(/^.*[\/\\](.*)/, '$1'));
           progress.hide();
