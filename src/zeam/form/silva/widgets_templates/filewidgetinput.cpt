@@ -1,7 +1,4 @@
 <div class="upload-file">
-  <script type="text/javascript"
-    src="/++resource++zeam.form.silva/upload.js">
-  </script>
   <div class="upload-popup" style="width: 100px; height:10px;">
     <p></p>
   </div>

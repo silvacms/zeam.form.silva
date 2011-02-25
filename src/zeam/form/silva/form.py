@@ -197,6 +197,9 @@ class SMIForm(SilvaFormData, PageREST, FormCanvas):
         PageREST.__init__(self, context, request)
         FormCanvas.__init__(self, context, request)
 
+    def update(self):
+        pass
+
     def renderActions(self):
         def renderAction(action):
             return {'label': action.title,
@@ -205,6 +208,7 @@ class SMIForm(SilvaFormData, PageREST, FormCanvas):
 
     def payload(self):
         convert_request_form_to_unicode(self.request.form)
+        self.update()
         action, status = self.updateActions()
         self.updateWidgets()
         actions = self.renderActions()
