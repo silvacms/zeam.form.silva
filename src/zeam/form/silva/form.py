@@ -15,6 +15,7 @@ from zeam.form.base.datamanager import BaseDataManager
 from zeam.form.base.fields import Fields
 from zeam.form.base.markers import SUCCESS, FAILURE, NO_VALUE
 from zeam.form.ztk import validation
+from zeam.form.composed.form import SubFormGroupBase
 
 from zeam.form.silva.interfaces import ISilvaFormData
 from zeam.form.silva.utils import find_locale, convert_request_form_to_unicode
@@ -23,7 +24,6 @@ from zeam.form.silva.actions import EditAction, ExtractedDecoratedAction
 
 from infrae.layout.interfaces import IPage, ILayoutFactory
 
-from Products.Silva.icon import get_icon_url
 from Products.Silva.ExtensionRegistry import extensionRegistry
 
 from zope import component
@@ -231,20 +231,32 @@ class PublicForm(SilvaForm, base.Form):
     grok.require('zope.Public')
 
 
-class SMIComposedForm(SilvaForm, composed.ComposedForm):
+class SMIComposedForm(SilvaFormData, PageREST, SubFormGroupBase, FormCanvas):
     """SMI Composed forms.
     """
     grok.baseclass()
     grok.require('silva.ChangeSilvaContent')
 
-    @property
-    def icon_url(self):
-        return get_icon_url(self.context, self.request)
+    def __init__(self, context, request):
+        PageREST.__init__(self, context, request)
+        SubFormGroupBase.__init__(self, context, request)
+        FormCanvas.__init__(self, context, request)
+
+    def payload(self):
+        convert_request_form_to_unicode(self.request.form)
+        self.update()
+        action, status = SubFormGroupBase.updateActions(self)
+        if action is None:
+            FormCanvas.updateActions(self)
+        SubFormGroupBase.updateWidgets(self)
+        FormCanvas.updateWidgets(self)
+        return {'ifaces': ['form'],
+                'success': status == SUCCESS,
+                'html': self.render()}
 
 
 class SMIComposedFormTemplate(pt.PageTemplate):
     pt.view(SMIComposedForm)
-
 
 class SMISubForm(SilvaFormData, composed.SubForm):
     """SMI Sub forms.

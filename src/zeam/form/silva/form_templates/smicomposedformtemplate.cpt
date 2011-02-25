@@ -1,0 +1,5 @@
+<tal:composedform>
+  <tal:repeat tal:repeat="form view.subforms"
+              tal:replace="structure form.render()">
+  </tal:repeat>
+</tal:composedform>
