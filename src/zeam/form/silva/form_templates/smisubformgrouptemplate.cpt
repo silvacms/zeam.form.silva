@@ -1,4 +1,4 @@
-<div class="zeam-subform" id="#"
+<div class="form-subforms" id="#"
      tal:attributes="id view.htmlId()"
      tal:condition="view.available()">
 

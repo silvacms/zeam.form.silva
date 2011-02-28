@@ -1,48 +1,41 @@
-<form class="content-form" i18n:domain="silva">
-  <table>
-    <tbody>
-      <tal:repeat tal:repeat="widget view.fieldWidgets">
-        <tr>
-          <td class="label">
-            <label tal:attributes="for widget.htmlId()"
-                   tal:content="widget.title">
-              Field Name
-            </label>
-            <span class="required"
-                  tal:condition="widget.required">
-              *
-            </span>
-            <p tal:condition="widget.description"
-               tal:content="widget.description">
-              Description
-            </p>
-          </td>
-          <td class="field">
-            <div class="error"
-                 tal:condition="widget.error"
-                 tal:content="structure widget.error.title">
-              Validation error.
-            </div>
-            <tal:widget tal:content="structure widget.render()">
-              Widget.
-            </tal:widget>
-          </td>
-        </tr>
-      </tal:repeat>
-    </tbody>
-    <tfoot>
-      <tr tal:condition="view.haveRequiredFields()">
-        <td i18n:translate="">
-          * required
-        </td>
-        <td>&nbsp;</td>
-      </tr>
-      <tr class="controls" tal:condition="view.actionWidgets">
-        <td colspan="2">
-          <input tal:repeat="widget view.actionWidgets"
-                 tal:replace="structure widget.render()" />
-        </td>
-      </tr>
-    </tfoot>
-  </table>
+<form class="form-content" i18n:domain="silva">
+  <div class="form-body">
+  <tal:repeat tal:repeat="widget view.fieldWidgets">
+    <div class="form-section">
+      <div class="form-label">
+        <label tal:attributes="for widget.htmlId()"
+               tal:content="widget.title">
+          Field Name
+        </label>
+        <span class="form-required"
+              tal:condition="widget.required">
+          *
+        </span>
+        <p tal:condition="widget.description"
+           tal:content="widget.description">
+          Description
+        </p>
+      </div>
+      <div class="form-field">
+          <div class="form-error"
+               tal:condition="widget.error"
+               tal:content="structure widget.error.title">
+            Validation error.
+          </div>
+          <tal:widget tal:content="structure widget.render()">
+            Widget.
+          </tal:widget>
+      </div>
+    </div>
+  </tal:repeat>
+  </div>
+  <div class="form-footer">
+    <div tal:condition="view.haveRequiredFields()">
+      <span i18n:translate="">* required</span>
+    </div>
+    <div class="form-controls" tal:condition="view.actionWidgets">
+        <input tal:repeat="widget view.actionWidgets"
+               tal:replace="structure widget.render()" />
+    </div>
+  </div>
 </form>

@@ -116,9 +116,10 @@
 
     FileUploader.prototype.start = function() {
         // listen to event triggered by the iframe
-        $(document).one('upload-finished', function(event, data){
-            this.finalize(data['paths'][0]);
-        }.scope(this));
+        $(document).one('done.' + String(this.uploadId) + '.upload',
+            function(event, data){
+                this.finalize(data.path);
+            }.scope(this));
         this._form.submit();
         this.getStatus();
     };
