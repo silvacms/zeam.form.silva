@@ -1,22 +1,29 @@
 <form class="form-content" i18n:domain="silva">
+  <div class="form-head">
+    <h4 tal:condition="view.label" tal:content="view.label">label</h4>
+    <p tal:condition="view.description"
+       tal:content="structure view.description">
+      Description
+    </p>
+  </div>
   <div class="form-body">
-  <tal:repeat tal:repeat="widget view.fieldWidgets">
-    <div class="form-section">
-      <div class="form-label">
-        <label tal:attributes="for widget.htmlId()"
-               tal:content="widget.title">
-          Field Name
-        </label>
-        <span class="form-required"
-              tal:condition="widget.required">
-          *
-        </span>
-        <p tal:condition="widget.description"
-           tal:content="widget.description">
-          Description
-        </p>
-      </div>
-      <div class="form-field">
+    <tal:repeat tal:repeat="widget view.fieldWidgets">
+      <div class="form-section">
+        <div class="form-label">
+          <label tal:attributes="for widget.htmlId()"
+                 tal:content="widget.title">
+            Field Name
+          </label>
+          <span class="form-required"
+                tal:condition="widget.required">
+            *
+          </span>
+          <p tal:condition="widget.description"
+             tal:content="widget.description">
+            Description
+          </p>
+        </div>
+        <div class="form-field">
           <div class="form-error"
                tal:condition="widget.error"
                tal:content="structure widget.error.title">
@@ -25,17 +32,17 @@
           <tal:widget tal:content="structure widget.render()">
             Widget.
           </tal:widget>
+        </div>
       </div>
-    </div>
-  </tal:repeat>
+    </tal:repeat>
   </div>
   <div class="form-footer">
     <div tal:condition="view.haveRequiredFields()">
       <span i18n:translate="">* required</span>
     </div>
     <div class="form-controls" tal:condition="view.actionWidgets">
-        <input tal:repeat="widget view.actionWidgets"
-               tal:replace="structure widget.render()" />
+      <input tal:repeat="widget view.actionWidgets"
+             tal:replace="structure widget.render()" />
     </div>
   </div>
 </form>

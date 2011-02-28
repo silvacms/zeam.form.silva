@@ -1,8 +1,7 @@
-<form action="#" method="post" enctype="multipart/form-data"
-      name="#" class="zeam-form"
+<form method="post" enctype="multipart/form-data"
+      name="#" class="form-content"
       tal:define="form view.getComposedForm()"
-      tal:attributes="action path:form/@@absolute_url;
-                      name view.prefix"
+      tal:attributes="name view.prefix"
       i18n:domain="silva">
   <table class="listing"
          tal:define="columns len(view.tableFields) + 1">
