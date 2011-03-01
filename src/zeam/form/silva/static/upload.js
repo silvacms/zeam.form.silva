@@ -8,9 +8,10 @@
     var FileUploader = function(element, options){
         var defaults = {
             statTimeout: 5000,
-            statDelay: 500
+            statDelay: 500,
+            tooManyTriesLabel: 'unknown error while uploading file.',
+            fileTooBigLabel: 'upload failed file is too big.'
         };
-
         this.progress = 0;
         this.retries = 0;
         this.options = $.extend(defaults, options);
@@ -82,14 +83,14 @@
             url: this.statURL + this.uploadId + query,
             success: function(data) {
                 if (data.state == -1) {
-                    this.stop(this.options.tooManyTriesLabel);
+                    this.stop(this.options.fileTooBigLabel);
                     return;
                 }
                 if (data.state == 0) {
                     // not started
                     this.retries += 1;
                     if (this.retries > this.max_retries) {
-                        this.stop();
+                        this.stop(this.options.tooManyTriesLabel);
                     } else {
                         this.getStatus();
                     }
@@ -110,7 +111,7 @@
             error: function() {
                 this.retries += 1;
                 if (this.retries > 3) {
-                    this.stop();
+                    this.stop(this.options.tooManyTriesLabel);
                 } else {
                     this.getStatus(this.options.statDelay);
                 }
@@ -174,13 +175,14 @@
             trigger.show();
         });
         field.bind('failure-fileupload', function(event, message){
+            field.trigger('notify', {'message': message,
+                'category': 'error'});
             input.val(oldValue);
             display.text(basename(oldValue));
             progress.hide();
             trigger.button('enable');
             trigger.show();
         });
-
     };
 
     $('form').live('load-smiform', function() {
