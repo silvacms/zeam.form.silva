@@ -1,6 +1,10 @@
 
 (function($) {
 
+    function basename(path) {
+        return path.replace(/^.*[\/\\](.*)/, '$1');
+    }
+
     var FileUploader = function(element, options){
         var defaults = {
             statTimeout: 5000,
@@ -41,7 +45,7 @@
 
     FileUploader.prototype.terminate = function() {
         this.progress = 100;
-        this.element.trigger('upload.complete', this.uploadId);
+        this.element.trigger('complete-fileupload', this.uploadId);
     };
 
     FileUploader.prototype.finalize = function(filename) {
@@ -65,7 +69,7 @@
         var old = this.progress;
         if (value != old) {
             this.progress = value;
-            this.element.trigger('finished-fileupload', value);
+            this.element.trigger('progress-fileupload', value);
         }
     };
 
@@ -116,14 +120,13 @@
 
     FileUploader.prototype.start = function() {
         // listen to event triggered by the iframe
-        $(document).one('done.' + String(this.uploadId) + '.upload',
+        $(document).one('done-' + String(this.uploadId) + '-upload',
             function(event, data){
                 this.finalize(data.path);
             }.scope(this));
         this._form.submit();
         this.getStatus();
     };
-
 
     var create_upload_field = function(field) {
 
@@ -166,13 +169,13 @@
         field.bind('finished-fileupload', function(event, filename){
             input.val(filename);
             progress.hide();
-            display.text(filename.replace(/^.*[\/\\](.*)/, '$1'));
+            display.text(basename(filename));
             trigger.button('enable');
             trigger.show();
         });
         field.bind('failure-fileupload', function(event, message){
             input.val(oldValue);
-            display.text(oldValue.replace(/^.*[\/\\](.*)/, '$1'));
+            display.text(basename(oldValue));
             progress.hide();
             trigger.button('enable');
             trigger.show();

@@ -59,9 +59,9 @@ class FileWidgetInput(SchemaFieldWidget):
         return absoluteURL(self.form.context, self.request) + '/++rest++upload'
 
     def displayValue(self):
-        value = self.inputValue
+        value = self.inputValue()
         if value:
-            return unicode(os.path.basename(self.inputValue()))
+            return unicode(os.path.basename(value))
         return _(u'not set, please upload a file.')
 
     def valueToUnicode(self, value):

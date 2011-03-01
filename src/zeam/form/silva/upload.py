@@ -27,7 +27,7 @@ class Upload(rest.REST):
                 <body>
                     <script>
                         var $ = window.parent.jQuery;
-                        $(window.parent.document).trigger('done.%d.upload', %s);
+                        $(window.parent.document).trigger('done-%d-upload', %s);
                     </script>
                 </body>
             </html>
