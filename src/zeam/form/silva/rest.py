@@ -6,7 +6,6 @@
 from five import grok
 from infrae import rest
 from megrok import pagetemplate as pt
-from silva.core.interfaces import IVersionedContent
 from silva.core.smi.interfaces import ISMILayer
 from zope.i18n import translate
 from zope.interface import alsoProvides
@@ -16,10 +15,8 @@ from zeam.form.base.interfaces import IFormCanvas
 from zeam.form.base.markers import SUCCESS
 from zeam.form.base.widgets import getWidgetExtractor
 from zeam.form.silva import interfaces
-from zeam.form.silva.form import SilvaDataManager
 from zeam.form.silva.form import SilvaFormData, SMIComposedForm
 from zeam.form.silva.utils import convert_request_form_to_unicode
-from zeam.form.ztk import validation
 
 
 REST_ACTIONS_TO_TOKEN = [
@@ -140,24 +137,3 @@ class RESTPopupForm(SilvaFormData, rest.REST, FormCanvas):
 
 class RESTFormTemplate(pt.PageTemplate):
     pt.view(RESTPopupForm)
-
-
-class RESTKupuEditProperties(RESTPopupForm):
-    grok.baseclass()
-    grok.name('kupu-properties')
-
-    ignoreContent = False
-    dataManager = SilvaDataManager
-    dataValidators = [validation.InvariantsValidation]
-
-    def setContentData(self, content):
-        original_content = content
-        if IVersionedContent.providedBy(original_content):
-            content = original_content.get_editable()
-            if content is None:
-                content = original_content.get_previewable()
-        super(RESTKupuEditProperties, self).setContentData(content)
-
-
-class RESTKupuTemplate(pt.PageTemplate):
-    pt.view(RESTKupuEditProperties)
