@@ -3,10 +3,10 @@
       tal:define="form view.getComposedForm()"
       tal:attributes="name view.prefix"
       i18n:domain="silva">
-  <table class="listing"
+  <table class="form-table"
          tal:define="columns len(view.tableFields) + 1">
     <thead>
-      <tr class="top-controls" tal:condition="view.label">
+      <tr class="form-top-controls" tal:condition="view.label">
         <td colspan="#"
             tal:attributes="colspan columns">
           <h3 tal:content="view.label">label</h3>
@@ -54,7 +54,7 @@
       </tr>
     </tbody>
     <tfoot tal:condition="view.actionWidgets">
-      <tr class="controls">
+      <tr class="form-controls">
         <td colspan="3"
             tal:attributes="colspan columns">
 
@@ -68,8 +68,9 @@
               Field Name
             </label>
             <span class="required"
-                  tal:condition="widget.required">
-              *
+                  tal:condition="widget.required"
+                  i18n:translate="">
+              required
             </span>
             <span class="error"
                  tal:condition="widget.error"

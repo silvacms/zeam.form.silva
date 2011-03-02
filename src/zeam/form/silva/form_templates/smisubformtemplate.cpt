@@ -19,8 +19,9 @@
             Field Name
           </label>
           <span class="form-required"
-                tal:condition="widget.required">
-            *
+                tal:condition="widget.required"
+                i18n:translate="">
+              required
           </span>
           <p tal:condition="widget.description"
              tal:content="widget.description">
@@ -41,9 +42,6 @@
     </tal:repeat>
   </div>
   <div class="form-footer">
-    <div tal:condition="view.haveRequiredFields()">
-      <span i18n:translate="">* required</span>
-    </div>
     <div class="form-controls" tal:condition="view.actionWidgets">
         <input tal:repeat="widget view.actionWidgets"
                tal:replace="structure widget.render()" />

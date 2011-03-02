@@ -1,11 +1,10 @@
 <div class="form-subforms" id="#"
      tal:attributes="id view.htmlId()"
      tal:condition="view.available()">
-
-  <h2 tal:content="view.label"
+  <h3 tal:content="view.label"
       tal:condition="view.label">
     label
-  </h2>
+  </h3>
   <p tal:condition="view.description"
      tal:content="view.description">
     description
@@ -13,5 +12,4 @@
   <tal:forms tal:repeat="form view.subforms"
               tal:replace="structure form.render()">
   </tal:forms>
-  <div class="fixed-clear">&nbsp;</div>
 </div>
