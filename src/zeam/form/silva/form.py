@@ -299,6 +299,11 @@ class SMIAddForm(SMIForm):
     ignoreContent = True
     actions = Actions()
 
+    def update(self):
+        super(SMIAddForm, self).update()
+        self.label = _('add a ${content_type}',
+            mapping={'content_type': self._content_type})
+
     @property
     def _content_type(self):
         return self.__name__.split('/')[1]
