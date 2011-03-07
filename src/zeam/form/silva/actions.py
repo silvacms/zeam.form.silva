@@ -48,10 +48,6 @@ class PopupAction(Action):
         return SUCCESS
 
 
-class SMIActionWidget(ActionWidget):
-    grok.adapts(IAction, interfaces.ISMIForm, Interface)
-
-
 class PopupWidget(ActionWidget):
     """Widget to style popup buttons
     """
@@ -63,13 +59,12 @@ class PopupWidget(ActionWidget):
              '++rest++' + self.component.action))
 
 
-# class RemoverWidget(ActionWidget):
-#     """Widget in red.
-#     """
-#     grok.adapts(interfaces.IRemoverAction, IFormData, Interface)
+class SMIActionWidget(ActionWidget):
+    grok.adapts(IAction, interfaces.ISMIForm, Interface)
 
-#     def htmlClass(self):
-#         return 'action remover'
+
+class SMIRemoverWidget(ActionWidget):
+    grok.adapts(interfaces.IRemoverAction, interfaces.ISMIForm, Interface)
 
 
 class CancelAction(Action):
@@ -109,13 +104,11 @@ class CancelEditAction(CancelAction):
         return SUCCESS
 
 
-# class CancelWidget(ActionWidget):
-#     """Widget to style Cancel buttons
-#     """
-#     grok.adapts(interfaces.ICancelerAction, IFormData, Interface)
+class SMICancelWidget(ActionWidget):
+    """Widget to style Cancel buttons
+    """
+    grok.adapts(interfaces.ICancelerAction, interfaces.ISMIForm, Interface)
 
-#     def htmlClass(self):
-#         return 'canceler'
 
 
 class ExtractedDecoratedAction(DecoratedAction):

@@ -1,0 +1,7 @@
+<a class="ui-state-default form-control" id="#" name="#" title="#"
+   tal:attributes="name widget.identifier;
+                   title widget.description;
+                   id widget.htmlId();">
+  <ins class="ui-icon ui-icon-arrowreturnthick-1-w"></ins>
+  <tal:label tal:content="widget.title">Label</tal:label>
+</a>
