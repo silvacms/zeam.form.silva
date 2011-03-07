@@ -7,7 +7,7 @@ import martian
 from zope.component import provideUtility
 from zope.component.interfaces import IFactory
 
-from zeam.form.silva.form import SMIAddForm
+from zeam.form.silva.form.smi import SMIAddForm
 from silva.core import conf as silvaconf
 
 

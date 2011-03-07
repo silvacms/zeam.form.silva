@@ -6,16 +6,19 @@ from five import grok
 from five.grok.meta import ViewSecurityGrokker
 from grokcore.security.components import Permission
 from martian.error import GrokError
-from zeam.form.silva import form
 from zope.component import provideUtility
 from zope.security.interfaces import IPermission
 import martian
+
+from zeam.form.silva.form.smi import SMIAddForm
+from zeam.form.silva.form.public import SilvaForm
+from zeam.form.silva.form.zmi import ZopeForm
 
 
 class SilvaAddFormSecurityGrokker(martian.ClassGrokker):
     """Set the correct permission on add forms.
     """
-    martian.component(form.SMIAddForm)
+    martian.component(SMIAddForm)
     martian.directive(grok.name)
     martian.directive(grok.require)
     martian.priority(800)       # Priority > SilvaFormSecurityGrokker
@@ -42,14 +45,13 @@ class SilvaAddFormSecurityGrokker(martian.ClassGrokker):
         return True
 
 
-class SilvaFormSecurityGrokker(ViewSecurityGrokker):
+class PublicFormSecurityGrokker(ViewSecurityGrokker):
     """We want to set Zope 2 security on Forms
     """
-    martian.component(form.SilvaForm)
-    martian.priority(400)
+    martian.component(SilvaForm)
 
 
 class ZopeFormSecurityGrokker(ViewSecurityGrokker):
     """We want to set Zope 2 security on Forms
     """
-    martian.component(form.ZopeForm)
+    martian.component(ZopeForm)

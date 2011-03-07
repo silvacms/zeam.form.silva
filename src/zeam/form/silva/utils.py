@@ -3,8 +3,30 @@
 # See also LICENSE.txt
 # $Id$
 
+from five import grok
 from zope.i18n.interfaces import IUserPreferredLanguages
 from zope.i18n.locales import locales, LoadLocaleError
+from zope import component
+from zope.cachedescriptors.property import CachedProperty
+
+from zeam.form.silva.interfaces import ISilvaFormData
+from silva.core.messages.interfaces import IMessageService
+
+
+class SilvaFormData(object):
+    grok.implements(ISilvaFormData)
+
+    @CachedProperty
+    def i18nLanguage(self):
+        adapter = IUserPreferredLanguages(self.request)
+        languages = adapter.getPreferredLanguages()
+        if languages:
+            return languages[0]
+        return 'en'
+
+    def send_message(self, message, type=u""):
+        service = component.getUtility(IMessageService)
+        service.send(message, self.request, namespace=type)
 
 
 def find_locale(request):

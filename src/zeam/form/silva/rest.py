@@ -15,7 +15,7 @@ from zeam.form.base.interfaces import IFormCanvas
 from zeam.form.base.markers import SUCCESS
 from zeam.form.base.widgets import getWidgetExtractor
 from zeam.form.silva import interfaces
-from zeam.form.silva.form import SilvaFormData, SMIComposedForm
+from zeam.form.silva.form.smi import SilvaFormData, SMIComposedForm
 from zeam.form.silva.utils import convert_request_form_to_unicode
 
 

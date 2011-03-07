@@ -3,132 +3,36 @@
 # $Id$
 
 from Acquisition import aq_base
-from zExceptions import Redirect
 
 from five import grok
 from megrok import pagetemplate as pt
 
 from zeam.form.base.form import FormCanvas
 from zeam.form.base.actions import Actions, action
-from zeam.form import base, composed, table, viewlet
+from zeam.form import composed, table
 from zeam.form.base.datamanager import BaseDataManager
 from zeam.form.base.fields import Fields
 from zeam.form.base.markers import SUCCESS, FAILURE, NO_VALUE
 from zeam.form.ztk import validation
 from zeam.form.composed.form import SubFormGroupBase
 
-from zeam.form.silva.interfaces import ISilvaFormData
-from zeam.form.silva.utils import find_locale, convert_request_form_to_unicode
+from zeam.form.silva.utils import convert_request_form_to_unicode
 from zeam.form.silva.actions import CancelAddAction, CancelEditAction
 from zeam.form.silva.actions import EditAction, ExtractedDecoratedAction
-
-from infrae.layout.interfaces import IPage, ILayoutFactory
+from zeam.form.silva.utils import SilvaFormData
 
 from Products.Silva.ExtensionRegistry import extensionRegistry
 
-from zope import component
-from zope.cachedescriptors.property import CachedProperty
 from zope.configuration.name import resolve
-from zope.i18n.interfaces import IUserPreferredLanguages
-from zope.publisher.publish import mapply
 
 from silva.core.conf.interfaces import ITitledContent
 from silva.core.conf.utils import getFactoryName
 from silva.core.interfaces.content import IVersionedContent
-from silva.core.layout.interfaces import ISilvaLayer
-from silva.core.messages.interfaces import IMessageService
-from silva.core.views.views import HTTPHeaderView
 from silva.translations import translate as _
 from silva.ui.rest.base import PageREST, RedirectToPage
 
 
 REST_ACTIONS_TO_TOKEN = []
-
-class SilvaFormData(object):
-    grok.implements(ISilvaFormData)
-
-    @CachedProperty
-    def i18nLanguage(self):
-        adapter = IUserPreferredLanguages(self.request)
-        languages = adapter.getPreferredLanguages()
-        if languages:
-            return languages[0]
-        return 'en'
-
-    def send_message(self, message, type=u""):
-        service = component.getUtility(IMessageService)
-        service.send(message, self.request, namespace=type)
-
-
-class ZopeForm(object):
-    """Simple Zope Form.
-    """
-    grok.baseclass()
-    dataValidators = [validation.InvariantsValidation]
-
-    @CachedProperty
-    def i18nLanguage(self):
-        adapter = IUserPreferredLanguages(self.request)
-        languages = adapter.getPreferredLanguages()
-        if languages:
-            return languages[0]
-        return 'en'
-
-    def __init__(self, context, request):
-        super(ZopeForm, self).__init__(context, request)
-        self.__name__ = self.__view_name__
-
-    def __call__(self):
-        if not hasattr(self.request, 'locale'):
-            # This is not pretty, but no choice.
-            self.request.locale = find_locale(self.request)
-        convert_request_form_to_unicode(self.request.form)
-
-        return super(ZopeForm, self).__call__()
-
-
-class SilvaForm(HTTPHeaderView, SilvaFormData):
-    """Form in Silva.
-    """
-    grok.baseclass()
-    grok.implements(IPage)
-    dataValidators = [validation.InvariantsValidation]
-
-    def __init__(self, context, request):
-        super(SilvaForm, self).__init__(context, request)
-        self.__name__ = self.__view_name__
-        self.layout = None
-
-    def default_namespace(self):
-        namespace = super(SilvaForm, self).default_namespace()
-        namespace['layout'] = self.layout
-        return namespace
-
-    def content(self):
-        return self.render()
-
-    def __call__(self):
-        self.setHTTPHeaders()
-        if not hasattr(self.request, 'locale'):
-            # This is not pretty, but no choice.
-            self.request.locale = find_locale(self.request)
-        convert_request_form_to_unicode(self.request.form)
-
-        layout_factory = component.getMultiAdapter(
-            (self.request, self.context,), ILayoutFactory)
-        self.layout = layout_factory(self)
-
-        mapply(self.update, (), self.request)
-        if self.request.response.getStatus() in (302, 303):
-            # A redirect was triggered somewhere in update(). Don't
-            # continue processing the form
-            return
-
-        self.updateForm()
-        if self.request.response.getStatus() in (302, 303):
-            return
-
-        return self.layout(self)
 
 
 class SilvaDataManager(BaseDataManager):
@@ -149,38 +53,6 @@ class SilvaDataManager(BaseDataManager):
             setter = getattr(self.content, 'set_%s' % identifier)
             return setter(value)
         return setattr(self.content, identifier, value)
-
-
-class ZMIForm(ZopeForm, base.Form):
-    """Regular ZMI forms.
-    """
-    grok.baseclass()
-    grok.require('zope2.ViewManagementScreens')
-
-
-class ZMIFormTemplate(pt.PageTemplate):
-    pt.view(ZMIForm)
-
-
-class ZMIComposedForm(ZopeForm, composed.ComposedForm):
-    """ZMI Composed forms.
-    """
-    grok.baseclass()
-    grok.require('zope2.ViewManagementScreens')
-
-
-class ZMIComposedFormTemplate(pt.PageTemplate):
-    pt.view(ZMIComposedForm)
-
-
-class ZMISubForm(composed.SubForm):
-    """ZMI Composed forms.
-    """
-    grok.baseclass()
-
-
-class ZMISubFormTemplate(pt.PageTemplate):
-    pt.view(ZMISubForm)
 
 
 class SMIForm(SilvaFormData, PageREST, FormCanvas):
@@ -223,14 +95,6 @@ class SMIFormTemplate(pt.PageTemplate):
     pt.view(SMIForm)
 
 
-class PublicForm(SilvaForm, base.Form):
-    """Regular SMI form.
-    """
-    grok.baseclass()
-    grok.layer(ISilvaLayer)
-    grok.require('zope.Public')
-
-
 class SMIComposedForm(SilvaFormData, PageREST, SubFormGroupBase, FormCanvas):
     """SMI Composed forms.
     """
@@ -257,6 +121,7 @@ class SMIComposedForm(SilvaFormData, PageREST, SubFormGroupBase, FormCanvas):
 
 class SMIComposedFormTemplate(pt.PageTemplate):
     pt.view(SMIComposedForm)
+
 
 class SMISubForm(SilvaFormData, composed.SubForm):
     """SMI Sub forms.
@@ -374,42 +239,4 @@ class SMIEditForm(SMIForm):
             if content is None:
                 content = original_content.get_previewable()
         super(SMIEditForm, self).setContentData(content)
-
-
-class PublicViewletForm(SilvaFormData, viewlet.ViewletForm):
-    """ Base form in viewlet
-    """
-    grok.baseclass()
-
-    def available(self):
-        for action in self.actions:
-            if action.available(self):
-                return True
-        return False
-
-    def update(self):
-        if not hasattr(self.request, 'locale'):
-            self.request.locale = find_locale(self.request)
-        convert_request_form_to_unicode(self.request.form)
-        return super(PublicViewletForm, self).update()
-
-    def redirect(self, url):
-        # Raise redirect exception to be not to render the current
-        # page anymore.
-        raise Redirect(url)
-
-
-class PublicContentProviderForm(SilvaFormData, viewlet.ViewletManagerForm):
-    grok.baseclass()
-
-    def update(self):
-        if not hasattr(self.request, 'locale'):
-            self.request.locale = find_locale(self.request)
-        convert_request_form_to_unicode(self.request.form)
-        return super(PublicContentProviderForm, self).update()
-
-    def redirect(self, url):
-        # Raise redirect exception to be not to render the current
-        # page anymore.
-        raise Redirect(url)
 
