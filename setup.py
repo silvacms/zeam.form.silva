@@ -49,6 +49,6 @@ setup(name='zeam.form.silva',
       entry_points="""
       # -*- Entry points: -*-
       [zeam.form.components]
-      file = zeam.form.silva.widgets:register
+      file = zeam.form.silva.widgets.file:register
       """,
       )
