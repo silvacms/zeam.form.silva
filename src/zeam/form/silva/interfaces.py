@@ -4,12 +4,16 @@
 # $Id$
 
 from zope import interface
-from zeam.form.base.interfaces import IAction
+from zeam.form.base.interfaces import IFormData, IAction
 
 
 # Integrate a form in Silva.
 class ISilvaFormData(interface.Interface):
     """A form data in Silva.
+    """
+
+class ISMIForm(ISilvaFormData, IFormData):
+    """A form in SMI.
     """
 
 # Define style for actions

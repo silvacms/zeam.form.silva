@@ -1,0 +1,6 @@
+<a class="form-control" id="#" name="#" title="#"
+   tal:attributes="name widget.identifier;
+                   title widget.description;
+                   id widget.htmlId();"
+   tal:content="widget.title">
+</a>

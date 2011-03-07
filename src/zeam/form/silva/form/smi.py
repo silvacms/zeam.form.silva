@@ -16,10 +16,11 @@ from zeam.form.base.markers import SUCCESS, FAILURE, NO_VALUE
 from zeam.form.ztk import validation
 from zeam.form.composed.form import SubFormGroupBase
 
-from zeam.form.silva.utils import convert_request_form_to_unicode
 from zeam.form.silva.actions import CancelAddAction, CancelEditAction
 from zeam.form.silva.actions import EditAction, ExtractedDecoratedAction
+from zeam.form.silva.interfaces import ISMIForm
 from zeam.form.silva.utils import SilvaFormData
+from zeam.form.silva.utils import convert_request_form_to_unicode
 
 from Products.Silva.ExtensionRegistry import extensionRegistry
 
@@ -61,6 +62,7 @@ class SMIForm(SilvaFormData, PageREST, FormCanvas):
     grok.baseclass()
     grok.name('silva.ui.content')
     grok.require('silva.ChangeSilvaContent')
+    grok.implements(ISMIForm)
 
     dataValidators = [validation.InvariantsValidation]
     dataManager = SilvaDataManager
@@ -71,6 +73,9 @@ class SMIForm(SilvaFormData, PageREST, FormCanvas):
 
     def update(self):
         pass
+
+    def redirect(self, url):
+        raise RedirectToPage(url)
 
     def renderActions(self):
         def renderAction(action):
@@ -99,6 +104,7 @@ class SMIComposedForm(SilvaFormData, PageREST, SubFormGroupBase, FormCanvas):
     """SMI Composed forms.
     """
     grok.baseclass()
+    grok.implements(ISMIForm)
     grok.require('silva.ChangeSilvaContent')
 
     def __init__(self, context, request):
@@ -127,6 +133,7 @@ class SMISubForm(SilvaFormData, composed.SubForm):
     """SMI Sub forms.
     """
     grok.baseclass()
+    grok.implements(ISMIForm)
 
 
 class SMISubFormTemplate(pt.PageTemplate):
@@ -147,6 +154,7 @@ class SMISubTableForm(SilvaFormData, table.SubTableForm):
     """SMI Sub table forms.
     """
     grok.baseclass()
+    grok.implements(ISMIForm)
 
 
 class SMISubTableFormTemplate(pt.PageTemplate):
@@ -202,7 +210,7 @@ class SMIAddForm(SMIForm):
                 editable_content.set(key, value)
 
     @action(
-        _(u'save'),
+        _(u'Save'),
         description=_(u"create the content"),
         factory=ExtractedDecoratedAction)
     def save(self, data):

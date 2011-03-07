@@ -13,7 +13,7 @@ from silva.translations import translate as _
 from zope.traversing.browser import absoluteURL
 from zeam.form.base import SUCCESS, FAILURE
 from zeam.form.base.actions import Action, DecoratedAction
-from zeam.form.base.interfaces import IFormData
+from zeam.form.base.interfaces import IFormData, IAction
 from zeam.form.base.widgets import ActionWidget
 from zeam.form.ztk.actions import EditAction as BaseEditAction
 
@@ -24,9 +24,8 @@ class EditAction(BaseEditAction):
     """Edit action
     """
     grok.implements(interfaces.IRESTCloseOnSuccessAction)
-    title = _(u"save changes")
-    description = _(u"save modifications: alt-s")
-    accesskey = u's'
+    title = _(u"Save changes")
+    description = _(u"save modifications")
 
     def __call__(self, form):
         status = super(EditAction, self).__call__(form)
@@ -49,6 +48,10 @@ class PopupAction(Action):
         return SUCCESS
 
 
+class SMIActionWidget(ActionWidget):
+    grok.adapts(IAction, interfaces.ISMIForm, Interface)
+
+
 class PopupWidget(ActionWidget):
     """Widget to style popup buttons
     """
@@ -60,25 +63,24 @@ class PopupWidget(ActionWidget):
              '++rest++' + self.component.action))
 
 
-class RemoverWidget(ActionWidget):
-    """Widget in red.
-    """
-    grok.adapts(interfaces.IRemoverAction, IFormData, Interface)
+# class RemoverWidget(ActionWidget):
+#     """Widget in red.
+#     """
+#     grok.adapts(interfaces.IRemoverAction, IFormData, Interface)
 
-    def htmlClass(self):
-        return 'action remover'
+#     def htmlClass(self):
+#         return 'action remover'
 
 
 class CancelAction(Action):
     """A action to cancel
     """
     grok.implements(interfaces.IRESTCloseAction, interfaces.ICancelerAction)
-    title = _(u"cancel")
-    description = _(u"go back to the folder view: alt-c")
-    accesskey = u'c'
+    title = _(u"Cancel")
+    description = _(u"go back to the folder view")
 
     def __call__(self, form):
-        form.redirect(form.url(name="edit"))
+        form.redirect(form.context)
         return SUCCESS
 
 
@@ -86,10 +88,10 @@ class CancelAddAction(CancelAction):
     """Cancel an add action.
     """
     description = _(
-        u"go back to the folder view without adding the content: alt-c")
+        u"go back to the folder view without adding the content")
 
     def __call__(self, form):
-        form.redirect(form.url(name="edit"))
+        form.redirect(form.context)
         return SUCCESS
 
 
@@ -97,23 +99,23 @@ class CancelEditAction(CancelAction):
     """Cancel an edit action.
     """
     description = _(
-        u"go back to the folder view without editing the content: alt-c")
+        u"go back to the folder view without editing the content")
 
     def __call__(self, form):
         content = form.context
         if not IRoot.providedBy(content):
             content = aq_parent(aq_inner(content))
-        form.redirect(form.url(obj=content, name='edit'))
+        form.redirect(content)
         return SUCCESS
 
 
-class CancelWidget(ActionWidget):
-    """Widget to style Cancel buttons
-    """
-    grok.adapts(interfaces.ICancelerAction, IFormData, Interface)
+# class CancelWidget(ActionWidget):
+#     """Widget to style Cancel buttons
+#     """
+#     grok.adapts(interfaces.ICancelerAction, IFormData, Interface)
 
-    def htmlClass(self):
-        return 'canceler'
+#     def htmlClass(self):
+#         return 'canceler'
 
 
 class ExtractedDecoratedAction(DecoratedAction):
