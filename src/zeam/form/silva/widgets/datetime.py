@@ -25,6 +25,7 @@ from zeam.form.ztk.widgets.date import DatetimeSchemaField
 
 class IDateTimeResources(IDefaultBrowserLayer):
     silvaconf.resource(jqueryui)
+    silvaconf.resource('datetime.js')
 
 
 class DateTimeFieldWidget(SchemaFieldWidget):

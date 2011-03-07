@@ -181,58 +181,6 @@ PopupZeamForm.prototype.display = function() {
 };
 
 
-var ZeamDateField = function(field) {
-    this.field = $(field);
-    var id = this.field.attr('id');
-    this.year = $('#' + id + '-year');
-    this.month = $('#' + id + '-month');
-    this.day = $('#' + id + '-day');
-    this.hour = $('#' + id + '-hour');
-    this.min = $('#' + id + '-min');
-    this.lang = $(document).find('html').attr('lang');
-};
-
-ZeamDateField.prototype.initialize = function () {
-    var number_reg = /^(\d)+$/;
-    var self = this;
-    var settings = {};
-    var lang_settings = $.datepicker.regional[this.lang];
-    if (!lang_settings) {
-        lang_settings = $.datepicker.regional[''];
-    };
-    for (key in lang_settings) {
-        settings[key] = lang_settings[key];
-    };
-    settings['showOn'] = 'button';
-    settings['buttonImage'] = '/++resource++silva.core.smi/calendar.gif';
-    settings['showWeek'] = true;
-    settings['showOtherMonths'] = true;
-    settings['dateFormat'] = 'yy/mm/dd';
-    settings['onSelect'] = function(date, picker) {
-        var parts = date.split('/');
-        self.day.val(parts[2]);
-        self.month.val(parts[1]);
-        self.year.val(parts[0]);
-        if (!self.hour.val()) {
-            self.hour.val('00');
-        };
-        if (!self.min.val()) {
-            self.min.val('00');
-        };
-    };
-    settings['beforeShow'] = function() {
-        var day = self.day.val();
-        var month = self.month.val();
-        var year = self.year.val();
-        if (day && month && year) {
-            self.field.datepicker(
-                'setDate', new Date(year, month - 1, day));
-        };
-    };
-    this.field.datepicker(settings);
-};
-
-
 $('form').live('zeam-form-ready', function () {
     var form = $(this);
 
