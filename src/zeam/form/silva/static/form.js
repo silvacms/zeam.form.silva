@@ -1,19 +1,6 @@
 // ZEAM JS support scripts
 
 
-var zeam_focus_field = function(form) {
-    // Focus error field first
-    field = form.find('.field-error:first').find('.field:first');
-    if (field.length) {
-        field.trigger('focus');
-    }
-    else {
-        // Focus first required field otherwise
-        form.find('.field-required:first').trigger('focus');
-    };
-};
-
-
 var InlineZeamValidator = function(input) {
     this.input = $(input);
     this.name = this.input.attr('name');
@@ -184,8 +171,6 @@ PopupZeamForm.prototype.display = function() {
 $('form').live('zeam-form-ready', function () {
     var form = $(this);
 
-    // Focus form field
-    zeam_focus_field(form);
     // Inline validation
     if (form.hasClass('zeam-inline-validation')) {
         form.find('.field').bind('change', function() {
@@ -194,19 +179,6 @@ $('form').live('zeam-form-ready', function () {
             return true;
         });
     };
-    // Datetime fields on the page
-    form.find('.field-datetime').each(function(index) {
-        var field = new ZeamDateField($(this));
-        field.initialize();
-    });
-    // Select all
-    form.find('.zeam-select-all').bind('change', function() {
-        var select = $(this);
-        var status = select.attr('checked');
-        form.find('.' + select.attr('name')).each(function() {
-            $(this).attr('checked', status);
-        });
-    });
 });
 
 $(document).ready(function() {

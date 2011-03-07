@@ -6,6 +6,10 @@ from Acquisition import aq_base
 
 from five import grok
 from megrok import pagetemplate as pt
+from zope.configuration.name import resolve
+from zope.publisher.interfaces.browser import IDefaultBrowserLayer
+
+from js.jquery import jquery
 
 from zeam.form.base.form import FormCanvas
 from zeam.form.base.actions import Actions, action
@@ -24,11 +28,11 @@ from zeam.form.silva.utils import convert_request_form_to_unicode
 
 from Products.Silva.ExtensionRegistry import extensionRegistry
 
-from zope.configuration.name import resolve
-
+from silva.core import conf as silvaconf
 from silva.core.conf.interfaces import ITitledContent
 from silva.core.conf.utils import getFactoryName
 from silva.core.interfaces.content import IVersionedContent
+from silva.fanstatic import need
 from silva.translations import translate as _
 from silva.ui.rest.base import PageREST, RedirectToPage
 
@@ -54,6 +58,11 @@ class SilvaDataManager(BaseDataManager):
             setter = getattr(self.content, 'set_%s' % identifier)
             return setter(value)
         return setattr(self.content, identifier, value)
+
+
+class IFormResources(IDefaultBrowserLayer):
+    silvaconf.resource(jquery)
+    silvaconf.resource('smi.js')
 
 
 class SMIForm(SilvaFormData, PageREST, FormCanvas):
@@ -84,6 +93,7 @@ class SMIForm(SilvaFormData, PageREST, FormCanvas):
         return map(renderAction, self.actionWidgets)
 
     def payload(self):
+        need(IFormResources)
         convert_request_form_to_unicode(self.request.form)
         self.update()
         action, status = self.updateActions()
@@ -113,6 +123,7 @@ class SMIComposedForm(SilvaFormData, PageREST, SubFormGroupBase, FormCanvas):
         FormCanvas.__init__(self, context, request)
 
     def payload(self):
+        need(IFormResources)
         convert_request_form_to_unicode(self.request.form)
         self.update()
         action, status = SubFormGroupBase.updateActions(self)

@@ -1,4 +1,4 @@
-<div class="upload-file">
+<div class="upload-file" i18n:domain="silva">
   <div class="upload-popup" style="width: 100px; height:10px;">
     <p></p>
   </div>
@@ -17,10 +17,12 @@
           name="${widget.htmlId()}-upload-iframe">
   </iframe>
   <a href="${widget.uploadURL()}"
-     i18n:translate=""
-     onclick="return false" class="upload-trigger">upload</a>
-  <input id="#" name="#" value="${widget.inputValue()}" type="hidden"
+     onclick="return false" class="${widget.htmlClass()} form-button upload-trigger">
+    <ins class="ui-icon ui-icon-document"></ins>
+    <tal:msg i18n:translate="">Upload</tal:msg>
+  </a>
+  <input id="#" name="#" class="upload-input" value="${widget.inputValue()}" type="hidden"
        tal:attributes="name widget.identifier;
-                       class widget.htmlClass() + ' upload-input';
                        id widget.htmlId()" />
+  <br clear="both"/>
 </div>

@@ -161,7 +161,6 @@
             }
         });
 
-        trigger.button({'icons': {'primary': 'ui-icon-document'}});
         trigger.bind('click', function(){ popup.dialog('open'); });
         progress.progressbar({value: 0});
         field.bind('progress-fileupload', function(event, value){
