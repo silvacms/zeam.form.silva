@@ -10,8 +10,8 @@ from zeam.form.silva.form import ZMIForm, ZMIComposedForm, ZMISubForm
 from zeam.form.silva.form import SMIForm, SMIAddForm, SMIEditForm
 from zeam.form.silva.form import SMIComposedForm, SMISubForm, SMISubFormGroup
 from zeam.form.silva.form import SMISubTableForm
-from zeam.form.silva.form import SMIViewletForm, PublicViewletForm
-from zeam.form.silva.form import SMIContentProviderForm, PublicContentProviderForm
+from zeam.form.silva.form import PublicViewletForm
+from zeam.form.silva.form import PublicContentProviderForm
 from zeam.form.silva.form import PublicForm
 from zeam.form.silva.rest import RESTPopupForm
 from zeam.form.silva.actions import EditAction, CancelAction, PopupAction

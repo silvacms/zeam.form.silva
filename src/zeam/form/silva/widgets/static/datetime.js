@@ -9,7 +9,6 @@
         var hour = $('#' + id + '-hour');
         var min = $('#' + id + '-min');
         var lang = $(document).find('html').attr('lang');
-        var number_reg = /^(\d)+$/;
         var settings = {};
 
         var lang_settings = $.datepicker.regional[lang];

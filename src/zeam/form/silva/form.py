@@ -376,7 +376,7 @@ class SMIEditForm(SMIForm):
         super(SMIEditForm, self).setContentData(content)
 
 
-class SMIViewletForm(SilvaFormData, viewlet.ViewletForm):
+class PublicViewletForm(SilvaFormData, viewlet.ViewletForm):
     """ Base form in viewlet
     """
     grok.baseclass()
@@ -391,28 +391,25 @@ class SMIViewletForm(SilvaFormData, viewlet.ViewletForm):
         if not hasattr(self.request, 'locale'):
             self.request.locale = find_locale(self.request)
         convert_request_form_to_unicode(self.request.form)
-        return super(SMIViewletForm, self).update()
+        return super(PublicViewletForm, self).update()
 
     def redirect(self, url):
         # Raise redirect exception to be not to render the current
         # page anymore.
         raise Redirect(url)
 
-PublicViewletForm = SMIViewletForm
 
-
-class SMIContentProviderForm(SilvaFormData, viewlet.ViewletManagerForm):
+class PublicContentProviderForm(SilvaFormData, viewlet.ViewletManagerForm):
     grok.baseclass()
 
     def update(self):
         if not hasattr(self.request, 'locale'):
             self.request.locale = find_locale(self.request)
         convert_request_form_to_unicode(self.request.form)
-        return super(SMIContentProviderForm, self).update()
+        return super(PublicContentProviderForm, self).update()
 
     def redirect(self, url):
         # Raise redirect exception to be not to render the current
         # page anymore.
         raise Redirect(url)
 
-PublicContentProviderForm = SMIContentProviderForm
