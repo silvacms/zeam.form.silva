@@ -40,9 +40,13 @@
             var selected_day = day.val();
             var selected_month = month.val();
             var selected_year = year.val();
-            if (day && month && year) {
-                field.datepicker('setDate', new Date(selected_year, selected_month - 1, selected_day));
+            var date = null;
+            if (selected_day && selected_month && selected_year) {
+                date = new Date(selected_year, selected_month - 1, selected_day);
+            } else {
+                date = new Date();
             };
+            field.datepicker('setDate', date);
         };
         field.datepicker(settings);
     };
