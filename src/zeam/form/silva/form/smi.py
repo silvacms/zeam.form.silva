@@ -3,6 +3,7 @@
 # $Id$
 
 from Acquisition import aq_base
+from AccessControl.security import checkPermission
 
 from five import grok
 from megrok import pagetemplate as pt
@@ -16,7 +17,7 @@ from zeam.form.base.actions import Actions, action
 from zeam.form import composed, table
 from zeam.form.base.datamanager import BaseDataManager
 from zeam.form.base.fields import Fields
-from zeam.form.base.markers import SUCCESS, FAILURE, NO_VALUE
+from zeam.form.base.markers import getValue, DISPLAY, SUCCESS, FAILURE, NO_VALUE
 from zeam.form.ztk import validation
 from zeam.form.composed.form import SubFormGroupBase
 
@@ -183,9 +184,9 @@ class SMIAddForm(SMIForm):
     ignoreContent = True
     actions = Actions()
 
-    def update(self):
-        super(SMIAddForm, self).update()
-        self.label = _('add a ${content_type}',
+    @property
+    def label(self):
+        return _('Add a ${content_type}',
             mapping={'content_type': self._content_type})
 
     @property
@@ -242,6 +243,10 @@ class SMIEditForm(SMIForm):
     """SMI Edit form.
     """
     grok.baseclass()
+    # The permission is read. If the user doesn't have the right to
+    # change the content, the form mode will be switch to display
+    # mode.
+    grok.require('silva.ReadSilvaContent')
 
     prefix = 'editform'
 
@@ -251,11 +256,36 @@ class SMIEditForm(SMIForm):
         EditAction(),
         CancelEditAction())
 
+    @property
+    def label(self):
+        return _('Edit a ${content_type}',
+            mapping={'content_type': self.context.meta_type})
+
+    def canSave(self):
+        for field in self.fields:
+            if str(getValue(field, 'mode', self)) != 'display':
+                return True
+        return False
+
+    actions['save-changes'].available = canSave
+
     def setContentData(self, content):
+        """Set edited content. If the content is a versioned content,
+        choose the correct version. This can change the form display
+        mode, if the content is only previewable, or if you don't have
+        the permission to edit it.
+        """
         original_content = content
         if IVersionedContent.providedBy(original_content):
             content = original_content.get_editable()
             if content is None:
+                self.mode = DISPLAY
                 content = original_content.get_previewable()
+
         super(SMIEditForm, self).setContentData(content)
 
+    def update(self):
+        # If you don't have the permission to edit the content, then
+        # you don't.
+        if not checkPermission('silva.ChangeSilvaContent', self.getContentData().content):
+            self.mode = DISPLAY
