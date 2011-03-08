@@ -6,16 +6,15 @@
 from five import grok
 from infrae import rest
 from megrok import pagetemplate as pt
-from silva.core.smi.interfaces import ISMILayer
-from zope.i18n import translate
-from zope.interface import alsoProvides
+
+from silva.ui.rest.base import UIREST
 
 from zeam.form.base.form import FormCanvas
 from zeam.form.base.interfaces import IFormCanvas
 from zeam.form.base.markers import SUCCESS
 from zeam.form.base.widgets import getWidgetExtractor
 from zeam.form.silva import interfaces
-from zeam.form.silva.form.smi import SilvaFormData, SMIComposedForm
+from zeam.form.silva.form.smi import SMIComposedForm
 from zeam.form.silva.utils import convert_request_form_to_unicode
 
 
@@ -25,18 +24,13 @@ REST_ACTIONS_TO_TOKEN = [
     (interfaces.IAction, 'send')]
 
 
-class RESTValidatorForm(SilvaFormData, rest.REST):
-    grok.name('form-validate')
+class RESTValidatorForm(UIREST):
+    grok.name('zeam.form.silva.validate')
     grok.context(IFormCanvas)
 
-    def __translate(self, message):
-        return translate(
-            message, target_language=self.i18nLanguage, context=self.request)
-
-    def validateField(self, name, value):
-        # Inject the value in form with the correct name and decode it.
-        self.request.form[name] = value
+    def validate(self):
         convert_request_form_to_unicode(self.request.form)
+        name = self.request.form['prefix.field']
 
         info = {'success': True}
 
@@ -50,19 +44,16 @@ class RESTValidatorForm(SilvaFormData, rest.REST):
                         error = field.validate(value, self.context.context)
                     if error is not None:
                         info['success'] = False
-                        info['error'] = self.__translate(error)
+                        info['error'] = self.translate(error)
                     break
         return self.json_response(info)
 
-    def GET(self, name, value):
-        return self.validateField(name, value)
-
-    def POST(self, name, value):
-        return self.validateField(name, value)
+    def POST(self):
+        return self.validate()
 
 
 class RESTRefreshForm(rest.REST):
-    grok.name('form-refresh')
+    grok.name('zeam.form.silva.refresh')
     grok.context(SMIComposedForm)
 
     def processForm(self, identifier):
@@ -85,28 +76,21 @@ class RESTRefreshForm(rest.REST):
         return self.processForm(identifier)
 
 
-class RESTPopupForm(SilvaFormData, rest.REST, FormCanvas):
+class RESTPopupForm(UIREST, FormCanvas):
     grok.baseclass()
 
     def __init__(self, context, request):
-        # Our custom widgets are registered on ISMILayer. Apply it as well
-        alsoProvides(request, ISMILayer)
-        # XXX I loved super
-        rest.REST.__init__(self, context, request)
+        UIREST.__init__(self, context, request)
         FormCanvas.__init__(self, context, request)
-
-    def __translate(self, message):
-        return translate(
-            message, target_language=self.i18nLanguage, context=self.request)
 
     def renderActions(self):
         def renderAction(action):
             for rest_action, action_type in REST_ACTIONS_TO_TOKEN:
                 if rest_action.providedBy(action.component):
                     break
-            return {'label': self.__translate(action.title),
-                    'name': action.identifier,
-                    'action': action_type}
+                return {'label': self.translate(action.title),
+                        'name': action.identifier,
+                        'action': action_type}
         return map(renderAction, self.actionWidgets)
 
     def processForm(self):
@@ -120,7 +104,7 @@ class RESTPopupForm(SilvaFormData, rest.REST, FormCanvas):
         if not (success_only and status == SUCCESS):
             actions = self.renderActions()
             info.update(
-                {'label': self.__translate(self.label),
+                {'label': self.translate(self.label),
                  'widgets': self.render(),
                  'actions': actions,
                  'default_action': actions[0]['name'] if actions else None})

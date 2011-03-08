@@ -66,15 +66,15 @@ class DateTimeWidgetExtractor(WidgetExtractor):
             value = self.request.form.get('.'.join((identifier, key)), None)
             if not value:
                 if required:
-                    raise ValueError(u'Missing %s value' %key)
+                    raise ValueError(u'Missing %s value.' %key)
                 return min_value
             try:
                 value = int(value)
             except ValueError:
-                raise ValueError((u'%s is not a number' % key).capitalize())
+                raise ValueError((u'%s is not a number.' % key).capitalize())
             if min_value and max_value:
                 if value < min_value or value > max_value:
-                    raise ValueError((u'%s is not within %d and %d' % (
+                    raise ValueError((u'%s is not within %d and %d.' % (
                                 key, min_value, max_value)).capitalize())
             return value
         try:

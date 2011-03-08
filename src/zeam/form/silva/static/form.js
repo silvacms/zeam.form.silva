@@ -1,68 +1,6 @@
 // ZEAM JS support scripts
 
 
-var InlineZeamValidator = function(input) {
-    this.input = $(input);
-    this.name = this.input.attr('name');
-    this.value = this.input.attr('value');
-};
-
-
-InlineZeamValidator.prototype.available = function () {
-    // Says if the functionality is available or not. We only do it on
-    // what we know we can serialize.
-    var input_type = this.input.attr('type');
-    if (input_type == 'text' || input_type == 'url' ||
-        input_type == 'email' || input_type == 'tel' ||
-        input_type == 'number') {
-        return true;
-    };
-    return false;
-};
-
-InlineZeamValidator.prototype.initialize = function () {
-    if (!this.available()) {
-        return false;
-    }
-    var self = this;
-    var info = {};
-    var form_url = this.input.closest('form').attr('action');
-    info['name'] = this.name;
-    info['value'] = this.value;
-    $.ajax({
-        url: form_url + '/++rest++form-validate',
-        type: 'POST',
-        dataType: 'json',
-        data: info,
-        success: function(data) {
-            if (data['success']) {
-                self.clearError();
-            }
-            else {
-                self.setError(data['error']);
-            };
-        }});
-};
-
-InlineZeamValidator.prototype.setError = function (error_text) {
-    var cell = this.input.parent();
-    var error = cell.find('.error');
-    if (!error.length) {
-        error = $('<div class="error"></div>');
-        cell.prepend(error);
-    };
-    error.text(error_text);
-};
-
-InlineZeamValidator.prototype.clearError = function() {
-    var cell = this.input.parent();
-    var error = cell.find('.error');
-    if (error) {
-        error.remove();
-    };
-};
-
-
 var PopupZeamForm = function(popup, url) {
     this.popup = popup;
     this.url = url;
@@ -166,20 +104,6 @@ PopupZeamForm.prototype.display = function() {
         self.focus();
     });
 };
-
-
-$('form').live('zeam-form-ready', function () {
-    var form = $(this);
-
-    // Inline validation
-    if (form.hasClass('zeam-inline-validation')) {
-        form.find('.field').bind('change', function() {
-            var validator = new InlineZeamValidator(this);
-            validator.initialize();
-            return true;
-        });
-    };
-});
 
 $(document).ready(function() {
     // Send form init event

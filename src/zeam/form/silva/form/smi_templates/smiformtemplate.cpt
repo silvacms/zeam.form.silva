@@ -1,5 +1,6 @@
-<form class="form-content form-simple" name="#" i18n:domain="silva"
-      tal:attributes="name view.prefix">
+<form class="form-content form-simple" name="#"
+      tal:attributes="name view.prefix"
+      i18n:domain="silva">
   <div class="form-head">
     <h3 tal:condition="view.label" tal:content="view.label">label</h3>
     <p tal:condition="view.description"
@@ -9,7 +10,8 @@
   </div>
   <div class="form-body">
     <tal:repeat tal:repeat="widget view.fieldWidgets">
-      <div class="form-section" data-field-prefix="#"
+      <div class="form-section ${widget.error and 'form-error' or None}"
+           data-field-prefix="#"
            tal:attributes="data-field-prefix widget.identifier">
         <div class="form-label">
           <label tal:attributes="for widget.htmlId()"
@@ -26,16 +28,15 @@
             Description
           </p>
         </div>
-        <div class="form-field">
-          <div class="form-error"
-               tal:condition="widget.error"
-               tal:content="structure widget.error.title">
-            Validation error.
-          </div>
-          <tal:widget tal:content="structure widget.render()">
-            Widget.
-          </tal:widget>
+        <div class="form-field"
+             tal:content="structure widget.render()">
+          Widget.
         </div>
+      </div>
+      <div class="form-detail-error"
+           tal:condition="widget.error"
+           tal:content="structure widget.error.title">
+        Validation error.
       </div>
     </tal:repeat>
   </div>
