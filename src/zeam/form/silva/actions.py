@@ -74,8 +74,11 @@ class CancelAction(Action):
     title = _(u"Cancel")
     description = _(u"go back to the folder view")
 
+    def getRedirectedContent(self, form):
+        return form.context
+
     def __call__(self, form):
-        form.redirect(form.context)
+        form.redirect(form.url(obj=self.getRedirectedContent(form)))
         return SUCCESS
 
 
@@ -85,9 +88,6 @@ class CancelAddAction(CancelAction):
     description = _(
         u"go back to the folder view without adding the content")
 
-    def __call__(self, form):
-        form.redirect(form.context)
-        return SUCCESS
 
 
 class CancelEditAction(CancelAction):
@@ -96,18 +96,23 @@ class CancelEditAction(CancelAction):
     description = _(
         u"go back to the folder view without editing the content")
 
-    def __call__(self, form):
+    def getRedirectedContent(self, form):
         content = form.context
         if not IRoot.providedBy(content):
             content = aq_parent(aq_inner(content))
-        form.redirect(content)
-        return SUCCESS
+        return content
 
 
 class SMICancelWidget(ActionWidget):
     """Widget to style Cancel buttons
     """
     grok.adapts(interfaces.ICancelerAction, interfaces.ISMIForm, Interface)
+
+    def update(self):
+        super(SMICancelWidget, self).update()
+        self.screen = 'content'
+        self.contentPath = self.form.get_content_path(
+            self.component.getRedirectedContent(self.form))
 
 
 

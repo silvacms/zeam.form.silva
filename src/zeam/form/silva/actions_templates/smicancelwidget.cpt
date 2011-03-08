@@ -1,7 +1,8 @@
-<a class="ui-state-default form-control" id="#" name="#" title="#"
-   tal:attributes="name widget.identifier;
-                   title widget.description;
-                   id widget.htmlId();">
+<a class="ui-state-default form-button open-screen" id="#" rel="#" title="#" href="#"
+   tal:attributes="title widget.description;
+                   id widget.htmlId();
+                   href widget.contentPath;
+                   rel widget.screen">
   <ins class="ui-icon ui-icon-arrowreturnthick-1-w"></ins>
   <tal:label tal:content="widget.title">Label</tal:label>
 </a>
