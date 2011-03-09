@@ -38,9 +38,6 @@ from silva.translations import translate as _
 from silva.ui.rest.base import PageREST, RedirectToPage
 
 
-REST_ACTIONS_TO_TOKEN = []
-
-
 class SilvaDataManager(BaseDataManager):
     """Try to use in priority set_ and get_ methods when setting and
     getting values on an object, paying attention to the Acquisition.

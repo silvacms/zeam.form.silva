@@ -12,6 +12,10 @@
         this.form_prefix = form.attr('name');
         this.form_url = form.attr('data-form-url');
 
+        if (!this.form_url) {
+            return;
+        };
+
         var validator = this.validate.scope(this);
         this.field.find('.field').bind('change', function () {
             setTimeout(validator, 0);
@@ -99,7 +103,7 @@
         };
     };
 
-    var create_form = function(form) {
+    var bootstrap_form = function(form) {
         // Focus
         focus_first_form_field(form);
 
@@ -118,12 +122,126 @@
         });
     };
 
+    /**
+     * Popup form.
+     */
+
+    var Popup = function(popup, url) {
+        this.popup = popup;
+        this.url = url;
+    };
+
+    Popup.prototype._send = function(form_data, callback) {
+        $.ajax({
+            url: this.url,
+            type: 'POST',
+            dataType: 'json',
+            data: form_data,
+            success: callback
+        });
+    };
+
+    Popup.prototype._refresh = function(identifier) {
+        $.getJSON(
+            document.location + '/++rest++form-refresh',
+            {'identifier': identifier},
+            function (data) {
+                $('#' + identifier).replaceWith(data['form']);
+                this.close();
+            }.scope(this));
+    };
+
+    Popup.prototype._create_callback = function(form, data) {
+        var action_label = data['label'];
+        var action_name = data['name'];
+        var action_type = data['action'];
+        return function() {
+            if (action_type == 'send' || action_type == 'close_on_success') {
+                var form_array = form.serializeArray();
+                var form_data = {};
+                form_data[action_name] = action_label;
+                for (var j=0; j < form_array.length; j++) {
+                    form_data[form_array[j]['name']] = form_array[j]['value'];
+                };
+                this._send(form_data,  function(data) {
+                    if (action_type == 'close_on_success' && data['success']) {
+                        if (data['refresh']) {
+                            this._refresh(data['refresh']);
+                        } else {
+                            this.close();
+                        };
+                    } else {
+                        bootstrap_form(this.update(data));
+                    };
+                }.scope(this));
+            };
+            if (action_type == 'close') {
+                this.close();
+            };
+            return false;
+        }.scope(this);
+    };
+
+    Popup.prototype.close = function() {
+        this.popup.dialog('close');
+        this.popup.empty();
+        $(document).trigger('refresh-feedback-smi');
+    };
+
+    Popup.prototype.update = function(data) {
+        var form = $('<form method="post" enctype="multipart/form-data" />');
+        var buttons = {};
+
+        this.popup.dialog('option', 'title', data['label']);
+        this.popup.empty();
+        this.popup.append(form);
+        form.attr('action', this.url);
+        form.append(data['widgets']);
+        // Add an empty input submit to activate form submission with enter
+        form.append($('<input type="submit" style="display: none" />'));
+        for (var i=0; i < data['actions'].length; i++) {
+            var label = data['actions'][i]['label'];
+            var callback = this._create_callback(form, data['actions'][i]);
+            buttons[label] = callback;
+            if (data['actions'][i]['name'] == data['default_action']) {
+                form.bind('submit', callback);
+            };
+        };
+        this.popup.dialog('option', 'buttons', buttons);
+        return form;
+    };
+
+    Popup.prototype.display = function() {
+        $.getJSON(this.url, function(data) {
+            var form = this.update(data);
+            this.popup.dialog('open');
+            bootstrap_form(form);
+        }.scope(this));
+    };
+
     $('form').live('load-smiform', function() {
-        create_form($(this));
+        bootstrap_form($(this));
     });
 
     $(document).ready(function() {
-        create_form($('.form-content'));
+        bootstrap_form($('.form-content'));
+
+        // Prepare Popup
+        $('.form-popup').live('click', function() {
+            var url = $(this).attr('href');
+            var popup = $('#form-popup');
+            if (!popup.length) {
+                popup= $('<div id="form-popup"></div>');
+            };
+            popup.dialog({
+                autoOpen: false,
+                modal: true,
+                width: 800
+            });
+            var form = new Popup(popup, url);
+            form.display();
+            return false;
+        });
     });
 
 

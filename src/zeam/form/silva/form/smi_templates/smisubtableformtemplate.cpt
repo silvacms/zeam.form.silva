@@ -1,23 +1,17 @@
-<form method="post" enctype="multipart/form-data"
-      name="#" class="form-content"
+<form name="#" class="form-content"
       tal:define="form view.getComposedForm()"
       tal:attributes="name view.prefix"
       i18n:domain="silva">
+  <div class="form-head">
+    <h4 tal:condition="view.label" tal:content="view.label">label</h4>
+    <p tal:condition="view.description"
+       tal:content="structure view.description">
+       Description
+    </p>
+  </div>
   <table class="form-table"
          tal:define="columns len(view.tableFields) + 1">
     <thead>
-      <tr class="form-top-controls" tal:condition="view.label">
-        <td colspan="#"
-            tal:attributes="colspan columns">
-          <h3 tal:content="view.label">label</h3>
-        </td>
-      </tr>
-      <tr class="odd" tal:condition="view.description">
-        <td class="designator" colspan="#"
-            tal:attributes="colspan columns"
-            tal:content="structure view.description">
-        </td>
-      </tr>
       <tr tal:condition="view.lineWidgets">
         <th width="2%"
             tal:define="name string:${view.htmlId()}-select;
@@ -81,7 +75,6 @@
               Widget.
             </tal:widget>
           </span>
-
         </td>
       </tr>
     </tfoot>

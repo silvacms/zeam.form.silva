@@ -1,8 +1,5 @@
-<form class="form-content form-simple" name="#"
-      tal:attributes="name view.prefix"
-      i18n:domain="silva">
+<div class="form-content" i18n:domain="silva">
   <div class="form-head">
-    <h3 tal:condition="view.label" tal:content="view.label">label</h3>
     <p tal:condition="view.description"
        tal:content="structure view.description">
       Description
@@ -40,10 +37,4 @@
       </div>
     </tal:repeat>
   </div>
-  <div class="form-footer">
-    <div class="form-controls" tal:condition="view.actionWidgets">
-      <input tal:repeat="widget view.actionWidgets"
-             tal:replace="structure widget.render()" />
-    </div>
-  </div>
-</form>
+</div>

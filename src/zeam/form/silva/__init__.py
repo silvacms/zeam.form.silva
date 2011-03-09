@@ -14,7 +14,7 @@ from zeam.form.silva.form.smi import SMISubTableForm
 from zeam.form.silva.form.public import PublicViewletForm
 from zeam.form.silva.form.public import PublicContentProviderForm
 from zeam.form.silva.form.public import PublicForm
-from zeam.form.silva.rest import RESTPopupForm
+from zeam.form.silva.form.popup import RESTPopupForm
 
 from zeam.form.silva.form.smi import SilvaDataManager
 from zeam.form.silva.actions import ExtractedDecoratedAction
