@@ -1,5 +1,15 @@
-<tal:composedform>
-  <tal:repeat tal:repeat="form view.subforms"
-              tal:replace="structure form.render()">
-  </tal:repeat>
-</tal:composedform>
+<div class="form-content" id="#"
+     tal:attributes="id view.htmlId()">
+  <div class="form-head">
+    <h3 tal:content="view.label"
+        tal:condition="view.label">
+      label
+    </h3>
+    <p tal:condition="view.description"
+     tal:content="view.description">
+      description
+    </p>
+  </div>
+  <tal:form tal:repeat="form view.subforms"
+            tal:replace="structure form.render()" />
+</div>
