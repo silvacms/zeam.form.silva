@@ -28,6 +28,9 @@ class RESTPopupForm(SilvaFormData, UIREST, FormCanvas):
         UIREST.__init__(self, context, request)
         FormCanvas.__init__(self, context, request)
 
+    def update(self):
+        pass
+
     def renderActions(self):
         def renderAction(action):
             for rest_action, action_type in REST_ACTIONS_TO_TOKEN:
@@ -39,6 +42,7 @@ class RESTPopupForm(SilvaFormData, UIREST, FormCanvas):
         return map(renderAction, self.actionWidgets)
 
     def processForm(self):
+        self.update()
         action, status = self.updateActions()
         self.updateWidgets()
         info = {}

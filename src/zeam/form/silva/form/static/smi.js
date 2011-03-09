@@ -195,7 +195,7 @@
         this.popup.dialog('option', 'title', data['label']);
         this.popup.empty();
         this.popup.append(form);
-        form.attr('action', this.url);
+        form.attr('data-form-url', this.url);
         form.append(data['widgets']);
         // Add an empty input submit to activate form submission with enter
         form.append($('<input type="submit" style="display: none" />'));

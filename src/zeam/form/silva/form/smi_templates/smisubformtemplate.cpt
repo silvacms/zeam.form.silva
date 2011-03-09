@@ -34,9 +34,10 @@
           Widget.
         </div>
         <div class="form-error-detail"
-             tal:condition="widget.error"
-             tal:content="structure widget.error.title">
-          Validation error.
+             tal:condition="widget.error">
+          <p tal:content="structure widget.error.title">
+            Validation error.
+          </p>
         </div>
       </div>
     </tal:repeat>

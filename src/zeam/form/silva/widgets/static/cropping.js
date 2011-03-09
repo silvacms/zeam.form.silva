@@ -9,6 +9,7 @@
         popup.dialog({
             modal: true,
             autoOpen: false,
+            width: 'auto',
             buttons: {
                 Ok: function(){
                     var c = img.data('crop');
