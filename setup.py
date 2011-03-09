@@ -26,15 +26,22 @@ setup(name='zeam.form.silva',
       zip_safe=False,
       install_requires=[
         'five.grok',
+        'js.jquery',
+        'js.jqueryui',
+        'gp.fileupload',
         'infrae.layout',
+        'infrae.rest',
         'martian',
         'megrok.pagetemplate',
         'setuptools',
         'silva.core.conf',
         'silva.core.interfaces',
+        'silva.core.layout',
         'silva.core.messages',
-        'silva.core.smi',
+        'silva.core.views',
+        'silva.fanstatic',
         'silva.translations',
+        'silva.ui',
         'zeam.form.base',
         'zeam.form.composed',
         'zeam.form.table',
@@ -44,11 +51,11 @@ setup(name='zeam.form.silva',
         'zope.i18n',
         'zope.interface',
         'zope.schema',
-        'gp.fileupload',
         ],
       entry_points="""
       # -*- Entry points: -*-
       [zeam.form.components]
       file = zeam.form.silva.widgets.file:register
+      cropping = zeam.form.silva.widgets.cropping:register
       """,
       )

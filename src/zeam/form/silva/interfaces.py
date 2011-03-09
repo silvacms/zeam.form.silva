@@ -16,6 +16,11 @@ class ISMIForm(ISilvaFormData, IFormData):
     """A form in SMI.
     """
 
+    def get_content_path(content):
+        """Return the relative path of the content.
+        """
+
+
 # Define style for actions
 class IRemoverAction(IAction):
     """An action that appear in red.
