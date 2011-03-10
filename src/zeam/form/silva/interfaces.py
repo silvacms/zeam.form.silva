@@ -12,6 +12,7 @@ class ISilvaFormData(interface.Interface):
     """A form data in Silva.
     """
 
+
 class ISMIForm(ISilvaFormData, IFormData):
     """A form in SMI.
     """
@@ -26,9 +27,11 @@ class IRemoverAction(IAction):
     """An action that appear in red.
     """
 
+
 class ICancelerAction(IAction):
     """An action that cancel something.
     """
+
 
 # Define categories of actions for RESTForm.
 class IRESTAction(IAction):
@@ -36,17 +39,21 @@ class IRESTAction(IAction):
     meaning.
     """
 
+
 class IRESTSuccessAction(IRESTAction):
     """Action just send success on success.
     """
+
 
 class IRESTCloseAction(IRESTAction):
     """Do not call the action callback, just close the RESTForm.
     """
 
+
 class IRESTCloseOnSuccessAction(IRESTCloseAction, IRESTSuccessAction):
     """Call the action callback, and close the rest Form upon success.
     """
+
 
 class IRESTRefreshAction(IRESTAction):
     """Trigger the refresh of a form component on the main view.
