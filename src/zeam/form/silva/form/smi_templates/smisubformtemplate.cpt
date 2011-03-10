@@ -29,15 +29,14 @@
             Description
           </p>
         </div>
-        <div class="form-field"
-             tal:content="structure widget.render()">
-          Widget.
-        </div>
-        <div class="form-error-detail"
-             tal:condition="widget.error">
-          <p tal:content="structure widget.error.title">
-            Validation error.
-          </p>
+        <div class="form-field">
+          <div class="form-error-detail"
+               tal:condition="widget.error">
+            <p tal:content="structure widget.error.title">
+              Validation error.
+            </p>
+          </div>
+          <tal:widget tal:content="structure widget.render()"/>
         </div>
       </div>
     </tal:repeat>

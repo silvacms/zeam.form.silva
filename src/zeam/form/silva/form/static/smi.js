@@ -57,16 +57,18 @@
     };
 
     Validator.prototype.error = function(message) {
-        this.field.children('.form-error-detail').remove();
+        var container = this.field.children('.form-field');
         this.field.addClass('form-error');
+        container.children('.form-error-detail').remove();
         if (message) {
-            this.field.append('<div class="form-error-detail"><p>' + message +'</p></div>');
+            container.prepend('<div class="form-error-detail"><p>' + message +'</p></div>');
         }
     };
 
     Validator.prototype.clear = function() {
+        var container = this.field.children('.form-field');
         this.field.removeClass('form-error');
-        this.field.children('.form-error-detail').remove();
+        container.children('.form-error-detail').remove();
     };
 
     /**
