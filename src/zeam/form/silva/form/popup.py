@@ -55,6 +55,7 @@ class RESTPopupForm(SilvaFormData, UIREST, FormCanvas):
             info.update(
                 {'label': self.translate(self.label),
                  'widgets': self.render(),
+                 'prefix': self.prefix,
                  'actions': actions,
                  'default_action': actions[0]['name'] if actions else None})
         return self.json_response(info)

@@ -189,13 +189,14 @@
     };
 
     Popup.prototype.update = function(data) {
-        var form = $('<form method="post" enctype="multipart/form-data" />');
+        var form = $('<form />');
         var buttons = {};
 
         this.popup.dialog('option', 'title', data['label']);
         this.popup.empty();
         this.popup.append(form);
         form.attr('data-form-url', this.url);
+        form.attr('name', data.prefix);
         form.append(data['widgets']);
         // Add an empty input submit to activate form submission with enter
         form.append($('<input type="submit" style="display: none" />'));
