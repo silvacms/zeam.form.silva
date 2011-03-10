@@ -5,12 +5,23 @@
 from five import grok
 from megrok import pagetemplate as pt
 
+from zope.cachedescriptors.property import CachedProperty
+from zope.i18n.interfaces import IUserPreferredLanguages
+from zope.publisher.interfaces.browser import IDefaultBrowserLayer
+
+import js.jqueryui
+
 from zeam.form import base, composed
 from zeam.form.ztk import validation
 from zeam.form.silva.utils import find_locale, convert_request_form_to_unicode
 
-from zope.cachedescriptors.property import CachedProperty
-from zope.i18n.interfaces import IUserPreferredLanguages
+from silva.fanstatic import need
+from silva.core import conf as silvaconf
+
+
+class IFormResources(IDefaultBrowserLayer):
+    silvaconf.resource(js.jqueryui.base)
+    silvaconf.resource('zmi.css')
 
 
 class ZopeForm(object):
@@ -32,6 +43,7 @@ class ZopeForm(object):
         self.__name__ = self.__view_name__
 
     def __call__(self):
+        need(IFormResources)
         if not hasattr(self.request, 'locale'):
             # This is not pretty, but no choice.
             self.request.locale = find_locale(self.request)

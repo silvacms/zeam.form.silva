@@ -1,0 +1,31 @@
+
+ins {
+  float: left;
+}
+
+a.form-button {
+  padding: 5px;
+}
+
+/* jquery ui overrides */
+
+body .ui-widget {
+  font-family: sans-serif;
+  font-size: inherit;
+}
+
+body .ui-widget .ui-button-text {
+  line-height: inherit;
+}
+
+body .ui-state-default, body .ui-state-active {
+  background: inherit;
+  color: inherit;
+  border: inherit;
+}
+
+body .upload-file .upload-progress {
+  width: 200px;
+  height: 10px;
+}
+
