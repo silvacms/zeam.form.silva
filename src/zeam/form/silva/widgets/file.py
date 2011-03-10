@@ -22,7 +22,7 @@ from silva.core.interfaces import ISilvaObject
 from silva.fanstatic import need
 from silva.translations import translate as _
 
-from zeam.form.base.markers import NO_VALUE
+from zeam.form.base.markers import NO_VALUE, NO_CHANGE
 from zeam.form.base.widgets import WidgetExtractor
 from zeam.form.ztk.fields import SchemaField, SchemaFieldWidget
 from zeam.form.ztk.fields import registerSchemaField
@@ -54,15 +54,26 @@ class FileWidgetInput(SchemaFieldWidget):
         super(FileWidgetInput, self).update()
 
     def uploadURL(self):
-        return absoluteURL(self.form.context, self.request) + '/++rest++zeam.form.silva.upload'
+        return absoluteURL(self.form.context, self.request) + \
+            '/++rest++zeam.form.silva.upload'
+
+    def prepareContentValue(self, value):
+        formatted_value = u''
+        if value is not NO_VALUE:
+            formatted_value = self.valueToUnicode(NO_CHANGE)
+        return {self.identifier: formatted_value}
 
     def displayValue(self):
         value = self.inputValue()
+        if value == u'__NO_CHANGE__':
+            return _('current file.')
         if value:
             return unicode(os.path.basename(value))
         return _(u'not set, please upload a file.')
 
     def valueToUnicode(self, value):
+        if value is NO_CHANGE:
+            return u'__NO_CHANGE__'
         return unicode(value)
 
 
@@ -84,6 +95,8 @@ class FileWidgetExtractor(WidgetExtractor):
 
     def extract(self):
         value = self.request.form.get(self.identifier, u'')
+        if value == "__NO_CHANGE__":
+            return NO_CHANGE, None
         if value:
             return open(os.path.join(self.upload_dir(), value), 'r'), None
         return NO_VALUE, None
