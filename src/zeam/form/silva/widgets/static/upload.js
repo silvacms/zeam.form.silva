@@ -174,8 +174,9 @@
             trigger.show();
         });
         field.bind('failure-fileupload', function(event, message){
-            field.trigger('notify', {'message': message,
-                'category': 'error'});
+            field.trigger(
+                'notify-feedback-smi',
+                {message: message, category: 'error'});
             input.val(oldValue);
             display.text(basename(oldValue));
             progress.hide();

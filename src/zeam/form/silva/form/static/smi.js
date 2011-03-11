@@ -128,6 +128,9 @@
                     form_data[form_array[j]['name']] = form_array[j]['value'];
                 };
                 this._send(form_data,  function(data) {
+                    if (data.notifications) {
+                        this.popup.trigger('notify-feedback-smi', data.notifications);
+                    };
                     if (action_type == 'close_on_success' && data['success']) {
                         if (data['refresh']) {
                             this._refresh(data['refresh']);

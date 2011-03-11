@@ -47,6 +47,9 @@ class RESTPopupForm(SilvaFormData, UIREST, FormCanvas):
         self.updateWidgets()
         info = {}
         info['success'] = status == SUCCESS
+        notifications = self.get_notifications()
+        if notifications is not None:
+            info['notifications'] = notifications
         if interfaces.IRESTRefreshAction.providedBy(action):
             info['refresh'] = action.refresh
         success_only = interfaces.IRESTSuccessAction.providedBy(action)
