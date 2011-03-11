@@ -6,7 +6,7 @@
       <div class="widget-crop-popup-options">
         <br />
         <span class="option">
-          <input type="checkbox" name="proportional" id="proportional" />
+          <input type="checkbox" name="proportional" class="crop-proportional" />
           <label for="proportional" i18n:translate="">keep proportions</label>
         </span>
       </div>

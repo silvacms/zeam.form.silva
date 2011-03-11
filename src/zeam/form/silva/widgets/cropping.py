@@ -35,7 +35,7 @@ class CropImageInputWidget(SchemaFieldWidget):
     def update(self):
         super(CropImageInputWidget, self).update()
         need(ICropResources)
-        self.url = self.form.url(self.form.context)
+        self.url = self.form.url(self.form.context) + '?hires'
 
     def valueToUnicode(self, value):
         return unicode(value)
