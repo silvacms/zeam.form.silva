@@ -11,6 +11,7 @@ from zeam.form.silva.form.zmi import ZMIForm, ZMIComposedForm, ZMISubForm
 from zeam.form.silva.form.smi import SMIForm, SMIAddForm, SMIEditForm
 from zeam.form.silva.form.smi import SMIComposedForm, SMISubForm, SMISubFormGroup
 from zeam.form.silva.form.smi import SMISubTableForm
+from zeam.form.silva.form.smi import SMIFormPortlets
 from zeam.form.silva.form.public import PublicViewletForm
 from zeam.form.silva.form.public import PublicContentProviderForm
 from zeam.form.silva.form.public import PublicForm

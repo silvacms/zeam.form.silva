@@ -7,6 +7,7 @@ from AccessControl.security import checkPermission
 
 from five import grok
 from megrok import pagetemplate as pt
+from zope.interface import Interface
 from zope.component import queryMultiAdapter
 from zope.configuration.name import resolve
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
@@ -33,6 +34,7 @@ from Products.Silva.ExtensionRegistry import extensionRegistry
 from silva.core import conf as silvaconf
 from silva.core.conf.interfaces import ITitledContent
 from silva.core.conf.utils import getFactoryName
+from silva.core.views import views as silvaviews
 from silva.core.interfaces.content import IVersionedContent
 from silva.fanstatic import need
 from silva.translations import translate as _
@@ -62,6 +64,14 @@ class SilvaDataManager(BaseDataManager):
 class IFormResources(IDefaultBrowserLayer):
     silvaconf.resource(jquery)
     silvaconf.resource('smi.js')
+
+
+class SMIFormPortlets(silvaviews.ViewletManager):
+    """Report information on assets.
+    """
+    grok.context(Interface)
+    grok.view(ISMIForm)
+    grok.name('portlets')
 
 
 class SMIForm(SilvaFormData, PageREST, FormCanvas):
@@ -106,7 +116,9 @@ class SMIForm(SilvaFormData, PageREST, FormCanvas):
         portlets = queryMultiAdapter((self.context, self.request, self), name='portlets')
         if portlets is not None:
             portlets.update()
-            result['portlets'] = portlets.render()
+            rendered_portlets = portlets.render()
+            if rendered_portlets:
+                result['portlets'] = rendered_portlets
         return result
 
 
@@ -141,7 +153,9 @@ class SMIComposedForm(SilvaFormData, PageREST, SubFormGroupBase, FormCanvas):
         portlets = queryMultiAdapter((self.context, self.request, self), name='portlets')
         if portlets is not None:
             portlets.update()
-            result['portlets'] = portlets.render()
+            rendered_portlets = portlets.render()
+            if rendered_portlets:
+                result['portlets'] = rendered_portlets
         return result
 
 
