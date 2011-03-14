@@ -7,6 +7,7 @@ from AccessControl.security import checkPermission
 
 from five import grok
 from megrok import pagetemplate as pt
+from zope.component import queryMultiAdapter
 from zope.configuration.name import resolve
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 
@@ -97,11 +98,16 @@ class SMIForm(SilvaFormData, PageREST, FormCanvas):
         action, status = self.updateActions()
         self.updateWidgets()
         actions = self.renderActions()
-        return {'ifaces': ['form'],
-                'success': status == SUCCESS,
-                'html': self.render(),
-                'actions': actions,
-                'default': actions[0]['name'] if actions else None}
+        result = {'ifaces': ['form'],
+                  'success': status == SUCCESS,
+                  'forms': self.render(),
+                  'actions': actions,
+                  'default': actions[0]['name'] if actions else None}
+        portlets = queryMultiAdapter((self.context, self.request, self), name='portlets')
+        if portlets is not None:
+            portlets.update()
+            result['portlets'] = portlets.render()
+        return result
 
 
 class SMIFormTemplate(pt.PageTemplate):
@@ -129,9 +135,15 @@ class SMIComposedForm(SilvaFormData, PageREST, SubFormGroupBase, FormCanvas):
             FormCanvas.updateActions(self)
         SubFormGroupBase.updateWidgets(self)
         FormCanvas.updateWidgets(self)
-        return {'ifaces': ['form'],
-                'success': status == SUCCESS,
-                'html': self.render()}
+        result = {'ifaces': ['form'],
+                  'success': status == SUCCESS,
+                  'forms': self.render()}
+        portlets = queryMultiAdapter((self.context, self.request, self), name='portlets')
+        if portlets is not None:
+            portlets.update()
+            result['portlets'] = portlets.render()
+        return result
+
 
 
 class SMIComposedFormTemplate(pt.PageTemplate):

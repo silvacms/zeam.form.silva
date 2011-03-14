@@ -1,4 +1,4 @@
-<form class="form-content" name="#"
+<form name="#"
       tal:define="form view.getComposedForm()"
       tal:attributes="name view.prefix"
       i18n:domain="silva">

@@ -1,4 +1,4 @@
-<div class="form-content" id="#"
+<div id="#"
      tal:attributes="id view.htmlId()">
   <div class="form-head">
     <h3 tal:content="view.label"
