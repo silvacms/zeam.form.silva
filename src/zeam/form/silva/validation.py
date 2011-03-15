@@ -67,26 +67,3 @@ class RESTValidatorForm(UIREST):
     def POST(self):
         return self.validate()
 
-
-# class RESTRefreshForm(rest.REST):
-#     grok.name('zeam.form.silva.refresh')
-#     grok.context(SMIComposedForm)
-
-#     def processForm(self, identifier):
-#         form = self.context.getSubForm(identifier)
-#         if form is None:
-#             self.response.setStatus(404)
-#             return ''
-#         action, status = form.updateActions()
-#         form.updateWidgets()
-#         return self.json_response(
-#             {'form': form.render(),
-#              'success': status == SUCCESS})
-
-#     def GET(self, identifier):
-#         convert_request_form_to_unicode(self.request.form)
-#         return self.processForm(identifier)
-
-#     def POST(self, identifier):
-#         convert_request_form_to_unicode(self.request.form)
-#         return self.processForm(identifier)

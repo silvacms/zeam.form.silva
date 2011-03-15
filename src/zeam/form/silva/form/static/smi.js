@@ -106,13 +106,8 @@
     };
 
     Popup.prototype._refresh = function(identifier) {
-        $.getJSON(
-            document.location + '/++rest++form-refresh',
-            {'identifier': identifier},
-            function (data) {
-                $('#' + identifier).replaceWith(data['form']);
-                this.close();
-            }.scope(this));
+        var form = $('form[name=' + identifier + ']');
+        form.trigger('refresh-smi');
     };
 
     Popup.prototype._create_callback = function(form, data) {
@@ -134,9 +129,8 @@
                     if (action_type == 'close_on_success' && data['success']) {
                         if (data['refresh']) {
                             this._refresh(data['refresh']);
-                        } else {
-                            this.close();
                         };
+                        this.close();
                     } else {
                         bootstrap_form(this.update(data));
                     };
@@ -152,7 +146,6 @@
     Popup.prototype.close = function() {
         this.popup.dialog('close');
         this.popup.empty();
-        $(document).trigger('refresh-feedback-smi');
     };
 
     Popup.prototype.update = function(data) {

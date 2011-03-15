@@ -159,7 +159,6 @@ class SMIComposedForm(SilvaFormData, PageREST, SubFormGroupBase, FormCanvas):
         return result
 
 
-
 class SMIComposedFormTemplate(pt.PageTemplate):
     pt.view(SMIComposedForm)
 
