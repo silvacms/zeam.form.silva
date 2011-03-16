@@ -207,7 +207,7 @@ class SMIAddForm(SMIForm):
 
     fields = Fields(ITitledContent)
     ignoreContent = True
-    actions = Actions()
+    actions = Actions(CancelAddAction())
 
     @property
     def label(self):
@@ -261,7 +261,6 @@ class SMIAddForm(SMIForm):
             type="feedback")
         raise RedirectToPage(content)
 
-    actions.append(CancelAddAction())
 
 
 class SMIEditForm(SMIForm):
@@ -278,8 +277,8 @@ class SMIEditForm(SMIForm):
     dataManager = SilvaDataManager
     ignoreContent = False
     actions = Actions(
-        EditAction(),
-        CancelEditAction())
+        CancelEditAction(),
+        EditAction())
 
     @property
     def label(self):
