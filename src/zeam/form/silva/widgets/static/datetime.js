@@ -20,7 +20,9 @@
         };
         settings['showOn'] = 'button';
         // XXX need to figure out something to get image with JS
-        settings['buttonImage'] = 'calendar.gif';
+        settings['buttonImage'] = '/++static++/zeam.form.silva.widgets/calendar.gif';
+        settings['buttonImageOnly'] = true;
+        settings['buttonText'] = 'Date picker';
         settings['showWeek'] = true;
         settings['showOtherMonths'] = true;
         settings['dateFormat'] = 'yy/mm/dd';
