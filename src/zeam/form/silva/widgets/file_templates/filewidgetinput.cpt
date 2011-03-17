@@ -21,6 +21,11 @@
     <ins class="ui-icon ui-icon-document"></ins>
     <tal:msg i18n:translate="">Upload</tal:msg>
   </a>
+  <a tal:condition="not widget.required" href="#" onclick="return false"
+     class="upload-clear form-button ui-state-default">
+     <ins class="ui-icon ui-icon-circle-close"></ins>
+    <tal:msg i18n:translate="">Clear</tal:msg>
+  </a>
   <input id="#" name="#" class="upload-input" value="${widget.inputValue()}" type="hidden"
        tal:attributes="name widget.identifier;
                        id widget.htmlId()" />

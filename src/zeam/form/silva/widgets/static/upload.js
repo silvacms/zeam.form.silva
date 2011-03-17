@@ -139,6 +139,7 @@
         var oldValue = input.val();
         var popup = $('.upload-popup', field);
         var uploader = new FileUploader(field);
+        var clear = $('.upload-clear', field);
 
         popup.dialog({
             title: trigger.text(),
@@ -161,6 +162,12 @@
             }
         });
 
+        if (clear.length > 0){
+            clear.bind('click', function(){
+                input.val('');
+                display.text('not set.');
+            });
+        }
         trigger.bind('click', function(){ popup.dialog('open'); });
         progress.progressbar({value: 0});
         field.bind('progress-fileupload', function(event, value){
