@@ -38,7 +38,7 @@ from silva.core.views import views as silvaviews
 from silva.core.interfaces.content import IVersionedContent
 from silva.fanstatic import need
 from silva.translations import translate as _
-from silva.ui.rest.base import PageREST, RedirectToPage
+from silva.ui.rest import PageREST, RedirectToPage
 
 
 class SilvaDataManager(BaseDataManager):
@@ -78,7 +78,7 @@ class SMIForm(SilvaFormData, PageREST, FormCanvas):
     """Regular SMI form.
     """
     grok.baseclass()
-    grok.name('silva.ui.content')
+    grok.name('content')
     grok.require('silva.ChangeSilvaContent')
     grok.implements(ISMIForm)
 
