@@ -8,6 +8,7 @@ from zExceptions import Redirect
 from five import grok
 from zope import interface, schema
 from megrok import pagetemplate as pt
+from zope.component.interfaces import ComponentLookupError
 
 from zeam.form import base, composed, table, viewlet
 from zeam.form.base.datamanager import BaseDataManager
@@ -34,6 +35,8 @@ from zope.configuration.name import resolve
 from zope.i18n.interfaces import IUserPreferredLanguages
 from zope.publisher.publish import mapply
 
+from silva.core.interfaces import (IContentLayout, IVersionedContentLayout, 
+                                   IDefaultContentTemplate)
 from silva.core.conf.interfaces import ITitledContent
 from silva.core.conf.utils import getFactoryName
 from silva.core.interfaces.content import (IPublishable, IContainer,
@@ -42,7 +45,7 @@ from silva.core.layout.interfaces import ISilvaLayer
 from silva.core.messages.interfaces import IMessageService
 from silva.core.smi.interfaces import IAddingTab, IEditTabIndex
 from silva.core.smi.interfaces import ISMILayer
-from silva.core.views.views import HTTPHeaderView
+from silva.core.views.views import HTTPHeaderView, ContentTemplateMixin
 from silva.translations import translate as _
 
 
@@ -89,7 +92,7 @@ class ZopeForm(object):
         return super(ZopeForm, self).__call__()
 
 
-class SilvaForm(HTTPHeaderView, SilvaFormData):
+class SilvaForm(HTTPHeaderView, SilvaFormData, ContentTemplateMixin):
     """Form in Silva.
     """
     grok.baseclass()
@@ -112,7 +115,9 @@ class SilvaForm(HTTPHeaderView, SilvaFormData):
         return namespace
 
     def content(self):
-        return self.render()
+        #wrap content around content layout template
+        content = self.render()
+        return self.wrap_if_necessary(content)
 
     def __call__(self):
         self.setHTTPHeaders()

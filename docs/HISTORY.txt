@@ -19,6 +19,9 @@ Bethel Changes
 
 * make SMIEditForm.update() look at versionedassets also
 
+* wrap rendered forms around the default content layout, if they are not
+  in the SMILayer
+
 1.2 (2010/12/20)
 ----------------
 
