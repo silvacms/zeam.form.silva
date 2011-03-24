@@ -249,7 +249,8 @@ class SMIAddForm(SMIForm):
     @action(
         _(u'Save'),
         description=_(u"create the content"),
-        factory=ExtractedDecoratedAction)
+        factory=ExtractedDecoratedAction,
+        accesskey=u's')
     def save(self, data):
         try:
             content = self._add(self.context, data)

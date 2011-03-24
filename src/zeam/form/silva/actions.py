@@ -26,6 +26,7 @@ class EditAction(BaseEditAction):
     grok.implements(interfaces.IRESTCloseOnSuccessAction)
     title = _(u"Save changes")
     description = _(u"save modifications")
+    accesskey = u's'
 
     def __call__(self, form):
         status = super(EditAction, self).__call__(form)
@@ -73,6 +74,7 @@ class CancelAction(Action):
     grok.implements(interfaces.IRESTCloseAction, interfaces.ICancelerAction)
     title = _(u"Cancel")
     description = _(u"go back to the folder view")
+    accesskey = u'c'
 
     def getRedirectedContent(self, form):
         return form.context
