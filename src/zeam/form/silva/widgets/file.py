@@ -18,7 +18,6 @@ from js.jqueryui import jqueryui
 from infrae import rest
 from silva.core import conf as silvaconf
 from silva.core.conf import schema as silvaschema
-from silva.core.interfaces import ISilvaObject
 from silva.fanstatic import need
 from silva.translations import translate as _
 
@@ -105,7 +104,7 @@ class FileWidgetExtractor(WidgetExtractor):
 class Upload(rest.REST):
     """ Check security and return information about gp.fileupload upload
     """
-    grok.context(ISilvaObject)
+    grok.context(Interface)
     grok.require('silva.ChangeSilvaContent')
     grok.name('zeam.form.silva.upload')
 

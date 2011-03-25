@@ -22,6 +22,7 @@ from silva.core import conf as silvaconf
 class IFormResources(IDefaultBrowserLayer):
     silvaconf.resource(js.jqueryui.base)
     silvaconf.resource('zmi.css')
+    silvaconf.resource('zmi.js')
 
 
 class ZopeForm(object):

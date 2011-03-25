@@ -4,7 +4,10 @@ ins {
 }
 
 a.form-button {
-  padding: 5px;
+  padding: 2px;
+  margin: 2px;
+  display: block;
+  border: 1px solid back;
 }
 
 /* jquery ui overrides */
