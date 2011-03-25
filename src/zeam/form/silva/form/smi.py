@@ -36,7 +36,6 @@ from silva.core.conf.interfaces import ITitledContent
 from silva.core.conf.utils import getFactoryName
 from silva.core.views import views as silvaviews
 from silva.core.interfaces.content import IVersionedContent
-from silva.fanstatic import need
 from silva.translations import translate as _
 from silva.ui.rest import PageREST, RedirectToPage
 
@@ -61,7 +60,7 @@ class SilvaDataManager(BaseDataManager):
         return setattr(self.content, identifier, value)
 
 
-class IFormResources(IDefaultBrowserLayer):
+class IFormSilvaUIResources(IDefaultBrowserLayer):
     silvaconf.resource(jquery)
     silvaconf.resource('smi.js')
 
@@ -102,7 +101,6 @@ class SMIForm(SilvaFormData, PageREST, FormCanvas):
         return map(renderAction, self.actionWidgets)
 
     def payload(self):
-        need(IFormResources)
         convert_request_form_to_unicode(self.request.form)
         self.update()
         action, status = self.updateActions()
@@ -139,7 +137,6 @@ class SMIComposedForm(SilvaFormData, PageREST, SubFormGroupBase, FormCanvas):
         FormCanvas.__init__(self, context, request)
 
     def payload(self):
-        need(IFormResources)
         convert_request_form_to_unicode(self.request.form)
         self.update()
         action, status = SubFormGroupBase.updateActions(self)

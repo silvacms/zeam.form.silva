@@ -58,6 +58,6 @@ setup(name='zeam.form.silva',
       file = zeam.form.silva.widgets.file:register
       cropping = zeam.form.silva.widgets.cropping:register
       [silva.ui.resources]
-      smi = zeam.form.silva.form.smi:IFormResources
+      smi = zeam.form.silva.form.smi:IFormSilvaUIResources
       """,
       )
