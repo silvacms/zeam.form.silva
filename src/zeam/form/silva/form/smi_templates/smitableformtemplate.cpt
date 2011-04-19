@@ -1,0 +1,81 @@
+<form name="#"
+      tal:attributes="name view.prefix"
+      i18n:domain="silva">
+  <div class="form-head">
+    <h3 tal:condition="view.label" tal:content="view.label">label</h3>
+    <p tal:condition="view.description"
+       tal:content="structure view.description">
+       Description
+    </p>
+  </div>
+  <table class="form-table"
+         tal:define="columns len(view.tableFields) + 1">
+    <thead>
+      <tr tal:condition="view.lineWidgets">
+        <th width="2%"
+            tal:define="name string:${view.htmlId()}-select;
+                        checked request.form.get(name) and 'checked' or None">
+          <input name="#" checked="#"
+                 type="checkbox" title="select all"
+                 class="zeam-select-all"
+                 i18n:attributes="title"
+                 tal:attributes="name name;
+                                 checked checked" />
+        </th>
+        <th tal:repeat="field view.tableFields"
+            tal:content="field.title">
+          Title
+        </th>
+      </tr>
+    </thead>
+    <tbody class="form-body">
+      <tal:line tal:repeat="line view.lineWidgets">
+        <tr class="#"
+            tal:define="odd repeat.line.odd"
+            tal:attributes="class odd and 'odd' or 'even'">
+          <td tal:repeat="widget line"
+              tal:content="structure widget.render()">
+          </td>
+        </tr>
+      </tal:line>
+      <tr class="odd" tal:condition="not view.lineWidgets">
+        <td colspan="#"
+            tal:attributes="colspan columns"
+            tal:content="view.emptyDescription">
+          There are no items.
+        </td>
+      </tr>
+    </tbody>
+    <tfoot class="form-footer" tal:condition="view.actionWidgets">
+      <tr class="form-controls">
+        <td colspan="3"
+            tal:attributes="colspan columns">
+
+          <input tal:repeat="widget view.actionWidgets"
+                 tal:replace="structure widget.render()" />
+
+          <span class="footer-fields"
+                tal:repeat="widget view.fieldWidgets">
+            <label tal:attributes="for widget.htmlId()"
+                   tal:content="widget.title">
+              Field Name
+            </label>
+            <span class="required"
+                  tal:condition="widget.required"
+                  i18n:translate="">
+              required
+            </span>
+            <span class="error"
+                 tal:condition="widget.error"
+                 tal:content="structure widget.error.title">
+              Validation error.
+            </span>
+            <tal:widget tal:content="structure widget.render()">
+              Widget.
+            </tal:widget>
+          </span>
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+</form>
