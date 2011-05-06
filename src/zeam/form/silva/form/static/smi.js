@@ -149,34 +149,35 @@
     };
 
     Popup.prototype.update = function(data) {
-        var form = $('<form />');
+        var $form = $('<form />');
         var buttons = {};
 
         this.popup.dialog('option', 'title', data['label']);
         this.popup.empty();
-        this.popup.append(form);
-        form.attr('data-form-url', this.url);
-        form.attr('name', data.prefix);
-        form.append(data['widgets']);
+        this.popup.append($form);
+        $form.attr('data-form-url', this.url);
+        $form.attr('name', data.prefix);
+        $form.append(data['widgets']);
         // Add an empty input submit to activate form submission with enter
-        form.append($('<input type="submit" style="display: none" />'));
+        $form.append('<input type="submit" style="display: none" />');
         for (var i=0; i < data['actions'].length; i++) {
             var label = data['actions'][i]['label'];
-            var callback = this._create_callback(form, data['actions'][i]);
+            var callback = this._create_callback($form, data['actions'][i]);
             buttons[label] = callback;
             if (data['actions'][i]['name'] == data['default_action']) {
-                form.bind('submit', callback);
+                $form.bind('submit', callback);
             };
         };
         this.popup.dialog('option', 'buttons', buttons);
-        return form;
+        return $form;
     };
 
     Popup.prototype.display = function() {
         $.getJSON(this.url, function(data) {
-            var form = this.update(data);
+            var $form = this.update(data);
             this.popup.dialog('open');
-            bootstrap_form(form);
+            // Initialize form and widgets JS.
+            $form.trigger('load-smiform');
         }.scope(this));
     };
 
@@ -184,24 +185,34 @@
         bootstrap_form($(this));
     });
 
+    /**
+     * Open a Form popup.
+     * @param url: if not undefined, the url for form.
+     */
+    $.fn.SMIFormPopup = function(url) {
+        var popup = $('#form-popup');
+        if (!popup.length) {
+            popup= $('<div id="form-popup"></div>');
+        };
+        if (url == undefined) {
+            url = $(this).attr('href');
+        };
+        popup.dialog({
+            autoOpen: false,
+            modal: true,
+            width: 800
+        });
+        var form = new Popup(popup, url);
+        form.display();
+        return false;
+    };
+
     $(document).ready(function() {
         bootstrap_form($('.form-content'));
 
         // Prepare Popup
         $('.form-popup').live('click', function() {
-            var url = $(this).attr('href');
-            var popup = $('#form-popup');
-            if (!popup.length) {
-                popup= $('<div id="form-popup"></div>');
-            };
-            popup.dialog({
-                autoOpen: false,
-                modal: true,
-                width: 800
-            });
-            var form = new Popup(popup, url);
-            form.display();
-            return false;
+            $(this).SMIFormPopup();
         });
     });
 
