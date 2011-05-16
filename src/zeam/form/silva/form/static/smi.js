@@ -212,7 +212,7 @@
 
         // Prepare Popup
         $('.form-popup').live('click', function() {
-            $(this).SMIFormPopup();
+            return $(this).SMIFormPopup();
         });
     });
 
