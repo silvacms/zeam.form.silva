@@ -106,7 +106,7 @@
     };
 
     Popup.prototype._refresh = function(identifier) {
-        var form = $('form[name=' + identifier + ']');
+        var form = $('form[name="' + identifier + '"]');
         form.trigger('refresh-smi');
     };
 
