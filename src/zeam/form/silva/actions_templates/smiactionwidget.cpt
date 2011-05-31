@@ -1,6 +1,7 @@
-<a class="form-control" id="#" name="#" title="#" accesskey="#"
+<a class="#" id="#" name="#" title="#" accesskey="#"
    tal:attributes="name widget.identifier;
                    title widget.description;
+                   class widget.css_class;
                    id widget.htmlId();
                    accesskey widget.accesskey"
    tal:content="widget.title">

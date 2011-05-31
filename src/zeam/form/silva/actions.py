@@ -23,7 +23,7 @@ from zeam.form.silva import interfaces
 class EditAction(BaseEditAction):
     """Edit action
     """
-    grok.implements(interfaces.IRESTCloseOnSuccessAction)
+    grok.implements(interfaces.IRESTCloseOnSuccessAction, interfaces.IDefaultAction)
     title = _(u"Save changes")
     description = _(u"save modifications")
     accesskey = u's'
@@ -62,6 +62,13 @@ class PopupWidget(ActionWidget):
 
 class SMIActionWidget(ActionWidget):
     grok.adapts(IAction, interfaces.ISMIForm, Interface)
+
+    def update(self):
+        super(SMIActionWidget, self).update()
+        self.is_default = interfaces.IDefaultAction.providedBy(self.component)
+        self.css_class = 'form-control'
+        if self.is_default:
+            self.css_class += ' default-form-control'
 
 
 class SMIRemoverWidget(ActionWidget):

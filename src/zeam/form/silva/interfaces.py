@@ -33,6 +33,11 @@ class ICancelerAction(IAction):
     """
 
 
+class IDefaultAction(IAction):
+    """Mark the default action.
+    """
+
+
 # Define categories of actions for RESTForm.
 class IRESTAction(IAction):
     """Action design to be used with a RESTForm, that have a special

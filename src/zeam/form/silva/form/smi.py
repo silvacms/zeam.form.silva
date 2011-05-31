@@ -25,7 +25,7 @@ from zeam.form.composed.form import SubFormGroupBase
 
 from zeam.form.silva.actions import CancelAddAction, CancelEditAction
 from zeam.form.silva.actions import EditAction, ExtractedDecoratedAction
-from zeam.form.silva.interfaces import ISMIForm
+from zeam.form.silva.interfaces import ISMIForm, IDefaultAction
 from zeam.form.silva.utils import SilvaFormData
 from zeam.form.silva.utils import convert_request_form_to_unicode
 
@@ -94,23 +94,14 @@ class SMIForm(SilvaFormData, PageREST, FormCanvas):
     def redirect(self, url):
         raise RedirectToPage(url)
 
-    def renderActions(self):
-        def renderAction(action):
-            return {'label': action.title,
-                    'name': action.identifier}
-        return map(renderAction, self.actionWidgets)
-
     def payload(self):
         convert_request_form_to_unicode(self.request.form)
         self.update()
         action, status = self.updateActions()
         self.updateWidgets()
-        actions = self.renderActions()
         result = {'ifaces': ['form'],
                   'success': status == SUCCESS,
-                  'forms': self.render(),
-                  'actions': actions,
-                  'default': actions[0]['name'] if actions else None}
+                  'forms': self.render()}
         portlets = queryMultiAdapter((self.context, self.request, self), name='portlets')
         if portlets is not None:
             portlets.update()
@@ -257,6 +248,7 @@ class SMIAddForm(SMIForm):
         _(u'Save'),
         description=_(u"create the content"),
         factory=ExtractedDecoratedAction,
+        implements=IDefaultAction,
         accesskey=u's')
     def save(self, data):
         try:
