@@ -20,3 +20,5 @@ from zeam.form.silva.form.popup import RESTPopupForm
 from zeam.form.silva.form.smi import SilvaDataManager
 from zeam.form.silva.actions import ExtractedDecoratedAction
 from zeam.form.silva.actions import EditAction, CancelAction, PopupAction
+
+from zeam.form.silva.interfaces import IDefaultAction

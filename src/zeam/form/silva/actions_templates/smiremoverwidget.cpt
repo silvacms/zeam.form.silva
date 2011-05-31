@@ -1,7 +1,8 @@
-<a class="ui-state-default form-control" id="#" name="#" title="#"
+<a class="ui-state-default form-control" id="#" name="#" title="#" data-form-shortcut="#"
    tal:attributes="name widget.identifier;
                    title widget.description;
-                   id widget.htmlId();">
+                   id widget.htmlId();
+                   data-form-shortcut widget.accesskey">
   <ins class="ui-icon ui-icon-close"></ins>
   <tal:label tal:content="widget.title">Label</tal:label>
 </a>
