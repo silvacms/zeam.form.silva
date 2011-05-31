@@ -180,6 +180,9 @@ class SMISubFormGroup(SilvaFormData, composed.SubFormGroup):
     """
     grok.baseclass()
 
+    def get_content_path(self, content):
+        return self.parent.get_content_path(content)
+
 
 class SMISubFormGroupTemplate(pt.PageTemplate):
     pt.view(SMISubFormGroup)
