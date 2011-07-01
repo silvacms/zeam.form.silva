@@ -5,86 +5,81 @@
     /**
      * Inline validation on a form.
      */
-    var Validator = function(field) {
-        var form = field.closest('form');
-        this.field = field;
-        this.field_prefix = field.attr('data-field-prefix');
-        this.form_prefix = form.attr('name');
-        this.form_url = form.attr('data-form-url');
+    var create_validator = function() {
+        var $field = $(this);
+        var $form = $field.closest('form');
+        var field_prefix = $field.attr('data-field-prefix');
+        var form_prefix = $form.attr('name');
+        var form_url = $form.attr('data-form-url');
 
-        if (!this.form_url) {
+        if (!form_url) {
             return;
         };
 
-        var validator = this.validate.scope(this);
-        this.field.find('.field').bind('change', function () {
-            setTimeout(validator, 0);
+        $field.find('.field').bind('change', function () {
+            setTimeout(function() {
+                var values = [{name: 'prefix.field', value: field_prefix},
+                              {name: 'prefix.form', value: form_prefix}];
+
+                var serialize_field = function() {
+                    var $input = $(this);
+                    var add = true;
+
+                    if ($input.is(':checkbox') && !$input.is(':checked')) {
+                        add = false;
+                    };
+                    if (add) {
+                        values.push({name: $input.attr('name'), value: $input.val()});
+                    };
+                };
+
+                $field.find('input').each(serialize_field);
+                $field.find('textarea').each(serialize_field);
+                $field.find('select').each(serialize_field);
+                $.ajax({
+                    url: form_url + '/++rest++zeam.form.silva.validate',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: values,
+                    success: function(data) {
+                        var $container = $field.children('.form-field');
+
+                        if (data['success']) {
+                            // Success, clear the errors
+                            $field.removeClass('form-error');
+                            $container.children('.form-error-detail').remove();
+                        } else {
+                            // Report error
+                            $field.addClass('form-error');
+                            $container.children('.form-error-detail').remove();
+                            if (data['error']) {
+                                $container.prepend(
+                                    '<div class="form-error-detail"><p>' + data['error'] +'</p></div>');
+                            };
+                        };
+                    }
+                });
+            }, 0);
         });
     };
 
-    Validator.prototype.validate = function() {
-        var values = [{name: 'prefix.field', value: this.field_prefix},
-                      {name: 'prefix.form', value: this.form_prefix}];
+    /**
+     * Bootstrap javascript helper for forms.
+     */
+    var bootstrap_form = function() {
+        var $form = $(this);
 
-        var serialize_field = function() {
-            var input = $(this);
-            var add = true;
-
-            if (input.is(':checkbox') && !input.is(':checked')) {
-                add = false;
-            };
-            if (add) {
-                values.push({name: input.attr('name'), value: input.val()});
-            };
-        };
-
-        this.field.find('input').each(serialize_field);
-        this.field.find('textarea').each(serialize_field);
-        this.field.find('select').each(serialize_field);
-        $.ajax({
-            url: this.form_url + '/++rest++zeam.form.silva.validate',
-            type: 'POST',
-            dataType: 'json',
-            data: values,
-            success: function(data) {
-                if (data['success']) {
-                    this.clear();
-                } else {
-                    this.error(data['error']);
-                };
-            }.scope(this)});
-
-    };
-
-    Validator.prototype.error = function(message) {
-        var container = this.field.children('.form-field');
-        this.field.addClass('form-error');
-        container.children('.form-error-detail').remove();
-        if (message) {
-            container.prepend('<div class="form-error-detail"><p>' + message +'</p></div>');
-        }
-    };
-
-    Validator.prototype.clear = function() {
-        var container = this.field.children('.form-field');
-        this.field.removeClass('form-error');
-        container.children('.form-error-detail').remove();
-    };
-
-    var bootstrap_form = function(form) {
         // Select all
-        form.find('.zeam-select-all').bind('change', function() {
-            var select = $(this);
-            var status = select.attr('checked');
-            form.find('.' + select.attr('name')).each(function() {
+        $form.find('.zeam-select-all').bind('change', function() {
+            var $select = $(this);
+            var status = $select.attr('checked');
+            $form.find('.' + $select.attr('name')).each(function() {
                 $(this).attr('checked', status);
             });
         });
 
         // Inline Validation
-        form.find('.form-section').each(function (index) {
-            new Validator($(this));
-        });
+        $form.find('.form-section').each(create_validator);
     };
 
     /**
@@ -145,7 +140,6 @@
 
     Popup.prototype.close = function() {
         this.popup.dialog('close');
-        this.popup.empty();
     };
 
     Popup.prototype.update = function(data) {
@@ -173,6 +167,9 @@
     };
 
     Popup.prototype.display = function() {
+        this.popup.bind('dialogclose', function() {
+            this.popup.remove();
+        }.scope(this));
         $.getJSON(this.url, function(data) {
             var $form = this.update(data);
             this.popup.dialog('open');
@@ -181,34 +178,33 @@
         }.scope(this));
     };
 
-    $('form').live('load-smiform', function() {
-        bootstrap_form($(this));
-    });
-
     /**
      * Open a Form popup.
      * @param url: if not undefined, the url for form.
      */
     $.fn.SMIFormPopup = function(url) {
-        var popup = $('#form-popup');
-        if (!popup.length) {
-            popup= $('<div id="form-popup"></div>');
+        var $popup = $('#form-popup');
+        if (!$popup.length) {
+            $popup= $('<div id="form-popup"></div>');
         };
         if (url == undefined) {
             url = $(this).attr('href');
         };
-        popup.dialog({
+        $popup.dialog({
             autoOpen: false,
             modal: true,
             width: 800
         });
-        var form = new Popup(popup, url);
+        var form = new Popup($popup, url);
         form.display();
         return false;
     };
 
+    // Registeration code: Prepare forms
+    $('form').live('load-smiform', bootstrap_form);
+
     $(document).ready(function() {
-        bootstrap_form($('.form-content'));
+        $('.form-content').each(bootstrap_form);
 
         // Prepare Popup
         $('.form-popup').live('click', function() {
