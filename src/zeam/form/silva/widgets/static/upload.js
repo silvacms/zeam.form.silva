@@ -174,13 +174,13 @@
         $upload_button.bind('click', function(){
             var $iframe = $field.find('iframe');
             var $popup = $field.find('.upload-popup').clone();
-            var uploader = new FileUploader($progress);
+            var uploader = FileUploader($progress);
 
             $popup.dialog({
                 title: $upload_button.text(),
                 modal: true,
-                create: function(){
-                    $(this).find('p').append(
+                create: function() {
+                    $popup.find('p').append(
                         uploader.get_form(
                             $iframe.attr('name'), $upload_button.attr('href')));
                 },
@@ -189,7 +189,6 @@
                     Send: function(event){
                         disable_upload_button();
                         $popup.dialog('close');
-                        //$(event.target).closest('ui-button-text').button('disable');
                         uploader.send().fail(
                             function (data) {
                                 // failure
