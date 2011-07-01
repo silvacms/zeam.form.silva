@@ -29,7 +29,11 @@ class EditAction(BaseEditAction):
     accesskey = u'ctrl+s'
 
     def __call__(self, form):
-        status = super(EditAction, self).__call__(form)
+        try:
+            status = super(EditAction, self).__call__(form)
+        except ValueError, error:
+            form.send_message(error.args[0], type="error")
+            return FAILURE
         if interfaces.ISilvaFormData.providedBy(form):
             if status is FAILURE:
                 for error in form.formErrors:
