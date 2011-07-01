@@ -195,7 +195,6 @@
                                 $field.trigger(
                                     'notify-feedback-smi',
                                     {message: data.message, category: 'error'});
-                                set_input_value(previous_value);
                             }).always(function (data) {
                                 // in any case
                                 set_input_value(data);
