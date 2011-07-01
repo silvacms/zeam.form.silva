@@ -5,9 +5,11 @@
       <img class="widget-crop-image" src="${widget.url}" />
       <div class="widget-crop-popup-options">
         <br />
-        <span class="option">
-          <input type="checkbox" name="proportional" class="crop-proportional" />
-          <label for="proportional" i18n:translate="">keep proportions</label>
+        <span class="option"
+              tal:define="proportional_id string:${widget.htmlId()}-proportional">
+          <input type="checkbox" name="proportional" class="crop-proportional"
+                 id="${proportional_id}" />
+          <label for="${proportional_id}" i18n:translate="">keep proportions</label>
         </span>
       </div>
     </p>
@@ -20,7 +22,8 @@
   <br />
   <a class="widget-crop-popup-button form-button ui-state-default"
      href="#" onclick="return false;" i18n:translate="">
-    <ins class="ui-icon ui-icon-carat-1-sw"></ins>
+    <ins class="ui-icon ui-icon-carat-1-sw"
+         i18n:name="icon"></ins>
     Set crop coordinates...
   </a>
   <br clear="both" />
