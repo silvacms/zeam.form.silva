@@ -175,6 +175,7 @@
             var $iframe = $field.find('iframe');
             var $popup = $field.find('.upload-popup').clone();
             var uploader = FileUploader($progress);
+            var promise = null;
 
             $popup.dialog({
                 title: $upload_button.text(),
@@ -188,8 +189,7 @@
                 buttons: {
                     Send: function(event){
                         disable_upload_button();
-                        $popup.dialog('close');
-                        uploader.send().fail(
+                        promise = uploader.send().fail(
                             function (data) {
                                 // failure
                                 $field.trigger(
@@ -201,7 +201,14 @@
                                 enable_upload_button();
                                 $popup.remove();
                             });
+                        $popup.dialog('close');
                     }
+                }
+            });
+            $popup.bind('dialogclose', function() {
+                // the user click on close.
+                if (promise === null) {
+                    $popup.remove();
                 }
             });
             $popup.dialog('open');
