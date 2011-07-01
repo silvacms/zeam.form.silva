@@ -3,8 +3,8 @@
     <p></p>
   </div>
   <div class="upload-display"
-        tal:content="widget.displayValue()">
-      Display value
+       tal:content="widget.displayValue()">
+    Display value
   </div>
   <div style="display:none"
        class="upload-progress">
@@ -23,11 +23,11 @@
   </a>
   <a tal:condition="not widget.required" href="#" onclick="return false"
      class="upload-clear form-button ui-state-default">
-     <ins class="ui-icon ui-icon-circle-close"></ins>
+    <ins class="ui-icon ui-icon-circle-close"></ins>
     <tal:msg i18n:translate="">Clear</tal:msg>
   </a>
   <input id="#" name="#" class="upload-input" value="${widget.inputValue()}" type="hidden"
-       tal:attributes="name widget.identifier;
-                       id widget.htmlId()" />
+         tal:attributes="name widget.identifier;
+                         id widget.htmlId()" />
   <br clear="both"/>
 </div>

@@ -5,203 +5,218 @@
         return path.replace(/^.*[\/\\](.*)/, '$1');
     }
 
-    var FileUploader = function(element, options){
-        var defaults = {
-            statTimeout: 5000,
-            statDelay: 500,
-            tooManyTriesLabel: 'unknown error while uploading file.',
-            fileTooBigLabel: 'upload failed file is too big.'
+    var default_options = {
+        stat_url: '/gp.fileupload.stat/',
+        stat_timeout: 5000,
+        stat_delay: 500,
+        max_retries: 3,
+        errors: {
+            too_many_retries: 'unknown error while uploading file.',
+            file_too_big: 'upload failed file is too big.'
+        }
+    };
+
+    var FileUploader = function($progress, options){
+        var deferred = $.Deferred();
+        var progress_value = 0;
+        var retries = 0;
+
+        var upload_id = Math.random() * 10000000000000000000;
+        var timeout = null;
+
+        var form = null;
+
+        options = $.extend(default_options, options);
+
+        var clear_status = function() {
+            if (timeout !== null) {
+                clearTimeout(timeout);
+                timeout = null;
+            };
         };
-        this.progress = 0;
-        this.retries = 0;
-        this.options = $.extend(defaults, options);
-        this.element = $(element);
-        this.uploadId = Math.random() * 10000000000000000000;
-        this.statURL = '/gp.fileupload.stat/';
-        this._timeout = null;
-    };
 
-    FileUploader.prototype.createForm = function(target, action) {
-        var form = $('<form class="upload-form"' +
-                     'enctype="multipart/form-data"' +
-                     'method="POST"' +
-                     'action=""' +
-                     'target="">' +
-                     '<input type="file" name="file" />' +
-                     '</form>');
-        form.attr('target', target);
-        var sep = '?';
-        if (action.match(/\?/))
-            sep = "&";
-        form.attr('action', action + sep + 'gp.fileupload.id=' + this.uploadId);
-        this._form = form;
-        return form;
-    };
-
-    FileUploader.prototype.getStatus = function(delay) {
-        this._clearTimeout();
-        this._timeout = setTimeout(
-            this._getStatusCallback.scope(this), this.options.statDelay);
-    };
-
-    FileUploader.prototype.terminate = function() {
-        this.progress = 100;
-        this.element.trigger('complete-fileupload', this.uploadId);
-    };
-
-    FileUploader.prototype.finalize = function(filename) {
-        this.element.trigger('finished-fileupload', filename);
-    };
-
-    FileUploader.prototype.stop = function(message) {
-        this._clearTimeout();
-        this.progress = 100;
-        this.element.trigger('failure-fileupload', message);
-    };
-
-    FileUploader.prototype._clearTimeout = function() {
-        if (this._timeout !== null) {
-            clearTimeout(this._timeout);
-            this._timeout = null;
-        }
-    };
-
-    FileUploader.prototype._setProgress = function(value) {
-        var old = this.progress;
-        if (value != old) {
-            this.progress = value;
-            this.element.trigger('progress-fileupload', value);
-        }
-    };
-
-    FileUploader.prototype._getStatusCallback = function() {
-        var query = '?q=' + (Math.random() * 10000000000000000000);
-        $.ajax({
-            type: 'GET',
-            dataType: 'json',
-            timeout: this.options.statTimeout,
-            url: this.statURL + this.uploadId + query,
-            success: function(data) {
-                if (data.state == -1) {
-                    this.stop(this.options.fileTooBigLabel);
-                    return;
-                }
-                if (data.state == 0) {
-                    // not started
-                    this.retries += 1;
-                    if (this.retries > this.max_retries) {
-                        this.stop(this.options.tooManyTriesLabel);
-                    } else {
-                        this.getStatus();
-                    }
-                    return;
-                } else {
-                    this.retries = 0;
-                }
-                if (data.percent >= 0 && data.percent < 100) {
-                    // progress
-                    this._setProgress(data.percent);
-                    this.getStatus();
-                }
-                if (data.percent == 100) {
-                    this._setProgress(data.percent);
-                    this.terminate();
-                }
-            }.scope(this),
-            error: function() {
-                this.retries += 1;
-                if (this.retries > 3) {
-                    this.stop(this.options.tooManyTriesLabel);
-                } else {
-                    this.getStatus(this.options.statDelay);
-                }
-            }.scope(this)
-        });
-    };
-
-    FileUploader.prototype.start = function() {
-        // listen to event triggered by the iframe
-        $(document).one('done-' + String(this.uploadId) + '-upload',
-            function(event, data){
-                this.finalize(data.path);
-            }.scope(this));
-        this._form.submit();
-        this.getStatus();
-    };
-
-    var create_upload_field = function(field) {
-
-        var iframe = $('iframe', field);
-        var progress = $('.upload-progress', field);
-        var trigger = $('a.upload-trigger', field);
-        var input = $('.upload-input', field);
-        var display = $('.upload-display', field);
-        var oldValue = input.val();
-        var popup = $('.upload-popup', field);
-        var uploader = new FileUploader(field);
-        var clear = $('.upload-clear', field);
-
-        popup.dialog({
-            title: trigger.text(),
-            modal: true,
-            create: function(){
-                $('p', $(this)).append(
-                    uploader.createForm(
-                        iframe.attr('name'), trigger.attr('href')));
-            },
-            autoOpen: false,
-            buttons: {
-                'send': function(event){
-                    $(this).dialog('close');
-                    $(event.target).closest('ui-button-text').button('disable');
-                    uploader.start();
-                    progress.show();
-                    trigger.button('disable');
-                    trigger.hide();
-                }
+        var set_progress = function(value) {
+            if (progress_value != value) {
+                progress_value = value;
+                $progress.progressbar('option', 'value', value);
             }
+        };
+
+        var abort_upload = function(message) {
+            clear_status();
+            deferred.reject({filename: null, message: message});
+        };
+
+        var poll_status = function() {
+            clear_status();
+            timeout = setTimeout(
+                function() {
+                    var url = (options.stat_url +
+                               upload_id +
+                               '?q=' + (Math.random() * 1000000000000000000));
+                    $.ajax({
+                        type: 'GET',
+                        dataType: 'json',
+                        timeout: options.stat_timeout,
+                        url: url,
+                        success: function(data) {
+                            switch (data.state) {
+                            case -1:
+                                abort_upload(options.errors.file_too_big);
+                                break;
+                            case 0:
+                                // not started
+                                retries += 1;
+                                if (retries > options.max_retries) {
+                                    abort_upload(options.errors.too_many_retries);
+                                    return;
+                                };
+                                poll_status();
+                                break;
+                            case 1:
+                                // dl in progress
+                                retries = 0;
+                                if (data.percent > 0) {
+                                    set_progress(data.percent);
+                                };
+                                if (data.percent < 100) {
+                                    poll_status();
+                                };
+                                break;
+                            };
+                        },
+                        error: function() {
+                            retries += 1;
+                            if (retries > options.max_retries) {
+                                abort_upload(options.errors.too_many_retries);
+                                return;
+                            }
+                            poll_status();
+                        }
+                    });
+                }, options.stat_delay);
+        };
+
+        return {
+            get_form: function(target, action) {
+                var sep = '?';
+
+                form = $('<form class="upload-form"' +
+                         'enctype="multipart/form-data"' +
+                         'method="POST"' +
+                         'action=""' +
+                         'target="' + target + '">' +
+                         '<input type="file" name="file" />' +
+                         '</form>');
+                if (action.match(/\?/))
+                    sep = "&";
+                form.attr('action', action + sep + 'gp.fileupload.id=' + upload_id);
+                return form;
+            },
+            send: function() {
+                if (form === null) {
+                    return null;
+                };
+                // listen to event triggered by the iframe, that will
+                // mark the end of a successful upload
+                $(document).one('done-' + String(upload_id) + '-upload', function(event, data) {
+                    deferred.resolve({filename: data.path});
+                });
+                form.submit();
+                poll_status();
+                return deferred.promise();
+            }
+        };
+    };
+
+    var create_upload_field = function() {
+        var $field = $(this);
+
+        var $upload_button = $field.find('a.upload-trigger');
+        var $clear_button = $field.find('a.upload-clear');
+
+        var $progress = $field.find('.upload-progress');
+        var $input = $field.find('.upload-input');
+        var $status = $field.find('.upload-display');
+
+        var previous_value = $input.val();
+
+        var set_input_value = function(data) {
+            if (data.filename) {
+                $status.text(basename(data.filename));
+            } else if (data.message) {
+                $status.text(data.message);
+            } else {
+                $status.text('not set.');
+            };
+            $input.val(data.filename);
+        };
+
+        var disable_upload_button = function() {
+            $progress.progressbar({value: 0});
+            $progress.show();
+            $upload_button.button('disable');
+            $upload_button.hide();
+        };
+
+        var enable_upload_button = function() {
+            $progress.hide();
+            $upload_button.button('enable');
+            $upload_button.show();
+        };
+
+        // Support for clear button
+        $clear_button.bind('click', function(){
+            set_input_value('');
         });
 
-        if (clear.length > 0){
-            clear.bind('click', function(){
-                input.val('');
-                display.text('not set.');
+        // Support for upload button
+        $upload_button.bind('click', function(){
+            var $iframe = $field.find('iframe');
+            var $popup = $field.find('.upload-popup').clone();
+            var uploader = new FileUploader($progress);
+
+            $popup.dialog({
+                title: $upload_button.text(),
+                modal: true,
+                create: function(){
+                    $(this).find('p').append(
+                        uploader.get_form(
+                            $iframe.attr('name'), $upload_button.attr('href')));
+                },
+                autoOpen: false,
+                buttons: {
+                    Send: function(event){
+                        disable_upload_button();
+                        $popup.dialog('close');
+                        //$(event.target).closest('ui-button-text').button('disable');
+                        uploader.send().fail(
+                            function (data) {
+                                // failure
+                                $field.trigger(
+                                    'notify-feedback-smi',
+                                    {message: data.message, category: 'error'});
+                                set_input_value(previous_value);
+                            }).always(function (data) {
+                                // in any case
+                                set_input_value(data);
+                                enable_upload_button();
+                                $popup.remove();
+                            });
+                    }
+                }
             });
-        }
-        trigger.bind('click', function(){ popup.dialog('open'); });
-        progress.progressbar({value: 0});
-        field.bind('progress-fileupload', function(event, value){
-            progress.progressbar('option', 'value', value);
+            $popup.dialog('open');
         });
-        field.bind('finished-fileupload', function(event, filename){
-            input.val(filename);
-            progress.hide();
-            display.text(basename(filename));
-            trigger.button('enable');
-            trigger.show();
-        });
-        field.bind('failure-fileupload', function(event, message){
-            field.trigger(
-                'notify-feedback-smi',
-                {message: message, category: 'error'});
-            input.val(oldValue);
-            display.text(basename(oldValue));
-            progress.hide();
-            trigger.button('enable');
-            trigger.show();
-        });
+
     };
 
     $('form').live('load-smiform', function() {
-        $(this).find('.upload-file').each(function(index, field){
-            create_upload_field($(field));
-        });
+        $(this).find('.upload-file').each(create_upload_field);
     });
 
     $(document).ready(function() {
-        $('.upload-file').each(function(index, field){
-            create_upload_field($(field));
-        });
+        $('.upload-file').each(create_upload_field);
     });
 
 

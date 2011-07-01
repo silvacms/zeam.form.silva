@@ -7,7 +7,7 @@
         var $input = $field.find('input');
         var $opener = $field.find('a.widget-crop-popup-button');
         var $template = $field.find('div.widget-crop-popup');
-        var required = $input.hasClass('required');
+        var required = $input.hasClass('field-required');
 
         var width = $(window).width();
         var height = $(window).height();
