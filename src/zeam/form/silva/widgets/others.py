@@ -13,8 +13,7 @@ from zeam.form.ztk.interfaces import ICollectionSchemaField
 from zeam.form.ztk.widgets.collection import newCollectionWidgetFactory
 from zeam.form.ztk.widgets.textline import TextLineSchemaField
 
-from Products.Silva.icon import get_icon_url
-
+from silva.core.interfaces.adapters import IIconResolver
 
 class IconDisplayWidget(SchemaFieldWidget):
     grok.name('silva.icon')
@@ -22,7 +21,7 @@ class IconDisplayWidget(SchemaFieldWidget):
     def update(self):
         super(IconDisplayWidget, self).update()
         content = self.form.getContentData().getContent()
-        self.icon_url = get_icon_url(content, self.request)
+        self.icon_url = IIconResolver(self.request).get_content_url(content)
 
 
 grok.global_adapter(
