@@ -46,6 +46,7 @@ class ZopeForm(object):
     def __call__(self):
         need(IFormResources)
         if not hasattr(self.request, 'locale'):
+            # XXX I don't think we need this now in Zope 2.13 ?
             # This is not pretty, but no choice.
             self.request.locale = find_locale(self.request)
         convert_request_form_to_unicode(self.request.form)

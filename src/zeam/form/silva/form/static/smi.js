@@ -117,10 +117,10 @@
                                 };
                                 if (action_type == 'close_on_success' && data['success']) {
                                     if (data['refresh']) {
-                                        var identifer = data['refresh'];
+                                        var identifier = data['refresh'];
                                         $('form[name="' + identifier + '"]').trigger('refresh-smi');
                                     };
-                                    close();
+                                    popup.close();
                                 } else {
                                     bootstrap_form(popup.from_data(data));
                                 };
@@ -211,7 +211,7 @@
             };
             var popup = new Popup($popup, url);
             var builder = null;
-            if (infrae.interfaces.isImplementedBy('popup_form', options)) {
+            if (infrae.interfaces.isImplementedBy('popup', options)) {
                 builder = popup.from_data(options);
             } else {
                 builder = popup.from_url();
@@ -220,6 +220,13 @@
             return false;
         };
 
+        // You can create a popup as a view as well
+        infrae.views.view({
+            iface: 'popup',
+            factory: function($content, data) {
+                return $content.SMIFormPopup(data);
+            }
+        });
     });
 
     // Registeration code: Prepare forms

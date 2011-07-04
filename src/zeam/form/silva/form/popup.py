@@ -3,13 +3,15 @@
 # See also LICENSE.txt
 # $Id$
 
+import json
+
 from five import grok
 from megrok import pagetemplate as pt
 
 from silva.ui.rest.base import UIREST
 from silva.ui.rest.base import get_resources
 
-from zeam.form.base.form import FormCanvas
+from zeam.form.base.form import FormCanvas, Form
 from zeam.form.base.markers import SUCCESS
 from zeam.form.silva import interfaces
 from zeam.form.silva.utils import SilvaFormData
@@ -22,12 +24,8 @@ REST_ACTIONS_TO_TOKEN = [
     (interfaces.IAction, 'send')]
 
 
-class RESTPopupForm(SilvaFormData, UIREST, FormCanvas):
+class PopupCanvas(SilvaFormData, FormCanvas):
     grok.baseclass()
-
-    def __init__(self, context, request):
-        UIREST.__init__(self, context, request)
-        FormCanvas.__init__(self, context, request)
 
     def update(self):
         pass
@@ -42,12 +40,13 @@ class RESTPopupForm(SilvaFormData, UIREST, FormCanvas):
                     'action': action_type}
         return map(renderAction, self.actionWidgets)
 
-    def processForm(self):
+    def updateForm(self):
+        convert_request_form_to_unicode(self.request.form)
         self.update()
         action, status = self.updateActions()
         self.updateWidgets()
-        info = {}
-        info['success'] = status == SUCCESS
+        info = {'ifaces': ['popup'],
+                'success': status == SUCCESS}
         if interfaces.IRESTRefreshAction.providedBy(action):
             info['refresh'] = action.refresh
         success_only = interfaces.IRESTSuccessAction.providedBy(action)
@@ -66,16 +65,39 @@ class RESTPopupForm(SilvaFormData, UIREST, FormCanvas):
         resources = get_resources(self.request)
         if resources is not None:
             result['resources'] = resources
-        return self.json_response(result)
+        return result
+
+
+class RESTPopupForm(UIREST, PopupCanvas):
+    grok.baseclass()
+
+    def __init__(self, context, request):
+        UIREST.__init__(self, context, request)
+        FormCanvas.__init__(self, context, request)
 
     def GET(self):
-        convert_request_form_to_unicode(self.request.form)
-        return self.processForm()
+        return self.json_response(self.updateForm())
 
     def POST(self):
-        convert_request_form_to_unicode(self.request.form)
-        return self.processForm()
+        return self.json_response(self.updateForm())
+
+
+class PopupForm(PopupCanvas, Form):
+    grok.baseclass()
+
+    # XXX implement this later
+    def translate(self, string):
+        return unicode(string)
+
+    def get_notifications(self):
+        return None
+
+    def __call__(self):
+        """Popup form as a view.
+        """
+        self.response.setHeader('Content-Type', 'application/json')
+        return json.dumps(self.updateForm())
 
 
 class RESTFormTemplate(pt.PageTemplate):
-    pt.view(RESTPopupForm)
+    pt.view(PopupCanvas)

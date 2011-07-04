@@ -13,6 +13,7 @@ import martian
 from zeam.form.silva.form.smi import SMIAddForm
 from zeam.form.silva.form.public import SilvaForm
 from zeam.form.silva.form.zmi import ZopeForm
+from zeam.form.silva.form.popup import PopupForm
 
 
 class SilvaAddFormSecurityGrokker(martian.ClassGrokker):
@@ -55,3 +56,9 @@ class ZopeFormSecurityGrokker(ViewSecurityGrokker):
     """We want to set Zope 2 security on Forms
     """
     martian.component(ZopeForm)
+
+
+class PopupFormSecurityGrokker(ViewSecurityGrokker):
+    """We want to set Zope 2 security on Forms
+    """
+    martian.component(PopupForm)
