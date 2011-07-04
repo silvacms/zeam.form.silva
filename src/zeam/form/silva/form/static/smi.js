@@ -1,6 +1,6 @@
 
 
-(function($) {
+(function($, infrae) {
 
     /**
      * Inline validation on a form.
@@ -82,123 +82,137 @@
         $form.find('.form-section').each(create_validator);
     };
 
-    /**
-     * Popup form.
-     */
-    var Popup = function(popup, url) {
-        this.popup = popup;
-        this.url = url;
-    };
 
-    Popup.prototype._send = function(form_data, callback) {
-        $.ajax({
-            url: this.url,
-            type: 'POST',
-            dataType: 'json',
-            data: form_data,
-            success: callback
-        });
-    };
+    $(document).bind('load-smiplugins', function(event, smi) {
 
-    Popup.prototype._refresh = function(identifier) {
-        var form = $('form[name="' + identifier + '"]');
-        form.trigger('refresh-smi');
-    };
+        /**
+         * Popup form.
+         */
+        var Popup = function($popup, url) {
+            var popup = {};
+            var ready = false;
 
-    Popup.prototype._create_callback = function(form, data) {
-        var action_label = data['label'];
-        var action_name = data['name'];
-        var action_type = data['action'];
-        return function() {
-            if (action_type == 'send' || action_type == 'close_on_success') {
-                var form_array = form.serializeArray();
-                var form_data = {};
-                form_data[action_name] = action_label;
-                for (var j=0; j < form_array.length; j++) {
-                    form_data[form_array[j]['name']] = form_array[j]['value'];
-                };
-                this._send(form_data,  function(data) {
-                    if (data.notifications) {
-                        this.popup.trigger('notify-feedback-smi', data.notifications);
-                    };
-                    if (action_type == 'close_on_success' && data['success']) {
-                        if (data['refresh']) {
-                            this._refresh(data['refresh']);
+            var create_callback = function($form, data) {
+                var action_label = data['label'];
+                var action_name = data['name'];
+                var action_type = data['action'];
+
+                return function() {
+                    switch (action_type) {
+                    case 'send':
+                    case 'close_on_success':
+                        var form_array = $form.serializeArray();
+                        var form_data = {};
+
+                        form_data[action_name] = action_label;
+                        for (var j=0; j < form_array.length; j++) {
+                            form_data[form_array[j]['name']] = form_array[j]['value'];
                         };
-                        this.close();
-                    } else {
-                        bootstrap_form(this.update(data));
+
+                        // Send request
+                        smi.ajax.query(url, form_data).pipe(
+                            function(data) {
+                                if (data.notifications) {
+                                    $popup.trigger('notify-feedback-smi', data.notifications);
+                                };
+                                if (action_type == 'close_on_success' && data['success']) {
+                                    if (data['refresh']) {
+                                        var identifer = data['refresh'];
+                                        $('form[name="' + identifier + '"]').trigger('refresh-smi');
+                                    };
+                                    close();
+                                } else {
+                                    bootstrap_form(popup.from_data(data));
+                                };
+                            });
+                        break;
+                    case 'close':
+                        popup.close();
+                        break;
                     };
-                }.scope(this));
+                    return false;
+                };
             };
-            if (action_type == 'close') {
-                this.close();
+
+            $.extend(popup, {
+                display: function(builder) {
+                    return $.when(builder).done(function ($form) {
+                        // Initialize form and widgets JS, show the popup
+                        $form.trigger('load-smiform');
+                        $popup.dialog('open');
+                    });
+                },
+                close: function() {
+                    $popup.dialog('close');
+                },
+                from_url: function() {
+                    return smi.ajax.query(url).pipe(popup.from_data);
+                },
+                from_data: function(data) {
+                    var $form = $('<form />');
+                    var buttons = {};
+
+                    $popup.dialog('option', 'title', data['label']);
+                    $popup.empty();
+                    $popup.append($form);
+                    $form.attr('data-form-url', url);
+                    $form.attr('name', data.prefix);
+                    $form.append(data['widgets']);
+                    // Add an empty input submit to activate form submission with enter
+                    $form.append('<input type="submit" style="display: none" />');
+                    for (var i=0; i < data['actions'].length; i++) {
+                        var label = data['actions'][i]['label'];
+                        var callback = create_callback($form, data['actions'][i]);
+
+                        buttons[label] = callback;
+                        if (data['actions'][i]['name'] == data['default_action']) {
+                            $form.bind('submit', callback);
+                        };
+                    };
+                    $popup.dialog('option', 'buttons', buttons);
+                    ready = true;
+                    return $form;
+                }
+            });
+            return popup;
+        };
+
+        /**
+         * Open a Form popup.
+         * @param url: if not undefined, the url for form.
+         */
+        $.fn.SMIFormPopup = function(options) {
+            var $popup = $('<div></div>');
+
+            $popup.dialog({
+                autoOpen: false,
+                modal: true,
+                width: 800
+            });
+            // When the popup is closed, clean its HTML and bindings
+            $popup.bind('dialogclose', function() {
+                $popup.remove();
+            });
+
+            // Create a popup from a builder
+            var url = undefined;
+            if (options !== undefined && options.url !== undefined) {
+                url = options.url;
+            } else {
+                url = $(this).attr('href');
             };
+            var popup = new Popup($popup, url);
+            var builder = null;
+            if (infrae.interfaces.isImplementedBy('popup_form', options)) {
+                builder = popup.from_data(options);
+            } else {
+                builder = popup.from_url();
+            };
+            popup.display(builder);
             return false;
-        }.scope(this);
-    };
-
-    Popup.prototype.close = function() {
-        this.popup.dialog('close');
-    };
-
-    Popup.prototype.update = function(data) {
-        var $form = $('<form />');
-        var buttons = {};
-
-        this.popup.dialog('option', 'title', data['label']);
-        this.popup.empty();
-        this.popup.append($form);
-        $form.attr('data-form-url', this.url);
-        $form.attr('name', data.prefix);
-        $form.append(data['widgets']);
-        // Add an empty input submit to activate form submission with enter
-        $form.append('<input type="submit" style="display: none" />');
-        for (var i=0; i < data['actions'].length; i++) {
-            var label = data['actions'][i]['label'];
-            var callback = this._create_callback($form, data['actions'][i]);
-            buttons[label] = callback;
-            if (data['actions'][i]['name'] == data['default_action']) {
-                $form.bind('submit', callback);
-            };
         };
-        this.popup.dialog('option', 'buttons', buttons);
-        return $form;
-    };
 
-    Popup.prototype.display = function() {
-        this.popup.bind('dialogclose', function() {
-            this.popup.remove();
-        }.scope(this));
-        $.getJSON(this.url, function(data) {
-            var $form = this.update(data);
-            this.popup.dialog('open');
-            // Initialize form and widgets JS.
-            $form.trigger('load-smiform');
-        }.scope(this));
-    };
-
-    /**
-     * Open a Form popup.
-     * @param url: if not undefined, the url for form.
-     */
-    $.fn.SMIFormPopup = function(url) {
-        var $popup = $('#form-popup');
-        if (!$popup.length) {
-            $popup= $('<div id="form-popup"></div>');
-        };
-        if (url == undefined) {
-            url = $(this).attr('href');
-        };
-        $popup.dialog({
-            autoOpen: false,
-            modal: true,
-            width: 800
-        });
-        var form = new Popup($popup, url);
-        form.display();
-        return false;
-    };
+    });
 
     // Registeration code: Prepare forms
     $('form').live('load-smiform', bootstrap_form);
@@ -213,4 +227,4 @@
     });
 
 
-})(jQuery);
+})(jQuery, infrae);

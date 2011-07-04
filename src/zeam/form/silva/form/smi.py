@@ -10,9 +10,6 @@ from megrok import pagetemplate as pt
 from zope.interface import Interface
 from zope.component import queryMultiAdapter
 from zope.configuration.name import resolve
-from zope.publisher.interfaces.browser import IDefaultBrowserLayer
-
-from js.jquery import jquery
 
 from zeam.form.base.form import FormCanvas
 from zeam.form.base.actions import Actions, action
@@ -36,6 +33,7 @@ from silva.core.conf.interfaces import ITitledContent
 from silva.core.conf.utils import getFactoryName
 from silva.core.views import views as silvaviews
 from silva.core.interfaces.content import IVersionedContent
+from silva.ui.interfaces import ISilvaUIDependencies
 from silva.translations import translate as _
 from silva.ui.rest import PageREST, RedirectToPage
 
@@ -60,8 +58,7 @@ class SilvaDataManager(BaseDataManager):
         return setattr(self.content, identifier, value)
 
 
-class IFormSilvaUIResources(IDefaultBrowserLayer):
-    silvaconf.resource(jquery)
+class IFormSilvaUIResources(ISilvaUIDependencies):
     silvaconf.resource('smi.js')
 
 

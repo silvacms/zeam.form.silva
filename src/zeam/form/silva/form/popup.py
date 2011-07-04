@@ -7,6 +7,7 @@ from five import grok
 from megrok import pagetemplate as pt
 
 from silva.ui.rest.base import UIREST
+from silva.ui.rest.base import get_resources
 
 from zeam.form.base.form import FormCanvas
 from zeam.form.base.markers import SUCCESS
@@ -47,9 +48,6 @@ class RESTPopupForm(SilvaFormData, UIREST, FormCanvas):
         self.updateWidgets()
         info = {}
         info['success'] = status == SUCCESS
-        notifications = self.get_notifications()
-        if notifications is not None:
-            info['notifications'] = notifications
         if interfaces.IRESTRefreshAction.providedBy(action):
             info['refresh'] = action.refresh
         success_only = interfaces.IRESTSuccessAction.providedBy(action)
@@ -61,7 +59,14 @@ class RESTPopupForm(SilvaFormData, UIREST, FormCanvas):
                  'prefix': self.prefix,
                  'actions': actions,
                  'default_action': actions[0]['name'] if actions else None})
-        return self.json_response(info)
+        result = {'content': info}
+        notifications = self.get_notifications()
+        if notifications is not None:
+            result['notifications'] = notifications
+        resources = get_resources(self.request)
+        if resources is not None:
+            result['resources'] = resources
+        return self.json_response(result)
 
     def GET(self):
         convert_request_form_to_unicode(self.request.form)
