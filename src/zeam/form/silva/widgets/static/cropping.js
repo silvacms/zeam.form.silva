@@ -27,19 +27,19 @@
 
             // Define popup actions
             var actions = {
+                Cancel: function() {
+                    $popup.dialog('close');
+                },
+                Clear: function() {
+                    $input.val('');
+                    $popup.dialog('close');
+                },
                 Ok: function(){
                     if (crop !== undefined) {
                         $input.val(
                             crop.x + 'x' + crop.y + '-' + crop.x2 + 'x' + crop.y2);
                         $popup.dialog('close');
                     }
-                },
-                Clear: function() {
-                    $input.val('');
-                    $popup.dialog('close');
-                },
-                Cancel: function() {
-                    $popup.dialog('close');
                 }
             };
             if (required) {
