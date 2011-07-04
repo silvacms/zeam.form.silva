@@ -146,7 +146,15 @@
                     $popup.dialog('close');
                 },
                 from_url: function() {
-                    return smi.ajax.query(url).pipe(popup.from_data);
+                    return smi.ajax.query(url).pipe(
+                        popup.from_data,
+                        function (request) {
+                            // In case of error, close the popup (to
+                            // trigger the cleaning), return an reject
+                            // not to display it.
+                            popup.close();
+                            return $.Deferred().reject(request);
+                        });
                 },
                 from_data: function(data) {
                     var $form = $('<form />');
