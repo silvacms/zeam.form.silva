@@ -92,7 +92,7 @@
             var popup = {};
             var ready = false;
 
-            var create_callback = function($form, data) {
+            var create_callback = function($form, form_url, data) {
                 var action_label = data['label'];
                 var action_name = data['name'];
                 var action_type = data['action'];
@@ -110,7 +110,7 @@
                         };
 
                         // Send request
-                        smi.ajax.query(url, form_data).pipe(
+                        smi.ajax.query(form_url, form_data).pipe(
                             function(data) {
                                 if (data.notifications) {
                                     $popup.trigger('notify-feedback-smi', data.notifications);
@@ -170,7 +170,7 @@
                     $form.append('<input type="submit" style="display: none" />');
                     for (var i=0; i < data['actions'].length; i++) {
                         var label = data['actions'][i]['label'];
-                        var callback = create_callback($form, data['actions'][i]);
+                        var callback = create_callback($form, data.form_url || url, data['actions'][i]);
 
                         buttons[label] = callback;
                         if (data['actions'][i]['name'] == data['default_action']) {
