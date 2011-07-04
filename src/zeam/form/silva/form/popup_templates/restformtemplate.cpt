@@ -9,6 +9,7 @@
     <tal:repeat tal:repeat="widget view.fieldWidgets">
       <div class="form-section ${widget.error and 'form-error' or ''}"
            data-field-prefix="#"
+           tal:condition="widget.isVisible()"
            tal:attributes="data-field-prefix widget.identifier">
         <div class="form-label">
           <label tal:attributes="for widget.htmlId()"
@@ -35,6 +36,9 @@
           <tal:widget tal:content="structure widget.render()" />
         </div>
       </div>
+      <tal:hidden
+         tal:condition="not widget.isVisible()"
+         tal:content="structure widget.render()" />
     </tal:repeat>
   </div>
 </div>
