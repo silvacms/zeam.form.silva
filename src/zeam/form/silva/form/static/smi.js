@@ -141,7 +141,7 @@
                     return $.when(builder).done(function ($form) {
                         // Initialize form and widgets JS, show the popup
                         $form.trigger('load-smiform');
-                        $popup.dialog('open');
+                        infrae.ui.ShowDialog($popup);
                     });
                 },
                 close: function() {
@@ -193,13 +193,11 @@
          */
         $.fn.SMIFormPopup = function(options) {
             var $popup = $('<div></div>');
-            var maxHeight = $(window).height() * 0.7;
 
             $popup.dialog({
                 autoOpen: false,
                 modal: true,
-                width: 800,
-                maxHeight: maxHeight
+                width: 800
             });
             // When the popup is closed, clean its HTML and bindings
             $popup.bind('dialogclose', function() {
