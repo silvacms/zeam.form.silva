@@ -9,7 +9,7 @@ from operator import itemgetter
 from five import grok
 from megrok import pagetemplate as pt
 
-from silva.ui.rest.base import UIREST
+from silva.ui.rest.base import UIREST, UIHelper
 from silva.ui.rest.base import get_resources
 
 from zeam.form.base.form import FormCanvas, Form
@@ -26,7 +26,7 @@ REST_ACTIONS_TO_TOKEN = [
     (interfaces.IAction, 'send')]
 
 
-class PopupCanvas(SilvaFormData, FormCanvas):
+class PopupCanvas(SilvaFormData, FormCanvas, UIHelper):
     grok.baseclass()
 
     def update(self):
@@ -96,13 +96,6 @@ class RESTPopupForm(UIREST, PopupCanvas):
 
 class PopupForm(PopupCanvas, Form):
     grok.baseclass()
-
-    # XXX implement this later
-    def translate(self, string):
-        return unicode(string)
-
-    def get_notifications(self):
-        return None
 
     def __call__(self):
         """Popup form as a view.
