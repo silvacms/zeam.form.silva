@@ -193,11 +193,13 @@
          */
         $.fn.SMIFormPopup = function(options) {
             var $popup = $('<div></div>');
+            var maxHeight = $(window).height() * 0.7;
 
             $popup.dialog({
                 autoOpen: false,
                 modal: true,
-                width: 800
+                width: 800,
+                maxHeight: maxHeight
             });
             // When the popup is closed, clean its HTML and bindings
             $popup.bind('dialogclose', function() {
