@@ -4,6 +4,7 @@
 # $Id$
 
 import json
+from operator import itemgetter
 
 from five import grok
 from megrok import pagetemplate as pt
@@ -19,6 +20,7 @@ from zeam.form.silva.utils import convert_request_form_to_unicode
 
 
 REST_ACTIONS_TO_TOKEN = [
+    (interfaces.IRESTCloseOnSendAction, 'close_on_send'),
     (interfaces.IRESTCloseOnSuccessAction, 'close_on_success'),
     (interfaces.IRESTCloseAction, 'close'),
     (interfaces.IAction, 'send')]
@@ -31,13 +33,16 @@ class PopupCanvas(SilvaFormData, FormCanvas):
         pass
 
     def renderActions(self):
+
         def renderAction(action):
             for rest_action, action_type in REST_ACTIONS_TO_TOKEN:
                 if rest_action.providedBy(action.component):
                     break
             return {'label': self.translate(action.title),
                     'name': action.identifier,
-                    'action': action_type}
+                    'action': action_type,
+                    'default': interfaces.IDefaultAction.providedBy(action.component)}
+
         return map(renderAction, self.actionWidgets)
 
     def updateForm(self):
@@ -52,12 +57,19 @@ class PopupCanvas(SilvaFormData, FormCanvas):
         success_only = interfaces.IRESTSuccessAction.providedBy(action)
         if not (success_only and status == SUCCESS):
             actions = self.renderActions()
+
+            def findDefault(actions):
+                candidates = filter(itemgetter('default'), actions)
+                if not candidates:
+                    candidates = actions
+                return candidates[0]['name'] if candidates else None
+
             info.update(
                 {'label': self.translate(self.label),
                  'widgets': self.render(),
                  'prefix': self.prefix,
                  'actions': actions,
-                 'default_action': actions[0]['name'] if actions else None})
+                 'default_action': findDefault(actions)})
         result = {'content': info}
         notifications = self.get_notifications()
         if notifications is not None:

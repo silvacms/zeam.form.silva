@@ -56,7 +56,13 @@ class IRESTCloseAction(IRESTAction):
 
 
 class IRESTCloseOnSuccessAction(IRESTCloseAction, IRESTSuccessAction):
-    """Call the action callback, and close the rest Form upon success.
+    """Call the action callback, and close the rest form upon success.
+    """
+
+
+class IRESTCloseOnSendAction(IRESTAction):
+    """Call the action callback, but close the rest form right after
+    without waiting for an answer.
     """
 
 

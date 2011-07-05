@@ -100,6 +100,7 @@
                 return function() {
                     switch (action_type) {
                     case 'send':
+                    case 'close_on_send':
                     case 'close_on_success':
                         var form_array = $form.serializeArray();
                         var form_data = {};
@@ -112,19 +113,23 @@
                         // Send request
                         smi.ajax.query(form_url, form_data).pipe(
                             function(data) {
-                                if (data.notifications) {
-                                    $popup.trigger('notify-feedback-smi', data.notifications);
-                                };
-                                if (action_type == 'close_on_success' && data['success']) {
-                                    if (data['refresh']) {
-                                        var identifier = data['refresh'];
-                                        $('form[name="' + identifier + '"]').trigger('refresh-smi');
+                                if (infrae.interfaces.isImplementedBy('popup', data)) {
+                                    if (action_type == 'close_on_success' && data['success']) {
+                                        if (data['refresh']) {
+                                            var identifier = data['refresh'];
+                                            $('form[name="' + identifier + '"]').trigger('refresh-smi');
+                                        };
+                                        popup.close();
+                                    } else {
+                                        bootstrap_form(popup.from_data(data));
                                     };
-                                    popup.close();
-                                } else {
-                                    bootstrap_form(popup.from_data(data));
+                                    return data;
                                 };
+                                return $(document).render({data: data, args: [smi]});
                             });
+                        if (action_type == 'close_on_send') {
+                            popup.close();
+                        };
                         break;
                     case 'close':
                         popup.close();
