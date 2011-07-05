@@ -4,17 +4,18 @@
     var create_datetime_field = function() {
         var $field = $(this);
         var id = $field.attr('id');
-        var year = $('#' + id + '-year');
-        var month = $('#' + id + '-month');
-        var day = $('#' + id + '-day');
-        var hour = $('#' + id + '-hour');
-        var min = $('#' + id + '-min');
+        var $year = $('#' + id + '-year');
+        var $month = $('#' + id + '-month');
+        var $day = $('#' + id + '-day');
+        var $hour = $('#' + id + '-hour');
+        var $minute = $('#' + id + '-min');
+        var $remove = $('#' + id + '-remove');
         var lang = $(document).find('html').attr('lang');
 
         var field_settings = {
             showOn: 'button',
             // XXX need to figure out something to get image with JS
-            buttonImage: '/++static++/zeam.form.silva.widgets/calendar.gif',
+            buttonImage: '/++static++/zeam.form.silva.widgets/calendar.png',
             buttonImageOnly: true,
             buttonText: 'Date picker',
             showWeek: true,
@@ -23,20 +24,20 @@
             onSelect: function(date, picker) {
                 var parts = date.split('/');
 
-                day.val(parts[2]);
-                month.val(parts[1]);
-                year.val(parts[0]);
-                if (!hour.val()) {
-                    hour.val('00');
+                $day.val(parts[2]);
+                $month.val(parts[1]);
+                $year.val(parts[0]);
+                if (!$hour.val()) {
+                    $hour.val('00');
                 };
-                if (!min.val()) {
-                    min.val('00');
+                if (!$minute.val()) {
+                    $minute.val('00');
                 };
             },
             beforeShow: function() {
-                var selected_day = day.val();
-                var selected_month = month.val();
-                var selected_year = year.val();
+                var selected_day = $day.val();
+                var selected_month = $month.val();
+                var selected_year = $year.val();
                 var date = null;
 
                 if (selected_day && selected_month && selected_year) {
@@ -46,6 +47,18 @@
                 };
                 $field.datepicker('setDate', date);
             }
+        };
+        if ($remove.length) {
+            $remove.bind('click', function(event) {
+                // Reset everything
+                $day.val('');
+                $month.val('');
+                $year.val('');
+                $hour.val('');
+                $minute.val('');
+                $field.datepicker('setDate', new Date());
+                return false;
+            });
         };
 
         var lang_settings = $.datepicker.regional[lang];
