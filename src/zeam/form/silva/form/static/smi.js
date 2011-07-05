@@ -100,7 +100,6 @@
                 return function() {
                     switch (action_type) {
                     case 'send':
-                    case 'close_on_send':
                     case 'close_on_success':
                         var form_array = $form.serializeArray();
                         var form_data = {};
@@ -125,11 +124,9 @@
                                     };
                                     return data;
                                 };
+                                popup.close();
                                 return $(document).render({data: data, args: [smi]});
                             });
-                        if (action_type == 'close_on_send') {
-                            popup.close();
-                        };
                         break;
                     case 'close':
                         popup.close();

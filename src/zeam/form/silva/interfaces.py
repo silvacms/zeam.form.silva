@@ -60,12 +60,6 @@ class IRESTCloseOnSuccessAction(IRESTCloseAction, IRESTSuccessAction):
     """
 
 
-class IRESTCloseOnSendAction(IRESTAction):
-    """Call the action callback, but close the rest form right after
-    without waiting for an answer.
-    """
-
-
 class IRESTRefreshAction(IRESTAction):
     """Trigger the refresh of a form component on the main view.
     """

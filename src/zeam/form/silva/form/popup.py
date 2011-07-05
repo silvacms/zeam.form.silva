@@ -20,7 +20,6 @@ from zeam.form.silva.utils import convert_request_form_to_unicode
 
 
 REST_ACTIONS_TO_TOKEN = [
-    (interfaces.IRESTCloseOnSendAction, 'close_on_send'),
     (interfaces.IRESTCloseOnSuccessAction, 'close_on_success'),
     (interfaces.IRESTCloseAction, 'close'),
     (interfaces.IAction, 'send')]
