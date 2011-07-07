@@ -48,6 +48,8 @@
     <div class="form-controls" tal:condition="view.actionWidgets">
       <input tal:repeat="widget view.actionWidgets"
              tal:replace="structure widget.render()" />
+      <!-- This empty submit trigger the form submission with enter -->
+      <input type="submit" style="display: none" />
     </div>
   </div>
 </form>

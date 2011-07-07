@@ -167,7 +167,7 @@
                     $popup.append($form);
                     $form.attr('data-form-url', url);
                     $form.attr('name', data.prefix);
-                    $form.append(data['widgets']);
+                    $form.html(data['widgets']);
                     // Add an empty input submit to activate form submission with enter
                     $form.append('<input type="submit" style="display: none" />');
                     for (var i=0; i < data['actions'].length; i++) {
