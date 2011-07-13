@@ -25,7 +25,8 @@
                     var $input = $(this);
                     var add = true;
 
-                    if ($input.is(':checkbox') && !$input.is(':checked')) {
+                    if (($input.is(':checkbox') || $input.is(':radio')) &&
+                        !$input.is(':checked')) {
                         add = false;
                     };
                     if (add) {
