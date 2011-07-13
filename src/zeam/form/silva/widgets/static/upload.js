@@ -150,6 +150,7 @@
                 $status.text('not set.');
             };
             $input.val(data.filename);
+            $input.change();
         };
 
         var disable_upload_button = function() {

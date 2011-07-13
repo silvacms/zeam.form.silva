@@ -17,7 +17,7 @@
           name="${widget.htmlId()}-upload-iframe">
   </iframe>
   <a href="${widget.uploadURL()}"
-     onclick="return false" class="${widget.htmlClass()} form-button upload-trigger ui-state-default">
+     onclick="return false" class="form-button upload-trigger ui-state-default">
     <ins class="ui-icon ui-icon-document"></ins>
     <tal:msg i18n:translate="">Upload</tal:msg>
   </a>
@@ -26,8 +26,10 @@
     <ins class="ui-icon ui-icon-circle-close"></ins>
     <tal:msg i18n:translate="">Clear</tal:msg>
   </a>
-  <input id="#" name="#" class="upload-input" value="${widget.inputValue()}" type="hidden"
-         tal:attributes="name widget.identifier;
-                         id widget.htmlId()" />
+  <input type="hidden"
+         id="${widget.htmlId()}"
+         name="${widget.identifier}"
+         class="${widget.htmlClass()} upload-input"
+         value="${widget.inputValue()}" />
   <br clear="both"/>
 </div>
