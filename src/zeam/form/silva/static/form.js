@@ -232,12 +232,20 @@ ZeamDateField.prototype.initialize = function () {
     this.field.datepicker(settings);
 };
 
+(function() {
+// wrap the live in a closure, so this variable does not leak out
+// into the global scope
+var zeamformreadyfocused = false;
 
 $('form').live('zeam-form-ready', function () {
     var form = $(this);
 
     // Focus form field
-    zeam_focus_field(form);
+    debugger;
+    if (!zeamformreadyfocused) {
+        zeam_focus_field(form);
+        zeamformreadyfocused = true;
+    }
     // Inline validation
     if (form.hasClass('zeam-inline-validation')) {
         form.find('.field').bind('change', function() {
@@ -260,6 +268,8 @@ $('form').live('zeam-form-ready', function () {
         });
     });
 });
+
+})();
 
 $(document).ready(function() {
     // Send form init event
