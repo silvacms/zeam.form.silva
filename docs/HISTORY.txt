@@ -1,6 +1,12 @@
 Changes
 =======
 
+1.2-bethel.2 (unreleased)
+-------------------------
+
+* widgets marked as HIDDEN will no longer be rendered as normal within
+  the smisubformtemplate (smiformtemplate already featured this)
+
 1.2-bethel.1 (2011-07-07)
 -------------------------
 

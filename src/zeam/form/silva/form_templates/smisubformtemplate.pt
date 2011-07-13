@@ -29,6 +29,7 @@
       <tal:repeat tal:repeat="widget view/fieldWidgets">
         <tr class="#"
             tal:define="odd repeat/widget/odd"
+            tal:condition="python:str(widget.component.mode)!='hidden'"
             tal:attributes="class python:odd and 'odd' or 'even'">
           <td class="designator">
             <label tal:attributes="for widget/htmlId"
@@ -72,4 +73,9 @@
       </tr>
     </tfoot>
   </table>
+<tal:repeat tal:repeat="widget view/fieldWidgets">
+  <tal:cond condition="python:str(widget.component.mode)=='hidden'">
+    <tal:widget tal:content="structure widget/render" />
+  </tal:cond>
+</tal:repeat>
 </form>
