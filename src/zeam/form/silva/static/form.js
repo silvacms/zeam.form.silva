@@ -241,7 +241,6 @@ $('form').live('zeam-form-ready', function () {
     var form = $(this);
 
     // Focus form field
-    debugger;
     if (!zeamformreadyfocused) {
         zeam_focus_field(form);
         zeamformreadyfocused = true;
