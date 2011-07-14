@@ -14,7 +14,7 @@
   <include package="megrok.pagetemplate" file="meta.zcml" />
 
   <include package="infrae.rest" />
-  <include package="infrae.layout" />
+  <include package="grokcore.layout" />
 
   <include package="silva.ui" />
 

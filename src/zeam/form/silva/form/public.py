@@ -13,7 +13,7 @@ from zeam.form.silva.utils import SilvaFormData
 from zeam.form.silva.utils import find_locale, convert_request_form_to_unicode
 from zeam.form.ztk import validation
 
-from infrae.layout.interfaces import IPage, ILayoutFactory
+from grokcore.layout.interfaces import IPage, ILayout
 from silva.core.layout.interfaces import ISilvaLayer
 from silva.core.views.views import HTTPHeaderView
 
@@ -46,9 +46,9 @@ class SilvaForm(HTTPHeaderView, SilvaFormData):
             self.request.locale = find_locale(self.request)
         convert_request_form_to_unicode(self.request.form)
 
-        layout_factory = component.getMultiAdapter(
-            (self.request, self.context,), ILayoutFactory)
-        self.layout = layout_factory(self)
+        self.layout = component.getMultiAdapter(
+            (self.request, self.context), ILayout)
+
 
         mapply(self.update, (), self.request)
         if self.request.response.getStatus() in (302, 303):
