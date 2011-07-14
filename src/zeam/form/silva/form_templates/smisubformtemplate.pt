@@ -26,7 +26,7 @@
       </tr>
     </thead>
     <tbody>
-      <tal:repeat tal:repeat="widget view/fieldWidgets">
+      <tal:repeat tal:repeat="widget python:( fw for fw in view.fieldWidgets if str(fw.component.mode)!='hidden' )">
         <tr class="#"
             tal:define="odd repeat/widget/odd"
             tal:condition="python:str(widget.component.mode)!='hidden'"

@@ -7,6 +7,9 @@ Changes
 * widgets marked as HIDDEN will no longer be rendered as normal within
   the smisubformtemplate (smiformtemplate already featured this)
 
+* smi form and subforms correctly alternate between odd/even rows
+  when hidden fields are present
+
 1.2-bethel.1 (2011-07-07)
 -------------------------
 
