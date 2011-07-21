@@ -32,3 +32,47 @@ body .upload-file .upload-progress {
   height: 10px;
 }
 
+
+form button.field-collection-move-up {
+  background-image: url(arrows.png);
+  background-position: 16px 0px;
+  background-color: transparent;
+  height: 16px;
+  width: 16px;
+  border: 0px;
+  float: left;
+}
+
+form button.field-collection-move-down {
+  background-image: url(arrows.png);
+  background-color: transparent;
+  height: 16px;
+  width: 16px;
+  border: 0px;
+  margin: 0px;
+  padding: 0px;
+  float: right;
+}
+
+form input.field-collection-line-selector {
+  height: 16px;
+  width: 16px;
+  border: 0px;
+  float: right;
+}
+
+form .field-collection-lines div.line-actions {
+  float: left;
+  width: 54px;
+}
+form .field-collection-lines td.line-actions {
+  width: 16px;
+}
+
+form .field-collection-lines td.ordering-actions {
+  width: 54px;
+}
+
+form .field-collection .multi-actions {
+  clear: both;
+}
