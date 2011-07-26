@@ -32,6 +32,29 @@ body .upload-file .upload-progress {
   height: 10px;
 }
 
+/* Generic and Error */
+
+form label.form-label {
+  padding-top: 1.5em;
+  display: block;
+}
+
+form span.field-error {
+  display: block;
+  background-color: #FFFFFF;
+  border: 1px solid #000000;
+  color: #660033;
+  font-family: Verdana,Helvetica,sans-serif;
+  font-size: 10pt;
+  padding: 6px 4px;
+  margin: 0.5em 0px -1em;
+}
+
+form div.actions {
+  margin: 2em 0;
+}
+
+/* Collection CSS */
 
 form button.field-collection-move-up {
   background-image: url(arrows.png);
@@ -61,16 +84,25 @@ form input.field-collection-line-selector {
   float: right;
 }
 
+form tr.field-collection-line input.field-textline,
+form tr.field-collection-line table.field-collection-header {
+  width: 100%;
+}
+
+form div.field-collection-line {
+  clear: both;
+}
+
 form .field-collection-lines div.line-actions {
   float: left;
-  width: 54px;
+  width: 60px;
 }
 form .field-collection-lines td.line-actions {
   width: 16px;
 }
 
 form .field-collection-lines td.ordering-actions {
-  width: 54px;
+  width: 60px;
 }
 
 form .field-collection .multi-actions {
