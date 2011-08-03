@@ -75,7 +75,11 @@
             var $select = $(this);
             var status = $select.attr('checked');
             $form.find('.' + $select.attr('name')).each(function() {
-                $(this).attr('checked', status);
+                if (status) {
+                    $(this).attr('checked', status);
+                } else {
+                    $(this).removeAttr('checked');
+                };
             });
         });
 
