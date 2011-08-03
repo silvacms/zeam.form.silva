@@ -47,6 +47,12 @@
       </tr>
     </tbody>
     <tfoot class="form-footer" tal:condition="view.actionWidgets">
+      <tr tal:condition="view.batching">
+        <td colspan="#"
+            tal:attributes="colspan columns"
+            tal:content="structure view.batching">
+        </td>
+      </tr>
       <tr class="form-controls">
         <td colspan="3"
             tal:attributes="colspan columns">
