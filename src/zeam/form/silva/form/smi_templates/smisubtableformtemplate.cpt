@@ -55,12 +55,8 @@
         </td>
       </tr>
       <tr class="form-controls">
-        <td colspan="3"
+        <td colspan="#"
             tal:attributes="colspan columns">
-
-          <input tal:repeat="widget view.actionWidgets"
-                 tal:replace="structure widget.render()" />
-
           <span class="footer-fields"
                 tal:repeat="widget view.fieldWidgets">
             <label tal:attributes="for widget.htmlId()"
@@ -81,6 +77,10 @@
               Widget.
             </tal:widget>
           </span>
+
+          <input tal:repeat="widget view.actionWidgets"
+                 tal:replace="structure widget.render()" />
+
         </td>
       </tr>
     </tfoot>
