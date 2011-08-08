@@ -7,6 +7,9 @@
      */
     var create_validator = function() {
         var $field = $(this);
+        if ($field.hasClass('form-novalidation')) {
+            return;
+        };
         var $form = $field.closest('form');
         var field_prefix = $field.attr('data-field-prefix');
         var form_prefix = $form.attr('name');
