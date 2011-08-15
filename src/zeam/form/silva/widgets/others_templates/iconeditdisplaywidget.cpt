@@ -1,0 +1,5 @@
+<tal:icon>
+  <img tal:replace="structure widget.icon" />
+  <a href="${widget.path}" rel="content" class="open-screen"
+     tal:content="widget.inputValue()" />
+</tal:icon>

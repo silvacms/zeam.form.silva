@@ -12,16 +12,30 @@ from zeam.form.ztk.fields import SchemaFieldWidget
 from zeam.form.ztk.interfaces import ICollectionSchemaField
 from zeam.form.ztk.widgets.collection import newCollectionWidgetFactory
 from zeam.form.ztk.widgets.textline import TextLineSchemaField
-
+from zeam.form.silva.interfaces import ISMIForm
 from silva.core.interfaces.adapters import IIconResolver
+
 
 class IconDisplayWidget(SchemaFieldWidget):
     grok.name('silva.icon')
 
     def update(self):
         super(IconDisplayWidget, self).update()
-        content = self.form.getContentData().getContent()
-        self.icon_url = IIconResolver(self.request).get_content_url(content)
+        self._content = self.form.getContentData().getContent()
+        self.icon = IIconResolver(self.request).get_tag(self._content)
+
+
+class IconEditDisplayWidget(IconDisplayWidget):
+    grok.name('silva.icon.edit')
+
+    def update(self):
+        super(IconEditDisplayWidget, self).update()
+        self.path = None
+        form = self.form
+        while form is not None and not ISMIForm.providedBy(form):
+            form = getattr(form, 'parent', None)
+        if form is not None:
+            self.path = form.get_content_path(self._content)
 
 
 grok.global_adapter(
