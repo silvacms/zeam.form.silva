@@ -164,6 +164,8 @@ class SMISubForm(SilvaFormData, composed.SubForm):
     grok.baseclass()
     grok.implements(ISMIForm)
 
+    dataValidators = [validation.InvariantsValidation]
+
     def get_content_path(self, content):
         return self.parent.get_content_path(content)
 
