@@ -15,6 +15,7 @@ from zeam.form.base import SUCCESS, FAILURE
 from zeam.form.base.actions import Action, DecoratedAction
 from zeam.form.base.interfaces import IFormData, IAction
 from zeam.form.base.widgets import ActionWidget
+from zeam.form.base.markers import getValue, DISPLAY
 from zeam.form.ztk.actions import EditAction as BaseEditAction
 
 from zeam.form.silva import interfaces
@@ -23,10 +24,17 @@ from zeam.form.silva import interfaces
 class EditAction(BaseEditAction):
     """Edit action
     """
-    grok.implements(interfaces.IRESTCloseOnSuccessAction, interfaces.IDefaultAction)
+    grok.implements(
+        interfaces.IRESTCloseOnSuccessAction, interfaces.IDefaultAction)
     title = _(u"Save changes")
     description = _(u"save modifications")
     accesskey = u'ctrl+s'
+
+    def available(self, form):
+        for field in form.fields:
+            if getValue(field, 'mode', form) != DISPLAY:
+                return True
+        return False
 
     def __call__(self, form):
         try:

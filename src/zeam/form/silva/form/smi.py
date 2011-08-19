@@ -16,7 +16,7 @@ from zeam.form.base.actions import Actions, action
 from zeam.form import composed, table
 from zeam.form.base.datamanager import BaseDataManager
 from zeam.form.base.fields import Fields
-from zeam.form.base.markers import getValue, DISPLAY, SUCCESS, FAILURE, NO_VALUE
+from zeam.form.base.markers import DISPLAY, SUCCESS, FAILURE, NO_VALUE
 from zeam.form.ztk import validation
 from zeam.form.composed.form import SubFormGroupBase
 
@@ -286,14 +286,6 @@ class SMIEditForm(SMIForm):
     def label(self):
         return _('Edit a ${content_type}',
             mapping={'content_type': self.context.meta_type})
-
-    def canSave(self):
-        for field in self.fields:
-            if str(getValue(field, 'mode', self)) != 'display':
-                return True
-        return False
-
-    actions['save-changes'].available = canSave
 
     def setContentData(self, content):
         """Set edited content. If the content is a versioned content,
