@@ -10,7 +10,7 @@ from zope.publisher.publish import mapply
 
 from zeam.form import base, viewlet
 from zeam.form.silva.utils import SilvaFormData
-from zeam.form.silva.utils import find_locale, convert_request_form_to_unicode
+from zeam.form.silva.utils import convert_request_form_to_unicode
 from zeam.form.ztk import validation
 
 from grokcore.layout.interfaces import IPage, ILayout
@@ -41,9 +41,6 @@ class SilvaForm(HTTPHeaderView, SilvaFormData):
 
     def __call__(self):
         self.setHTTPHeaders()
-        if not hasattr(self.request, 'locale'):
-            # This is not pretty, but no choice.
-            self.request.locale = find_locale(self.request)
         convert_request_form_to_unicode(self.request.form)
 
         self.layout = component.getMultiAdapter(
@@ -83,8 +80,6 @@ class PublicViewletForm(SilvaFormData, viewlet.ViewletForm):
         return False
 
     def update(self):
-        if not hasattr(self.request, 'locale'):
-            self.request.locale = find_locale(self.request)
         convert_request_form_to_unicode(self.request.form)
         return super(PublicViewletForm, self).update()
 
@@ -98,8 +93,6 @@ class PublicContentProviderForm(SilvaFormData, viewlet.ViewletManagerForm):
     grok.baseclass()
 
     def update(self):
-        if not hasattr(self.request, 'locale'):
-            self.request.locale = find_locale(self.request)
         convert_request_form_to_unicode(self.request.form)
         return super(PublicContentProviderForm, self).update()
 

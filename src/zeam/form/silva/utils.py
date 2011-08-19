@@ -5,7 +5,6 @@
 
 from five import grok
 from zope.i18n.interfaces import IUserPreferredLanguages
-from zope.i18n.locales import locales, LoadLocaleError
 from zope import component
 from zope.cachedescriptors.property import CachedProperty
 
@@ -27,25 +26,6 @@ class SilvaFormData(object):
     def send_message(self, message, type=u""):
         service = component.getUtility(IMessageService)
         service.send(message, self.request, namespace=type)
-
-
-def find_locale(request):
-    envadapter = IUserPreferredLanguages(request, None)
-    if envadapter is None:
-        return None
-
-    langs = envadapter.getPreferredLanguages()
-    for httplang in langs:
-        parts = (httplang.split('-') + [None, None])[:3]
-        try:
-            return locales.getLocale(*parts)
-        except LoadLocaleError:
-            # Just try the next combination
-            pass
-    else:
-        # No combination gave us an existing locale, so use the default,
-        # which is guaranteed to exist
-        return locales.getLocale(None, None, None)
 
 
 def decode_to_unicode(string):
