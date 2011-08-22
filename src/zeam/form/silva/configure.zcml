@@ -16,8 +16,12 @@
   <include package="infrae.rest" />
   <include package="grokcore.layout" />
 
+  <grok:grok package=".martiansupport" />
+
+  <!-- Silva UI is a requirement but as a Zope form, so it should only
+       be included now -->
   <include package="silva.ui" />
 
-  <grok:grok package="." />
+  <grok:grok package="." exclude="martiansupport" />
 
 </configure>
