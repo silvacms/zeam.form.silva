@@ -16,6 +16,7 @@ from zeam.form.base.actions import Actions, action
 from zeam.form import composed, table
 from zeam.form.base.datamanager import BaseDataManager
 from zeam.form.base.fields import Fields
+from zeam.form.base.errors import Errors
 from zeam.form.base.markers import DISPLAY, SUCCESS, FAILURE, NO_VALUE
 from zeam.form.ztk import validation
 from zeam.form.composed.form import SubFormGroupBase
@@ -146,9 +147,11 @@ class SMIComposedForm(SilvaFormData, PageREST, SubFormGroupBase, FormCanvas):
         if action is None:
             action, status, FormCanvas.updateActions(self)
         if status is FAILURE:
+            # XXX updateAction need to return the form it worked with
             # Render correctly the validation errors
-            for error in self.formErrors:
-                self.send_message(error.title, type="error")
+            # for error in self.formErrors:
+            #    self.send_message(error.title, type="error")
+            pass
         SubFormGroupBase.updateWidgets(self)
         FormCanvas.updateWidgets(self)
         result = {'ifaces': ['form'],
