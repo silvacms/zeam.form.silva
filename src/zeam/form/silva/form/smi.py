@@ -95,11 +95,16 @@ class SMIForm(SilvaFormData, PageREST, FormCanvas):
         convert_request_form_to_unicode(self.request.form)
         self.update()
         action, status = self.updateActions()
+        if status is FAILURE:
+            # Render correctly the validation errors
+            for error in self.formErrors:
+                self.send_message(error.title, type="error")
         self.updateWidgets()
         result = {'ifaces': ['form'],
                   'success': status == SUCCESS,
                   'forms': self.render()}
-        portlets = queryMultiAdapter((self.context, self.request, self), name='portlets')
+        portlets = queryMultiAdapter(
+            (self.context, self.request, self), name='portlets')
         if portlets is not None:
             portlets.update()
             rendered_portlets = portlets.render()
@@ -139,13 +144,18 @@ class SMIComposedForm(SilvaFormData, PageREST, SubFormGroupBase, FormCanvas):
         self.update()
         action, status = SubFormGroupBase.updateActions(self)
         if action is None:
-            FormCanvas.updateActions(self)
+            action, status, FormCanvas.updateActions(self)
+        if status is FAILURE:
+            # Render correctly the validation errors
+            for error in self.formErrors:
+                self.send_message(error.title, type="error")
         SubFormGroupBase.updateWidgets(self)
         FormCanvas.updateWidgets(self)
         result = {'ifaces': ['form'],
                   'success': status == SUCCESS,
                   'forms': self.render()}
-        portlets = queryMultiAdapter((self.context, self.request, self), name='portlets')
+        portlets = queryMultiAdapter(
+            (self.context, self.request, self), name='portlets')
         if portlets is not None:
             portlets.update()
             rendered_portlets = portlets.render()

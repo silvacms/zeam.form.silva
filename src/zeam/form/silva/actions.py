@@ -43,10 +43,7 @@ class EditAction(BaseEditAction):
             form.send_message(error.args[0], type="error")
             return FAILURE
         if interfaces.ISilvaFormData.providedBy(form):
-            if status is FAILURE:
-                for error in form.formErrors:
-                    form.send_message(error.title, type="error")
-            else:
+            if status is SUCCESS:
                 form.send_message(_(u"Changes saved."), type="feedback")
         return status
 
@@ -136,7 +133,6 @@ class SMICancelWidget(ActionWidget):
             self.component.getRedirectedContent(self.form))
 
 
-
 class ExtractedDecoratedAction(DecoratedAction):
     """Action that can be used a factory for the decorator @action,
     which extract data itself before calling the decorated method.
@@ -145,9 +141,6 @@ class ExtractedDecoratedAction(DecoratedAction):
     def __call__(self, form):
         data, errors = form.extractData()
         if errors:
-            if interfaces.ISilvaFormData.providedBy(form):
-                for error in form.formErrors:
-                    form.send_message(error.title, type="error")
             return FAILURE
         # We directly give data.
         return super(ExtractedDecoratedAction, self).__call__(form, data)
