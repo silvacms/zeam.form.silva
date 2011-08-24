@@ -1,6 +1,14 @@
 Changes
 =======
 
+1.2-bethel.3 (unreleased)
+-------------------------
+
+* add a 'return_url' parameter to the AddForm, so that the legacy
+  object_lookup window can be returned to after adding new content.
+
+* allow hidden widgets in the add form to actually be hidden
+
 1.2-bethel.2 (2011-07-22)
 -------------------------
 

@@ -14,7 +14,7 @@ from zeam.form import base, composed, table, viewlet
 from zeam.form.base.datamanager import BaseDataManager
 from zeam.form.base.fields import Fields
 from zeam.form.base.widgets import Widgets
-from zeam.form.base.markers import DISPLAY, SUCCESS, FAILURE, NO_VALUE
+from zeam.form.base.markers import DISPLAY, SUCCESS, FAILURE, NO_VALUE, HIDDEN
 from zeam.form.ztk import validation
 
 from zeam.form.silva.interfaces import ISilvaFormData
@@ -279,6 +279,8 @@ class IAddOptions(interface.Interface):
             u"Position in the container to which the content will be added."),
         default=0,
         min=0)
+    return_url = schema.TextLine(
+        title=_(u"URL to return to after adding"))
 
 
 def add_position_available(form):
@@ -305,6 +307,7 @@ class SMIAddForm(SMIForm):
     optionFields['position'].prefix = 'options'
     optionFields['position'].mode = 'readonly'
     optionFields['position'].available = add_position_available
+    optionFields['return_url'].mode = HIDDEN
 
     def updateWidgets(self):
         super(SMIAddForm, self).updateWidgets()
@@ -421,7 +424,11 @@ class SMIAddForm(SMIForm):
         self.send_message(
             _(u'Added ${meta_type}.', mapping={'meta_type': self.__name__}),
             type="feedback")
-        self.redirect(self.url(name="edit"))
+        data, errors = self.extractData(self.optionFields)
+        if data['return_url']:
+            self.redirect(data['return_url'])
+        else:
+            self.redirect(self.url(name="edit"))
         return SUCCESS
 
     actions.append(CancelAddAction())

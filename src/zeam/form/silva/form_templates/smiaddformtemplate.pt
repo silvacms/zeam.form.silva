@@ -38,7 +38,7 @@
       </tr>
     </thead>
     <tbody>
-      <tal:repeat tal:repeat="widget view/fieldWidgets">
+      <tal:repeat tal:repeat="widget python:( fw for fw in view.fieldWidgets if str(fw.component.mode)!='hidden' )">
         <tr class="#"
             tal:define="odd repeat/widget/odd"
             tal:attributes="class python:odd and 'odd' or 'even'">
@@ -84,4 +84,9 @@
       </tr>
     </tfoot>
   </table>
+<tal:repeat tal:repeat="widget view/fieldWidgets">
+  <tal:cond condition="python:str(widget.component.mode)=='hidden'">
+    <tal:widget tal:content="structure widget/render" />
+  </tal:cond>
+</tal:repeat>
 </form>
