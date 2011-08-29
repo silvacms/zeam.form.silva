@@ -1,7 +1,7 @@
 Changes
 =======
 
-1.2-bethel.3 (unreleased)
+1.2-bethel.3 (2011-08-29)
 -------------------------
 
 * add a 'return_url' parameter to the AddForm, so that the legacy
