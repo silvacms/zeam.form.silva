@@ -1,6 +1,6 @@
 <tal:portlets tal:condition="viewletmanager.viewlets"
               i18n:domain="silva">
-  <h3 i18n:translate="">Informations</h3>
+  <h3 i18n:translate="">Information</h3>
   <tal:portlet tal:repeat="viewlet viewletmanager.viewlets"
                tal:content="structure viewlet.render()" />
 </tal:portlets>
