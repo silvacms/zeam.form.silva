@@ -16,7 +16,6 @@ from zeam.form.base.actions import Actions, action
 from zeam.form import composed, table
 from zeam.form.base.datamanager import BaseDataManager
 from zeam.form.base.fields import Fields
-from zeam.form.base.errors import Errors
 from zeam.form.base.markers import DISPLAY, SUCCESS, FAILURE, NO_VALUE
 from zeam.form.ztk import validation
 from zeam.form.composed.form import SubFormGroupBase
@@ -95,10 +94,10 @@ class SMIForm(SilvaFormData, PageREST, FormCanvas):
     def payload(self):
         convert_request_form_to_unicode(self.request.form)
         self.update()
-        action, status = self.updateActions()
+        form, action, status = self.updateActions()
         if status is FAILURE:
             # Render correctly the validation errors
-            for error in self.formErrors:
+            for error in form.formErrors:
                 self.send_message(error.title, type="error")
         self.updateWidgets()
         result = {'ifaces': ['form'],
@@ -143,15 +142,13 @@ class SMIComposedForm(SilvaFormData, PageREST, SubFormGroupBase, FormCanvas):
     def payload(self):
         convert_request_form_to_unicode(self.request.form)
         self.update()
-        action, status = SubFormGroupBase.updateActions(self)
+        form, action, status = SubFormGroupBase.updateActions(self)
         if action is None:
-            action, status, FormCanvas.updateActions(self)
+            form, action, status, FormCanvas.updateActions(self)
         if status is FAILURE:
-            # XXX updateAction need to return the form it worked with
             # Render correctly the validation errors
-            # for error in self.formErrors:
-            #    self.send_message(error.title, type="error")
-            pass
+            for error in form.formErrors:
+               self.send_message(error.title, type="error")
         SubFormGroupBase.updateWidgets(self)
         FormCanvas.updateWidgets(self)
         result = {'ifaces': ['form'],
