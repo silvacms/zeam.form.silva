@@ -58,6 +58,12 @@ class PopupAction(Action):
         return SUCCESS
 
 
+class LinkAction(Action):
+    """An action that opens as a link in a given target. (Only works in SMI).
+    """
+    target = '_blank'
+
+
 class PopupWidget(ActionWidget):
     """Widget to style popup buttons
     """
@@ -76,6 +82,18 @@ class SMIActionWidget(ActionWidget):
         super(SMIActionWidget, self).update()
         self.is_default = interfaces.IDefaultAction.providedBy(self.component)
         self.css_class = 'form-control'
+        if self.is_default:
+            self.css_class += ' default-form-control'
+
+
+class SMILinkActionWidget(ActionWidget):
+    grok.adapts(LinkAction, interfaces.ISMIForm, Interface)
+
+    def update(self):
+        super(SMILinkActionWidget, self).update()
+        self.target = self.component.target
+        self.is_default = interfaces.IDefaultAction.providedBy(self.component)
+        self.css_class = 'form-control link-control'
         if self.is_default:
             self.css_class += ' default-form-control'
 
