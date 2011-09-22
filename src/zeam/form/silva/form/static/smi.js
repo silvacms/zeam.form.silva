@@ -120,7 +120,7 @@
                         // Send request
                         smi.ajax.query(form_url, form_data).pipe(
                             function(data) {
-                                if (infrae.interfaces.isImplementedBy('popup', data)) {
+                                if (infrae.interfaces.is_implemented_by('popup', data)) {
                                     if (action_type == 'close_on_success' && data['success']) {
                                         if (data['refresh']) {
                                             var identifier = data['refresh'];
@@ -221,7 +221,7 @@
             };
             var popup = new Popup($popup, url);
             var builder = null;
-            if (infrae.interfaces.isImplementedBy('popup', options)) {
+            if (infrae.interfaces.is_implemented_by('popup', options)) {
                 builder = popup.from_data(options);
             } else {
                 builder = popup.from_url();

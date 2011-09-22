@@ -13,7 +13,7 @@ from silva.ui.rest.base import UIREST, UIHelper
 from silva.ui.rest.base import get_resources
 
 from zeam.form.base.form import FormCanvas, Form
-from zeam.form.base.markers import SUCCESS
+from zeam.form.base.markers import SUCCESS, FAILURE
 from zeam.form.silva import interfaces
 from zeam.form.silva.utils import SilvaFormData
 from zeam.form.silva.utils import convert_request_form_to_unicode
@@ -47,7 +47,11 @@ class PopupCanvas(SilvaFormData, FormCanvas, UIHelper):
     def updateForm(self):
         convert_request_form_to_unicode(self.request.form)
         self.update()
-        action, status = self.updateActions()
+        form, action, status = self.updateActions()
+        if status is FAILURE:
+            # Render correctly the validation errors
+            for error in form.formErrors:
+                self.send_message(error.title, type="error")
         self.updateWidgets()
         info = {'ifaces': ['popup'],
                 'success': status == SUCCESS}
