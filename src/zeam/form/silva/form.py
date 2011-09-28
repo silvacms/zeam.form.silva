@@ -425,7 +425,7 @@ class SMIAddForm(SMIForm):
             _(u'Added ${meta_type}.', mapping={'meta_type': self.__name__}),
             type="feedback")
         data, errors = self.extractData(self.optionFields)
-        if data['return_url']:
+        if data['return_url'] and data['return_url'] is not NO_VALUE:
             self.redirect(data['return_url'])
         else:
             self.redirect(self.url(name="edit"))
