@@ -216,6 +216,9 @@
             var url = undefined;
             if (options !== undefined && options.url !== undefined) {
                 url = options.url;
+                if (options.payload !== undefined) {
+                    url += '?' + $.param(options.payload);
+                };
             } else {
                 url = $(this).attr('href');
             };
