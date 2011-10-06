@@ -128,7 +128,7 @@
                                         };
                                         popup.close();
                                     } else {
-                                        bootstrap_form(popup.from_data(data));
+                                        popup.from_data(data).trigger('load-smiform');
                                     };
                                     return data;
                                 };
