@@ -1,9 +1,9 @@
-<a class="ui-state-default form-button open-screen" id="#" rel="#" title="#" href="#" data-form-shortcut="#"
-   tal:attributes="title widget.description;
-                   id widget.htmlId();
-                   href widget.contentPath;
-                   rel widget.screen;
-                   data-form-shortcut widget.accesskey">
+<a class="ui-state-default form-button open-screen"
+   id="${widget.htmlId()}"
+   rel="${widget.screen}"
+   title="${widget.description}"
+   href="${widget.contentPath}"
+   data-form-shortcut="${widget.accesskey}">
   <ins class="ui-icon ui-icon-arrowreturnthick-1-w"></ins>
   <tal:label tal:content="widget.title">Label</tal:label>
 </a>

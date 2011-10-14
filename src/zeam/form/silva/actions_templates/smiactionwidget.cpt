@@ -1,8 +1,8 @@
-<a class="#" id="#" name="#" title="#" data-form-shortcut="#"
-   tal:attributes="name widget.identifier;
-                   title widget.description;
-                   class widget.css_class;
-                   id widget.htmlId();
-                   data-form-shortcut widget.accesskey"
-   tal:content="widget.title">
+<a class="ui-state-default form-control ${widget.css_class}"
+   id="${widget.htmlId()}"
+   name="${widget.identifier}"
+   title="${widget.description}"
+   data-form-shortcut="${widget.accesskey}">
+  <ins class="ui-icon ${widget.icon}"></ins>
+  <tal:label tal:content="widget.title">Label</tal:label>
 </a>

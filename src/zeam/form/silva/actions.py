@@ -25,7 +25,8 @@ class EditAction(BaseEditAction):
     """Edit action
     """
     grok.implements(
-        interfaces.IRESTCloseOnSuccessAction, interfaces.IDefaultAction)
+        interfaces.IRESTCloseOnSuccessAction,
+        interfaces.IDefaultAction)
     title = _(u"Save changes")
     description = _(u"save modifications")
     accesskey = u'ctrl+s'
@@ -81,21 +82,19 @@ class SMIActionWidget(ActionWidget):
     def update(self):
         super(SMIActionWidget, self).update()
         self.is_default = interfaces.IDefaultAction.providedBy(self.component)
-        self.css_class = 'form-control'
+        self.css_class = ''
+        self.icon = 'ui-icon-radio-on'
         if self.is_default:
-            self.css_class += ' default-form-control'
+            self.icon = 'ui-icon-check'
+            self.css_class = 'default-form-control'
 
 
-class SMILinkActionWidget(ActionWidget):
+class SMILinkActionWidget(SMIActionWidget):
     grok.adapts(LinkAction, interfaces.ISMIForm, Interface)
 
     def update(self):
         super(SMILinkActionWidget, self).update()
         self.target = self.component.target
-        self.is_default = interfaces.IDefaultAction.providedBy(self.component)
-        self.css_class = 'form-control link-control'
-        if self.is_default:
-            self.css_class += ' default-form-control'
 
 
 class SMIRemoverWidget(ActionWidget):
