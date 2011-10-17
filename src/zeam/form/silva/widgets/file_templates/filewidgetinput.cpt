@@ -3,8 +3,14 @@
     <p></p>
   </div>
   <div class="upload-display"
-       tal:content="widget.displayValue()">
-    Display value
+     tal:define="display widget.displayValue()">
+    <p tal:condition="display.message">
+      <img tal:condition="display.icon"
+           tal:replace="structure display.icon" />
+      <span tal:replace="display.message" />
+    </p>
+    <span tal:content="display.filename"
+          tal:condition="display.filename" />
   </div>
   <div style="display:none"
        class="upload-progress">

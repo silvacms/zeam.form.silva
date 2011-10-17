@@ -18,6 +18,7 @@ from js.jqueryui import jqueryui
 from infrae import rest
 from silva.core import conf as silvaconf
 from silva.core.conf import schema as silvaschema
+from silva.core.interfaces.adapters import IIconResolver
 from silva.fanstatic import need
 from silva.translations import translate as _
 
@@ -37,6 +38,8 @@ def register():
 class FileSchemaField(SchemaField):
     """Field to upload a file.
     """
+    fileSetLabel = _('Current file.')
+    fileNotSetLabel = _(u'Not set, please upload a file.')
 
 
 class IUploadResources(IDefaultBrowserLayer):
@@ -64,11 +67,16 @@ class FileWidgetInput(SchemaFieldWidget):
 
     def displayValue(self):
         value = self.inputValue()
-        if value == u'__NO_CHANGE__':
-            return _('current file.')
+        label = None
         if value:
-            return unicode(os.path.basename(value))
-        return _(u'not set, please upload a file.')
+            if value != u'__NO_CHANGE__':
+                return {'icon': None,
+                        'message': None,
+                        'filename': unicode(os.path.basename(value))}
+            label = self.component.fileSetLabel
+        label = self.component.fileNotSetLabel
+        icon = IIconResolver(self.request).get_tag(None)
+        return {'icon': icon, 'message': label, 'filename': None}
 
     def valueToUnicode(self, value):
         if value is NO_CHANGE:
