@@ -1,25 +1,43 @@
-<span tal:define="id widget.htmlId()"
+<span tal:define="id widget.htmlId();
+                  required widget.required or None"
       i18n:domain="silva">
-  <input id="${id}-day" name="${widget.identifier}.day"
+  <input id="${id}-day"
+         name="${widget.identifier}.day"
          value="${widget.inputValue('day')}"
-         type="text" class="field" size="2" maxlength="2" title="Day"
-         i18n:attributes="title"/> /
-  <input id="${id}-month" name="${widget.identifier}.month"
+         type="text" class="field"
+         size="2" maxlength="2" pattern="[0-9]{2}"
+         title="day of month (two digits)" placeholder="dd"
+         tal:attributes="required required"
+         i18n:attributes="title; placeholder" /> /
+  <input id="${id}-month"
+         name="${widget.identifier}.month"
          value="${widget.inputValue('month')}"
-         type="text" class="field" size="2" maxlength="2" title="Month"
-         i18n:attributes="title"/> /
-  <input id="${id}-year" name="${widget.identifier}.year"
+         type="text" class="field"
+         size="2" maxlength="2" pattern="[0-9]{2}"
+         title="month of year (two digits)" placeholder="mm"
+         tal:attributes="required required"
+         i18n:attributes="title; placeholder"/> /
+  <input id="${id}-year"
+         name="${widget.identifier}.year"
          value="${widget.inputValue('year')}"
-         type="text" class="field" size="4" maxlength="4" title="Year"
-         i18n:attributes="title" /> &nbsp;
-  <input id="${id}-hour" name="${widget.identifier}.hour"
+         type="text" class="field"
+         size="4" maxlength="4" pattern="[0-9]{4}"
+         title="year (four digits)" placeholder="yyyy"
+         tal:attributes="required required"
+         i18n:attributes="title; placeholder" /> &nbsp;
+  <input id="${id}-hour"
+         name="${widget.identifier}.hour"
          value="${widget.inputValue('hour')}"
-         type="text" class="field" size="2" maxlength="2" title="Optional hour"
-         i18n:attributes="title" /> :
+         type="text" class="field"
+         size="2" maxlength="2" pattern="[0-9]{2}"
+         title="Optional hour in 24h format (two digits)" placeholder="HH"
+         i18n:attributes="title; placeholder" /> :
   <input id="${id}-min" name="${widget.identifier}.min"
          value="${widget.inputValue('min')}"
-         type="text" class="field" size="2" maxlength="2" title="Optional minute"
-         i18n:attributes="title" />
+         type="text" class="field"
+         size="2" maxlength="2" pattern="[0-9]{2}"
+         title="Optional minute (two digits)" placeholder="MM"
+         i18n:attributes="title; placeholder" />
   <input type="hidden" value="" id="${id}" class="${widget.htmlClass()}"
          name="${widget.identifier}" />
   <img src="/++static++/zeam.form.silva.widgets/remove.png"
