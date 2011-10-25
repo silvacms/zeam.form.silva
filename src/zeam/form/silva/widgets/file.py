@@ -74,7 +74,8 @@ class FileWidgetInput(SchemaFieldWidget):
                         'message': None,
                         'filename': unicode(os.path.basename(value))}
             label = self.component.fileSetLabel
-        label = self.component.fileNotSetLabel
+        else:
+            label = self.component.fileNotSetLabel
         icon = IIconResolver(self.request).get_tag(None)
         return {'icon': icon, 'message': label, 'filename': None}
 

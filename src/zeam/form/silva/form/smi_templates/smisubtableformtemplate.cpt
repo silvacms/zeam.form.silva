@@ -10,7 +10,8 @@
     </p>
   </div>
   <table class="form-table"
-         tal:define="columns len(view.tableFields) + 1">
+         tal:define="haveActions len(view.actionWidgets);
+                     columns len(view.tableFields) + 1">
     <thead>
       <tr tal:condition="view.lineWidgets">
         <th width="2%"
@@ -47,14 +48,14 @@
         </td>
       </tr>
     </tbody>
-    <tfoot tal:condition="view.actionWidgets">
+    <tfoot tal:condition="haveActions or view.batching">
       <tr tal:condition="view.batching">
         <td colspan="#"
             tal:attributes="colspan columns"
             tal:content="structure view.batching">
         </td>
       </tr>
-      <tr class="form-controls">
+      <tr class="form-controls" tal:condition="haveActions">
         <td colspan="#"
             tal:attributes="colspan columns">
           <span class="footer-fields"
