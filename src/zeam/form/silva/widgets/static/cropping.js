@@ -110,6 +110,7 @@
             $popup.dialog({
                 autoOpen: false,
                 modal: true,
+                minWidth: 250,
                 width: original_width,
                 height: original_height,
                 open: create_cropping,
