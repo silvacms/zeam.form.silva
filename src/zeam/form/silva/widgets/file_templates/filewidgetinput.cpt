@@ -7,7 +7,7 @@
     <p tal:condition="display.message">
       <img tal:condition="display.icon"
            tal:replace="structure display.icon" />
-      <span tal:replace="display.message" />
+      <i tal:content="display.message" />
     </p>
     <span tal:content="display.filename"
           tal:condition="display.filename" />

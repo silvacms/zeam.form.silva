@@ -99,6 +99,7 @@
         var Popup = function($popup, url) {
             var popup = {};
             var ready = false;
+            var popup_close = $.Deferred();
 
             var create_callback = function($form, form_url, data) {
                 var action_label = data['label'];
@@ -122,38 +123,52 @@
                             function(data) {
                                 if (infrae.interfaces.is_implemented_by('popup', data)) {
                                     if (action_type == 'close_on_success' && data['success']) {
-                                        if (data['refresh']) {
-                                            var identifier = data['refresh'];
-                                            $('form[name="' + identifier + '"]').trigger('refresh-smi');
-                                        };
-                                        popup.close();
-                                    } else {
-                                        popup.from_data(data).trigger('load-smiform');
+                                        return popup.close(data);
                                     };
-                                    return data;
+                                    return popup.from_data(data);
                                 };
-                                popup.close();
-                                return $(document).render({data: data, args: [smi]});
+                                return popup.close(data).done(function(data) {
+                                    return $(document).render({data: data, args: [smi]});
+                                });
                             });
                         break;
                     case 'close':
-                        popup.close();
+                        popup.close({});
                         break;
                     };
                     return false;
                 };
             };
 
+            $popup.dialog({
+                autoOpen: false,
+                modal: true,
+                width: 800
+            });
+            // When the popup is closed, clean its HTML and bindings
+            $popup.bind('dialogclose', function() {
+                $popup.remove();
+            });
+
             $.extend(popup, {
                 display: function(builder) {
-                    return $.when(builder).done(function ($form) {
-                        // Initialize form and widgets JS, show the popup
-                        $form.trigger('load-smiform');
-                        infrae.ui.ShowDialog($popup);
-                    });
+                    return $.when(builder).pipe(
+                        function ($form) {
+                            // Initialize form and widgets JS, show the popup
+                            infrae.ui.ShowDialog($popup);
+                            return popup;
+                        },
+                        function (request) {
+                            // Request failed.
+                            return $.Deferred().reject(request);
+                        });
                 },
-                close: function() {
+                close: function(data) {
                     $popup.dialog('close');
+                    return popup_close.resolve(data);
+                },
+                promise: function() {
+                    return popup_close.promise();
                 },
                 from_url: function() {
                     return smi.ajax.query(url).pipe(
@@ -162,8 +177,8 @@
                             // In case of error, close the popup (to
                             // trigger the cleaning), return an reject
                             // not to display it.
-                            popup.close();
-                            return $.Deferred().reject(request);
+                            $popup.dialog('close');
+                            return popup_close.reject(request);
                         });
                 },
                 from_data: function(data) {
@@ -188,6 +203,7 @@
                         };
                     };
                     $popup.dialog('option', 'buttons', buttons);
+                    $form.trigger('load-smiform');
                     ready = true;
                     return $form;
                 }
@@ -201,16 +217,6 @@
          */
         $.fn.SMIFormPopup = function(options) {
             var $popup = $('<div></div>');
-
-            $popup.dialog({
-                autoOpen: false,
-                modal: true,
-                width: 800
-            });
-            // When the popup is closed, clean its HTML and bindings
-            $popup.bind('dialogclose', function() {
-                $popup.remove();
-            });
 
             // Create a popup from a builder
             var url = undefined;
@@ -229,8 +235,7 @@
             } else {
                 builder = popup.from_url();
             };
-            popup.display(builder);
-            return false;
+            return popup.display(builder);
         };
 
         // You can create a popup as a view as well
@@ -250,7 +255,8 @@
 
         // Prepare Popup
         $('.form-popup').live('click', function() {
-            return $(this).SMIFormPopup();
+            $(this).SMIFormPopup();
+            return false;
         });
     });
 

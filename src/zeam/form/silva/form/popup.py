@@ -25,6 +25,15 @@ REST_ACTIONS_TO_TOKEN = [
     (interfaces.IAction, 'send')]
 
 
+
+class RefreshExtraPayload(grok.Adapter):
+    grok.context(interfaces.IRESTRefreshAction)
+    grok.provides(interfaces.IRESTExtraPayloadProvider)
+
+    def get_extra_payload(self, form):
+        return {'refresh': self.context.refresh}
+
+
 class PopupCanvas(SilvaFormData, FormCanvas, UIHelper):
     grok.baseclass()
 
@@ -54,9 +63,11 @@ class PopupCanvas(SilvaFormData, FormCanvas, UIHelper):
                 self.send_message(error.title, type="error")
         self.updateWidgets()
         info = {'ifaces': ['popup'],
-                'success': status == SUCCESS}
-        if interfaces.IRESTRefreshAction.providedBy(action):
-            info['refresh'] = action.refresh
+                'success': status is SUCCESS}
+        if status is SUCCESS:
+            extra = interfaces.IRESTExtraPayloadProvider(action, None)
+            if extra is not None:
+                info['extra'] = extra.get_extra_payload(self)
         success_only = interfaces.IRESTSuccessAction.providedBy(action)
         if not (success_only and status == SUCCESS):
             actions = self.renderActions()

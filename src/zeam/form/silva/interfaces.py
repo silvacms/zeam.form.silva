@@ -64,3 +64,12 @@ class IRESTRefreshAction(IRESTAction):
     """Trigger the refresh of a form component on the main view.
     """
     refresh = interface.Attribute(u'Identifier to refresh')
+
+
+class IRESTExtraPayloadProvider(interface.Interface):
+    """Adapt an action to provides extra payload.
+    """
+
+    def get_extra_payload(form):
+        """Return the extra payload for the given form.
+        """
