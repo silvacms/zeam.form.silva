@@ -9,7 +9,8 @@
               tal:define="proportional_id string:${widget.htmlId()}-proportional">
           <input type="checkbox" name="proportional" class="crop-proportional"
                  id="${proportional_id}" />
-          <label for="${proportional_id}" i18n:translate="">keep proportions</label>
+          <label for="${proportional_id}"
+                 i18n:translate="">keep proportions</label>
         </span>
       </div>
     </p>
