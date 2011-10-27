@@ -5,8 +5,9 @@
         var $field = $(this);
         var $input = $field.find('input.field-cropcoordinates');
         var $opener = $field.find('a.widget-crop-popup-button');
-        var $template = $field.find('div.widget-crop-popup');
+        var $template = $field.find('div.widget-crop-popup').detach();
         var required = $input.hasClass('field-required');
+        infrae.ui.selection.disable($template);
 
         $opener.bind('click', function(event){
             var $popup = $template.clone();
@@ -16,6 +17,7 @@
             var image_height = $img.get(0).height;
             var original_width = Math.max(40 + image_width, 250);
             var original_height = 145 + image_height;
+            var ratio = 0;
 
             var $proportional = $popup.find('input.crop-proportional');
 
@@ -34,6 +36,7 @@
                 var current;
 
                 options = $.extend(options, {
+                    aspectRatio: ratio,
                     onSelect: function(value){
                         crop = [value.x, value.y, value.x2, value.y2];
                     }
@@ -74,10 +77,11 @@
             $proportional.change(function(){
                 if (jCrop !== null) {
                     if (!!this.checked) {
-                        jCrop.setOptions({aspectRatio: image_width / image_height});
+                        ratio = image_width / image_height;
                     } else {
-                        jCrop.setOptions({aspectRatio: 0});
+                        ratio = 0;
                     };
+                    jCrop.setOptions({aspectRatio: ratio});
                 };
             });
             // Cleanup everything when the popup is closed
