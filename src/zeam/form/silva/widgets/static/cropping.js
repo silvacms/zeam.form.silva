@@ -112,7 +112,7 @@
                 open: create_cropping,
                 buttons: actions
             });
-            infrae.ui.ShowDialog($popup, 0.9);
+            infrae.ui.ShowDialog($popup, {factor:0.9});
         });
     };
 
