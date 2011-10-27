@@ -14,8 +14,8 @@
 
             var image_width = $img.get(0).width;
             var image_height = $img.get(0).height;
-            var original_width = Math.max(35 + image_width, 250);
-            var original_height = 140 + image_height;
+            var original_width = Math.max(40 + image_width, 250);
+            var original_height = 145 + image_height;
 
             var $proportional = $popup.find('input.crop-proportional');
 
@@ -35,19 +35,13 @@
 
                 options = $.extend(options, {
                     onSelect: function(value){
-                        crop = value;
-                    },
-                    onChange: function(value){
-                        crop = value;
+                        crop = [value.x, value.y, value.x2, value.y2];
                     }
                 });
                 if (jCrop !== undefined) {
-                    current = jCrop.tellSelect();
-                    if (current.x || current.y || current.x2 || current.y2) {
-                        options['setSelect'] = [current.x, current.y, current.x2, current.y2];
-                    };
                     jCrop.destroy();
-                } else if (crop !== undefined) {
+                };
+                if (crop !== undefined) {
                     options['setSelect'] = crop;
                 };
                 jCrop = $.Jcrop($img, options);
@@ -64,8 +58,10 @@
                 },
                 Ok: function(){
                     if (crop !== undefined) {
-                        $input.val(
-                            crop.x + 'x' + crop.y + '-' + crop.x2 + 'x' + crop.y2);
+                        $input.val(crop[0] + 'x' +
+                                   crop[1] + '-' +
+                                   crop[2] + 'x' +
+                                   crop[3]);
                         $popup.dialog('close');
                     }
                 }
@@ -89,8 +85,8 @@
                 $popup.remove();
             });
             $popup.bind('infrae-ui-dialog-resized', function (event, popup_size) {
-                var candidate_width = popup_size.width - 35;
-                var candidate_height = popup_size.height - 140;
+                var candidate_width = popup_size.width - 40;
+                var candidate_height = popup_size.height - 145;
 
                 if ((candidate_width < image_width) ||
                     (candidate_height < image_height)) {
