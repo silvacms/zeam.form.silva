@@ -217,8 +217,9 @@
 
     };
 
-    $('form').live('load-smiform', function() {
+    $('.form-fields-container').live('loadwidget-smiform', function(event) {
         $(this).find('.upload-file').each(create_upload_field);
+        event.stopPropagation();
     });
 
     $(document).ready(function() {

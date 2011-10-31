@@ -7,6 +7,7 @@
      */
     var create_validator = function() {
         var $field = $(this);
+
         if ($field.hasClass('form-novalidation')) {
             return;
         };
@@ -40,8 +41,9 @@
                 $field.find('input').each(serialize_field);
                 $field.find('textarea').each(serialize_field);
                 $field.find('select').each(serialize_field);
+                // XXX We remote any ? present in the URL.
                 $.ajax({
-                    url: form_url + '/++rest++zeam.form.silva.validate',
+                    url: form_url.split("?")[0] + '/++rest++zeam.form.silva.validate',
                     type: 'POST',
                     dataType: 'json',
                     data: values,
@@ -66,30 +68,6 @@
             }, 0);
         });
     };
-
-    /**
-     * Bootstrap javascript helper for forms.
-     */
-    var bootstrap_form = function() {
-        var $form = $(this);
-
-        // Select all
-        $form.find('.zeam-select-all').bind('change', function() {
-            var $select = $(this);
-            var status = $select.attr('checked');
-            $form.find('.' + $select.attr('name')).each(function() {
-                if (status) {
-                    $(this).attr('checked', status);
-                } else {
-                    $(this).removeAttr('checked');
-                };
-            });
-        });
-
-        // Inline Validation
-        $form.find('.form-section').each(create_validator);
-    };
-
 
     $(document).bind('load-smiplugins', function(event, smi) {
 
@@ -203,7 +181,7 @@
                         };
                     };
                     $popup.dialog('option', 'buttons', buttons);
-                    $form.trigger('load-smiform');
+                    $form.trigger('load-smiform', {form: $form, container: $form});
                     ready = true;
                     return $form;
                 }
@@ -216,7 +194,7 @@
          * @param url: if not undefined, the url for form.
          */
         $.fn.SMIFormPopup = function(options) {
-            var $popup = $('<div></div>');
+            var $popup = $('<div class="form-content"></div>');
 
             // Create a popup from a builder
             var url = undefined;
@@ -247,8 +225,45 @@
         });
     });
 
+    // Support for collection widget
+    $('.field-collection-line').live('addline-zeamform', function() {
+        var $line = $(this);
+
+        $line.addClass('form-fields-container');
+        $line.trigger('loadwidget-smiform');
+    });
+    $('.form-fields-container').live('loadwidget-smiform', function(event) {
+        $(this).find('div.field-collection').each(function() {
+            if ($(this).ZeamCollectionWidget !== undefined) {
+                $(this).ZeamCollectionWidget();
+            };
+        });
+        event.stopPropagation();
+    });
+
+    // Bootstrap form
+    var bootstrap_form = function() {
+        var $form = $(this);
+
+        // Select all
+        $form.find('.zeam-select-all').bind('change', function() {
+            var $select = $(this);
+            var status = $select.attr('checked');
+            $form.find('.' + $select.attr('name')).each(function() {
+                if (status) {
+                    $(this).attr('checked', status);
+                } else {
+                    $(this).removeAttr('checked');
+                };
+            });
+        });
+
+        // Inline Validation
+        $form.find('.form-section').each(create_validator);
+    };
+
     // Registeration code: Prepare forms
-    $('form').live('load-smiform', bootstrap_form);
+    $('.form-content').live('load-smiform', bootstrap_form);
 
     $(document).ready(function() {
         $('.form-content').each(bootstrap_form);

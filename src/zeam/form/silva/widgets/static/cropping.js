@@ -122,8 +122,9 @@
         });
     };
 
-    $('form').live('load-smiform', function() {
+    $('.form-fields-container').live('loadwidget-smiform', function(event) {
         $(this).find('div.widget-crop').each(create_cropping_field);
+        event.stopPropagation();
     });
 
     $(document).ready(function(){

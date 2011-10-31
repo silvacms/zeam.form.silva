@@ -79,8 +79,9 @@
         $field.datepicker(settings);
     };
 
-    $('form').live('load-smiform', function() {
+    $('.form-fields-container').live('loadwidget-smiform', function(event) {
         $(this).find('.field-datetime').each(create_datetime_field);
+        event.stopPropagation();
     });
 
     $(document).ready(function() {
