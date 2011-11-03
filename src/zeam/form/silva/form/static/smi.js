@@ -160,17 +160,18 @@
                         });
                 },
                 from_data: function(data) {
-                    var $form = $('<form />');
+                    var $form = $('<form class="form-fields-container" />');
                     var buttons = {};
 
-                    $popup.dialog('option', 'title', data['label']);
-                    $popup.empty();
-                    $popup.append($form);
                     $form.attr('data-form-url', url);
                     $form.attr('name', data.prefix);
                     $form.html(data['widgets']);
                     // Add an empty input submit to activate form submission with enter
                     $form.append('<input type="submit" style="display: none" />');
+                    // Set the dialog content
+                    $popup.dialog('option', 'title', data['label']);
+                    $popup.empty();
+                    $popup.append($form);
                     for (var i=0; i < data['actions'].length; i++) {
                         var label = data['actions'][i]['label'];
                         var callback = create_callback($form, data.form_url || url, data['actions'][i]);
