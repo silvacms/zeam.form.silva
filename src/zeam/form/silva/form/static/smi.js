@@ -41,9 +41,8 @@
                 $field.find('input').each(serialize_field);
                 $field.find('textarea').each(serialize_field);
                 $field.find('select').each(serialize_field);
-                // XXX We remote any ? present in the URL.
                 $.ajax({
-                    url: form_url.split("?")[0] + '/++rest++zeam.form.silva.validate',
+                    url: form_url + '/++rest++zeam.form.silva.validate',
                     type: 'POST',
                     dataType: 'json',
                     data: values,
@@ -74,7 +73,7 @@
         /**
          * Popup form.
          */
-        var Popup = function($popup, url) {
+        var Popup = function($popup, extra_array) {
             var popup = {};
             var ready = false;
             var popup_close = $.Deferred();
@@ -94,6 +93,11 @@
                         form_data[action_name] = action_label;
                         for (var j=0; j < form_array.length; j++) {
                             form_data[form_array[j]['name']] = form_array[j]['value'];
+                        };
+                        if (extra_array !== undefined) {
+                            for (j=0; j < extra_array.length; j++) {
+                                form_data[extra_array[j]['name']] = extra_array[j]['value'];
+                            };
                         };
 
                         // Send request
@@ -148,7 +152,7 @@
                 promise: function() {
                     return popup_close.promise();
                 },
-                from_url: function() {
+                from_url: function(url) {
                     return smi.ajax.query(url).pipe(
                         popup.from_data,
                         function (request) {
@@ -163,7 +167,7 @@
                     var $form = $('<form class="form-fields-container" />');
                     var buttons = {};
 
-                    $form.attr('data-form-url', url);
+                    $form.attr('data-form-url', data.url);
                     $form.attr('name', data.prefix);
                     $form.html(data['widgets']);
                     // Add an empty input submit to activate form submission with enter
@@ -174,7 +178,7 @@
                     $popup.append($form);
                     for (var i=0; i < data['actions'].length; i++) {
                         var label = data['actions'][i]['label'];
-                        var callback = create_callback($form, data.form_url || url, data['actions'][i]);
+                        var callback = create_callback($form, data.url, data['actions'][i]);
 
                         buttons[label] = callback;
                         if (data['actions'][i]['name'] == data['default_action']) {
@@ -199,20 +203,18 @@
 
             // Create a popup from a builder
             var url = undefined;
-            if (options !== undefined && options.url !== undefined) {
+            options = $.extend(options, {});
+            if (options.url !== undefined) {
                 url = options.url;
-                if (options.payload !== undefined) {
-                    url += '?' + $.param(options.payload);
-                };
             } else {
                 url = $(this).attr('href');
             };
-            var popup = new Popup($popup, url);
+            var popup = new Popup($popup, options.payload);
             var builder = null;
             if (infrae.interfaces.is_implemented_by('popup', options)) {
                 builder = popup.from_data(options);
             } else {
-                builder = popup.from_url();
+                builder = popup.from_url(url);
             };
             return popup.display(builder);
         };

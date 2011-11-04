@@ -8,10 +8,11 @@ from operator import itemgetter
 
 from five import grok
 from megrok import pagetemplate as pt
+from zope.traversing.browser import absoluteURL
 
 from silva.ui.rest.base import UIREST, UIHelper
 from silva.ui.rest.base import get_resources
-
+from silva.ui.rest.exceptions import RESTRedirectHandler
 from zeam.form.base.form import FormCanvas, Form
 from zeam.form.base.markers import SUCCESS, FAILURE
 from zeam.form.silva import interfaces
@@ -83,6 +84,7 @@ class PopupCanvas(SilvaFormData, FormCanvas, UIHelper):
                  'widgets': self.render(),
                  'prefix': self.prefix,
                  'actions': actions,
+                 'url': absoluteURL(self, self.request),
                  'default_action': findDefault(actions)})
         result = {'content': info}
         notifications = self.get_notifications()
@@ -102,10 +104,16 @@ class RESTPopupForm(UIREST, PopupCanvas):
         FormCanvas.__init__(self, context, request)
 
     def GET(self):
-        return self.json_response(self.updateForm())
+        try:
+            return self.json_response(self.updateForm())
+        except RESTRedirectHandler as handler:
+            return handler.publish(self)
 
     def POST(self):
-        return self.json_response(self.updateForm())
+        try:
+            return self.json_response(self.updateForm())
+        except RESTRedirectHandler as handler:
+            return handler.publish(self)
 
 
 class PopupForm(PopupCanvas, Form):
