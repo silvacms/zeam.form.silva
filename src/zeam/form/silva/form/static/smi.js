@@ -164,8 +164,9 @@
                         });
                 },
                 from_data: function(data) {
-                    var $form = $('<form class="form-fields-container" />');
+                    var $form = $('<form class="form-content form-fields-container" />');
                     var buttons = {};
+                    var submit_url = data.submit_url || data.url;
 
                     $form.attr('data-form-url', data.url);
                     $form.attr('name', data.prefix);
@@ -178,7 +179,7 @@
                     $popup.append($form);
                     for (var i=0; i < data['actions'].length; i++) {
                         var label = data['actions'][i]['label'];
-                        var callback = create_callback($form, data.url, data['actions'][i]);
+                        var callback = create_callback($form, submit_url, data['actions'][i]);
 
                         buttons[label] = callback;
                         if (data['actions'][i]['name'] == data['default_action']) {
@@ -199,7 +200,7 @@
          * @param url: if not undefined, the url for form.
          */
         $.fn.SMIFormPopup = function(options) {
-            var $popup = $('<div class="form-content"></div>');
+            var $popup = $('<div></div>');
 
             // Create a popup from a builder
             var url = undefined;
