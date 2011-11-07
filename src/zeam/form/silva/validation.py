@@ -55,7 +55,7 @@ class RESTValidatorForm(UIREST):
                     if extractor.identifier == fieldname:
                         value, error = extractor.extract()
                         if error is None:
-                            error = field.validate(value, self.context.context)
+                            error = field.validate(value, self.context)
                         if error is not None:
                             info['success'] = False
                             info['error'] = self.translate(error)
