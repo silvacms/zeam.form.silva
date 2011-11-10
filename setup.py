@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '1.3dev'
+version = '2.0b1'
 
 
 setup(name='zeam.form.silva',
@@ -26,12 +26,14 @@ setup(name='zeam.form.silva',
       zip_safe=False,
       install_requires=[
         'five.grok',
-        'js.jquery',
-        'js.jqueryui',
         'gp.fileupload',
         'grokcore.layout',
+        'grokcore.security',
         'infrae.rest',
+        'js.jquery',
+        'js.jqueryui',
         'martian',
+        'megrok.chameleon',
         'megrok.pagetemplate',
         'setuptools',
         'silva.core.conf',
@@ -47,13 +49,14 @@ setup(name='zeam.form.silva',
         'zeam.form.table',
         'zeam.form.viewlet',
         'zeam.form.ztk [fanstatic]',
+        'zope.cachedescriptors',
         'zope.component',
         'zope.i18n',
         'zope.interface',
-        'zope.schema',
+        'zope.publisher',
+        'zope.traversing',
         ],
       entry_points="""
-      # -*- Entry points: -*-
       [zeam.form.components]
       file = zeam.form.silva.widgets.file:register
       cropping = zeam.form.silva.widgets.cropping:register
