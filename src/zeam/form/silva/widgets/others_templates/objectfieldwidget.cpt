@@ -1,0 +1,38 @@
+<div class="field-object">
+  <tal:widgets tal:repeat="objectWidget widget.objectWidgets">
+      <div class="form-section ${objectWidget.error and 'form-error' or ''}"
+           data-field-prefix="#"
+           tal:condition="objectWidget.isVisible()"
+           tal:attributes="data-field-prefix objectWidget.identifier">
+        <div class="form-label">
+          <label tal:attributes="for objectWidget.htmlId()"
+                 tal:content="objectWidget.title">
+            Field Name
+          </label>
+          <span class="form-required"
+                tal:condition="objectWidget.required and not objectWidget.readonly"
+                i18n:translate="">
+              required
+          </span>
+          <p tal:condition="objectWidget.description"
+             tal:content="objectWidget.description">
+            Description
+          </p>
+        </div>
+        <div class="form-field">
+          <div class="form-error-detail"
+               tal:condition="objectWidget.error">
+            <p tal:content="structure objectWidget.error.title">
+              Validation error.
+            </p>
+          </div>
+          <tal:widget tal:content="structure objectWidget.render()"/>
+        </div>
+      </div>
+      <tal:hidden
+         tal:condition="not objectWidget.isVisible()"
+         tal:content="structure objectWidget.render()" />
+  </tal:widgets>
+  <input type="hidden" name="#" value="1"
+         tal:attributes="name widget.identifier" />
+</div>

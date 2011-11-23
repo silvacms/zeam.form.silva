@@ -12,6 +12,8 @@ from zeam.form.ztk.fields import SchemaFieldWidget
 from zeam.form.ztk.interfaces import ICollectionSchemaField
 from zeam.form.ztk.widgets.collection import newCollectionWidgetFactory
 from zeam.form.ztk.widgets.textline import TextLineSchemaField
+from zeam.form.ztk.widgets.object import ObjectSchemaField
+from zeam.form.ztk.widgets.object import ObjectFieldWidget
 from zeam.form.silva.interfaces import ISMIForm
 from silva.core.interfaces.adapters import IIconResolver
 
@@ -36,6 +38,10 @@ class IconEditDisplayWidget(IconDisplayWidget):
             form = getattr(form, 'parent', None)
         if form is not None:
             self.path = form.get_content_path(self._content)
+
+
+class ObjectFieldWidget(ObjectFieldWidget):
+    grok.adapts(ObjectSchemaField, Interface, Interface)
 
 
 grok.global_adapter(
