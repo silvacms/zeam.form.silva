@@ -26,7 +26,7 @@
 
         var form = null;
 
-        options = $.extend(default_options, options);
+        options = $.extend({}, default_options, options);
 
         var clear_status = function() {
             if (timeout !== null) {

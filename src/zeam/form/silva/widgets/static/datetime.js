@@ -3,6 +3,12 @@
 
     var create_datetime_field = function() {
         var $field = $(this);
+
+        if ($field.attr('readonly') == 'readonly') {
+            // No picker for readonly fields.
+            return;
+        };
+
         var id = $field.attr('id');
         var $year = $('#' + id + '-year');
         var $month = $('#' + id + '-month');
@@ -65,18 +71,7 @@
         if (!lang_settings) {
             lang_settings = $.datepicker.regional[''];
         };
-        var settings = {};
-        for (key in lang_settings) {
-            if (lang_settings[key]) {
-                settings[key] = lang_settings[key];
-            };
-        };
-        for (key in field_settings) {
-            if (field_settings[key]) {
-                settings[key] = field_settings[key];
-            };
-        };
-        $field.datepicker(settings);
+        $field.datepicker($.extend({}, lang_settings, field_settings));
     };
 
     $('.form-fields-container').live('loadwidget-smiform', function(event) {

@@ -30,17 +30,18 @@
 
             var need_refresh = false; //Resize need a last refresh with box 0
             var jCrop = undefined; //API to change keep ratio and resize
+            var default_cropping_options =  {
+                aspectRatio: ratio,
+                onSelect: function(value) {
+                    crop = [value.x, value.y, value.x2, value.y2];
+                }};
+
 
             var create_cropping = function(options) {
                 // Create or recreate the cropping with new options
                 var current;
 
-                options = $.extend(options, {
-                    aspectRatio: ratio,
-                    onSelect: function(value){
-                        crop = [value.x, value.y, value.x2, value.y2];
-                    }
-                });
+                options = $.extend({}, default_cropping_options, options);
                 if (jCrop !== undefined) {
                     jCrop.destroy();
                 };
