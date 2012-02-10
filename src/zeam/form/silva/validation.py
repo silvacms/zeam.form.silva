@@ -7,9 +7,10 @@ from five import grok
 
 from silva.ui.rest.base import UIREST
 
-from zeam.form.base.interfaces import IFormCanvas
-from zeam.form.composed.interfaces import ISubFormGroup
+from zeam.form.base.errors import Error
+from zeam.form.base.interfaces import IFormCanvas, ICollection, IError
 from zeam.form.base.widgets import getWidgetExtractor
+from zeam.form.composed.interfaces import ISubFormGroup
 from zeam.form.silva.utils import convert_request_form_to_unicode
 
 
@@ -17,6 +18,14 @@ def is_prefix(prefix, value):
     return (value.startswith(prefix) and
             (len(value) == len(prefix) or
              value[len(prefix)] == '.'))
+
+
+def serialize_error(rest, errors):
+    result = {errors.identifier: rest.translate(errors.title)}
+    if ICollection.providedBy(errors):
+        for error in errors:
+            result.update(serialize_error(rest, error))
+    return result
 
 
 class RESTValidatorForm(UIREST):
@@ -57,8 +66,10 @@ class RESTValidatorForm(UIREST):
                         if error is None:
                             error = field.validate(value, self.context)
                         if error is not None:
+                            if not IError.providedBy(error):
+                                error = Error(title=error, identifier=fieldname)
                             info['success'] = False
-                            info['error'] = self.translate(error)
+                            info['errors'] = serialize_error(self, error)
                         break
             else:
                 info['success'] = False

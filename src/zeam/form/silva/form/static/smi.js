@@ -11,6 +11,9 @@
         if ($field.hasClass('form-novalidation')) {
             return;
         };
+        if ($field.closest('.field-object').length) {
+            return;             // We ignore fields in objects
+        };
         var $form = $field.closest('form');
         var field_prefix = $field.attr('data-field-prefix');
         var form_prefix = $form.attr('name');
@@ -20,7 +23,7 @@
             return;
         };
 
-        $field.find('.field').bind('change', function () {
+        $field.delegate('.field', 'change', function () {
             setTimeout(function() {
                 var values = [{name: 'prefix.field', value: field_prefix},
                               {name: 'prefix.form', value: form_prefix}];
@@ -38,6 +41,13 @@
                     };
                 };
 
+                var find_sub_field = function(selector) {
+                    if (!$field.is(selector)) {
+                        return $field.find(selector).children('div.form-field');
+                    };
+                    return $field.children('div.form-field');
+                };
+
                 $field.find('input').each(serialize_field);
                 $field.find('textarea').each(serialize_field);
                 $field.find('select').each(serialize_field);
@@ -47,19 +57,20 @@
                     dataType: 'json',
                     data: values,
                     success: function(data) {
-                        var $container = $field.children('.form-field');
+                        var key, errors = data['errors'];
+                        $field.find('.form-error-detail').remove();
 
                         if (data['success']) {
                             // Success, clear the errors
                             $field.removeClass('form-error');
-                            $container.children('.form-error-detail').remove();
-                        } else {
-                            // Report error
-                            $field.addClass('form-error');
-                            $container.children('.form-error-detail').remove();
-                            if (data['error']) {
-                                $container.prepend(
-                                    '<div class="form-error-detail"><p>' + data['error'] +'</p></div>');
+                            return;
+                        };
+                        // Report error
+                        $field.addClass('form-error');
+                        if (errors) {
+                            for (key in errors) {
+                                find_sub_field('div[data-field-prefix="' + key + '"]').prepend(
+                                    '<div class="form-error-detail"><p>' + errors[key] +'</p></div>');
                             };
                         };
                     }
