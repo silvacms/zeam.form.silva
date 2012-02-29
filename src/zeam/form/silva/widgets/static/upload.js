@@ -47,54 +47,64 @@
             deferred.reject({filename: null, message: message});
         };
 
+        var poll_success = function(data) {
+            switch (data.state) {
+            case -1:
+                abort_upload(options.errors.file_too_big);
+                break;
+            case 0:
+                // not started
+                retries += 1;
+                if (retries > options.max_retries) {
+                    abort_upload(options.errors.too_many_retries);
+                    return;
+                };
+                $progress.show();
+                poll_status();
+                break;
+            case 1:
+                // dl in progress
+                retries = 0;
+                $progress.show();
+                if (data.percent > 0) {
+                    set_progress(data.percent);
+                };
+                if (data.percent < 100) {
+                    poll_status();
+                };
+                break;
+            case 2:
+                // not using the progressbar
+                $progress.hide();
+                clear_status();
+                break;
+            };
+        }
+
+        var poll_error = function(jqXHR, textStatus, errorThrown) { 
+            retries += 1;
+            if (retries > options.max_retries) {
+                abort_upload(options.errors.too_many_retries);
+                return;
+            }
+            poll_status();
+        }
+
+        var _poll_status = function() {
+            var url = (options.stat_url + upload_id + '?q=' + (Math.random() * 1000000000000000000));
+            $.ajax({
+                type: 'GET',
+                dataType: 'json',
+                timeout: options.stat_timeout,
+                url: url,
+                success: poll_success,
+                error: poll_error, 
+            });
+        }
+
         var poll_status = function() {
             clear_status();
-            timeout = setTimeout(
-                function() {
-                    var url = (options.stat_url +
-                               upload_id +
-                               '?q=' + (Math.random() * 1000000000000000000));
-                    $.ajax({
-                        type: 'GET',
-                        dataType: 'json',
-                        timeout: options.stat_timeout,
-                        url: url,
-                        success: function(data) {
-                            switch (data.state) {
-                            case -1:
-                                abort_upload(options.errors.file_too_big);
-                                break;
-                            case 0:
-                                // not started
-                                retries += 1;
-                                if (retries > options.max_retries) {
-                                    abort_upload(options.errors.too_many_retries);
-                                    return;
-                                };
-                                poll_status();
-                                break;
-                            case 1:
-                                // dl in progress
-                                retries = 0;
-                                if (data.percent > 0) {
-                                    set_progress(data.percent);
-                                };
-                                if (data.percent < 100) {
-                                    poll_status();
-                                };
-                                break;
-                            };
-                        },
-                        error: function() {
-                            retries += 1;
-                            if (retries > options.max_retries) {
-                                abort_upload(options.errors.too_many_retries);
-                                return;
-                            }
-                            poll_status();
-                        }
-                    });
-                }, options.stat_delay);
+            timeout = setTimeout(_poll_status, options.stat_delay);
         };
 
         return {
@@ -155,7 +165,7 @@
 
         var disable_upload_button = function() {
             $progress.progressbar({value: 0});
-            $progress.show();
+            //$progress.show();
             $upload_button.button('disable');
             $upload_button.hide();
         };
