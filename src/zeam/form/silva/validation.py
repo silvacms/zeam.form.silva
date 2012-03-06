@@ -51,6 +51,9 @@ class RESTValidatorForm(UIREST):
         convert_request_form_to_unicode(self.request.form)
         info = {'success': True}
         fieldname = self.request.form['prefix.field']
+        # We need to update the form first, since this is the common
+        # place to configure more fields.
+        self.context.update()
 
         try:
             form = self.get_form(self.request.form['prefix.form'])
