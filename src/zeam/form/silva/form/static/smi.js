@@ -23,6 +23,13 @@
             return;
         };
 
+        var find_sub_field = function(selector) {
+            if (!$field.is(selector)) {
+                return $field.find(selector).children('div.form-field');
+            };
+            return $field.children('div.form-field');
+        };
+
         $field.delegate('.field', 'change', function () {
             setTimeout(function() {
                 var values = [{name: 'prefix.field', value: field_prefix},
@@ -39,13 +46,6 @@
                     if (add) {
                         values.push({name: $input.attr('name'), value: $input.val()});
                     };
-                };
-
-                var find_sub_field = function(selector) {
-                    if (!$field.is(selector)) {
-                        return $field.find(selector).children('div.form-field');
-                    };
-                    return $field.children('div.form-field');
                 };
 
                 $field.find('input').each(serialize_field);

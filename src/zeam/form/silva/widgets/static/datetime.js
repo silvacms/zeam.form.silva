@@ -39,6 +39,7 @@
                 if (!$minute.val()) {
                     $minute.val('00');
                 };
+                $field.trigger('change');
             },
             beforeShow: function() {
                 var selected_day = $day.val();
