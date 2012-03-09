@@ -3,7 +3,8 @@
       tal:define="form view/getComposedForm"
       tal:attributes="action form/@@absolute_url;
                       name view/prefix"
-      i18n:domain="silva">
+      i18n:domain="silva"
+      tal:omit-tag="view/suppress_form_tag">
   <table class="listing">
     <thead>
       <tr class="top-controls" tal:condition="view/label">
@@ -59,7 +60,7 @@
       </tal:repeat>
     </tbody>
     <tfoot>
-      <tr tal:condition="view/haveRequiredFields">
+      <tr tal:condition="python:view.haveRequiredFields() and not view.suppress_required_notice">
         <th i18n:translate="">
           * required
         </th>

@@ -9,6 +9,7 @@ from zeam.form.table import *
 from zeam.form.silva.form import ZMIForm, ZMIComposedForm, ZMISubForm
 from zeam.form.silva.form import SMIForm, SMIAddForm, SMIEditForm
 from zeam.form.silva.form import SMIComposedForm, SMISubForm, SMISubFormGroup
+from zeam.form.silva.form import SMIComposedEditForm, SMISubEditForm
 from zeam.form.silva.form import SMISubTableForm
 from zeam.form.silva.form import SMIViewletForm, PublicViewletForm
 from zeam.form.silva.form import SMIContentProviderForm, PublicContentProviderForm

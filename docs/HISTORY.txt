@@ -1,6 +1,14 @@
 Changes
 =======
 
+1.2-bethel.5 (unreleased)
+-------------------------
+
+* added support for smi composed edit forms
+
+* added support for the composed form to have actions which
+  operate over all subforms
+
 1.2-bethel.4 (2011-09-28)
 -------------------------
 

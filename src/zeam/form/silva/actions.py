@@ -38,6 +38,40 @@ class EditAction(BaseEditAction):
                 form.send_message(_(u"Changes saved."), type="feedback")
         return status
 
+class ComposedEditAction(EditAction):
+    """An Edit action for a composed form.  This action will get all
+       subforms and save their changes.  This is to be used on a composed
+       form where only one set of action buttons is desired (e.g. saving), to
+       eliminate button duplication.
+    """
+    #this one edit action will be used to process all subforms
+    action = BaseEditAction(u"save changes")
+    
+    def __call__(self, form):
+        #Iterate over all subforms, saving the data for each
+
+        status = SUCCESS
+        messages = []
+        is_sfd = interfaces.ISilvaFormData.providedBy(form)
+        
+        for subform in form.subforms:
+            substatus = self.action(subform)
+            if substatus is FAILURE:
+                status = FAILURE
+                for error in subform.formErrors:
+                    messages.append(subform.label + ": " + error.title)
+            else:
+                messages.append(subform.label + u": Changes saved.")
+        #if any form had a bad status, report that as a failure.
+        #this is messy, as the form action machinery expects only
+        # one action on one form, but this is doing many actions on
+        # many forms; some of which may succeeed while others may fail.
+
+        if is_sfd:
+            t = status == FAILURE and "error" or "feedback"
+            form.send_message('<br />'.join(messages), type=t)
+        return status
+
 
 class PopupAction(Action):
     """An action that opens a popup form.

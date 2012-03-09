@@ -1,4 +1,9 @@
-<tal:composedform>
+<form action="#" method="post" enctype="multipart/form-data"
+      name="#" class="zeam-form zeam-inline-validation"
+      tal:attributes="action view/@@absolute_url;
+                      name view/prefix"
+      i18n:domain="silva"
+      tal:omit-tag="view/suppress_form_tag">
   <table class="listing">
     <thead>
       <tr tal:condition="view/label">
@@ -49,4 +54,4 @@
   <tal:repeat tal:repeat="form view/subforms"
               tal:replace="structure form/render">
   </tal:repeat>
-</tal:composedform>
+</form>

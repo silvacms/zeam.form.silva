@@ -232,7 +232,13 @@ class SMIComposedForm(SilvaForm, composed.ComposedForm):
     grok.baseclass()
     grok.layer(ISMILayer)
     grok.require('silva.ChangeSilvaContent')
-
+    
+    #whether to display a form tag around all subforms or not.  (default No)
+    #  set to True to have a single set of actions for the composed form,
+    #  using the subforms for grouping only.  (subforms should have
+    #  suppress_form_tag=True and an empty actions list)
+    suppress_form_tag = True
+    
     @property
     def icon_url(self):
         return get_icon_url(self.context, self.request)
@@ -246,6 +252,17 @@ class SMISubForm(SilvaFormData, composed.SubForm):
     """SMI Sub forms.
     """
     grok.baseclass()
+    
+    #set this to True to suppress the rendering of the form tag.  Useful
+    # if the subform is being used to group data, but the ComposedForm
+    # has the actions.
+    suppress_form_tag = False
+    
+    #it is more or less obvious which fields are required -- they have a '*'
+    # next to them.  when there are many subforms on the page, seeing the
+    # exact same notice below each isn't necessary.  Set to true to
+    # disable the notice.
+    suppress_required_notice = False
 
 
 class SMISubFormTemplate(pt.PageTemplate):
@@ -437,17 +454,17 @@ class SMIAddForm(SMIForm):
 class SMIAddFormTemplate(pt.PageTemplate):
     pt.view(SMIAddForm)
 
-
-class SMIEditForm(SMIForm):
-    """SMI Edit form.
+class SMIEditFormBase(object):
+    """Base class for any sort of SMI edit form.
+    
+    This base class takes care to use the correct version of the context object
+    when updating the form or setting the content data.
+    
+    If the content is versioned and it is published/approved, the form is set
+    to DISPLAY mode, and the previewable version is used.
     """
     grok.baseclass()
-    grok.name('tab_edit')
-    grok.implements(IEditTabIndex)
-
-    prefix = 'editform'
-    tab = 'edit'
-
+    
     dataManager = SilvaDataManager
     ignoreContent = False
     actions = base.Actions(
@@ -458,7 +475,7 @@ class SMIEditForm(SMIForm):
         """ If we have a versioned content and it has a published/approved
         version, the we set the form in display mode.
         """
-        super(SMIEditForm, self).update()
+        super(SMIEditFormBase, self).update()
         if IVersionable.providedBy(self.context):
             if ((not self.context.get_editable()) or
                 self.context.is_version_approval_requested()):
@@ -471,7 +488,52 @@ class SMIEditForm(SMIForm):
             content = original_content.get_editable()
             if content is None:
                 content = original_content.get_previewable()
-        super(SMIEditForm, self).setContentData(content)
+        super(SMIEditFormBase, self).setContentData(content)
+
+
+class SMIEditForm(SMIEditFormBase, SMIForm):
+    """SMI Edit form.
+    """
+    grok.baseclass()
+    grok.name('tab_edit')
+    grok.implements(IEditTabIndex)
+
+    prefix = 'editform'
+    tab = 'edit'
+
+
+class SMIComposedEditForm(SMIEditFormBase, SMIComposedForm):
+    """
+    A Silva Edit Form which contains other forms.
+    
+    This is useful if, on the SMI Edit screen, you want to have separate edit
+    forms with separate actions, or want to use subforms to separate out
+    related sets of configuration properties. In the latter case, you can use
+    a ComposedEditAction on the ComposedForm, with no actions in the subforms,
+    so there is a single "save" button.
+    
+    """
+    grok.baseclass()
+    grok.name('tab_edit')
+    grok.implements(IEditTabIndex)
+
+    prefix = 'editform'
+    tab = 'edit'
+
+
+class SMISubEditForm(SMIEditFormBase, SMISubForm):
+    """
+    An SMISubForm which is used on the edit screen, to edit a subset of
+    a Silva object's data.
+    
+    This subclass is specific to editing Silva content.  Like SMIEditForm,
+    it switches to the editable or previewable version of content as
+    appropriate.
+    
+    """
+    grok.baseclass()
+    suppress_form_tag = True
+
 
 class SMIViewletForm(SilvaFormData, viewlet.ViewletForm):
     """ Base form in viewlet
