@@ -532,7 +532,7 @@ class SMISubEditForm(SMIEditFormBase, SMISubForm):
     
     """
     grok.baseclass()
-    suppress_form_tag = True
+    suppress_form_tag = False
 
 
 class SMIViewletForm(SilvaFormData, viewlet.ViewletForm):
