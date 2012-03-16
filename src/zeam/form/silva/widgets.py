@@ -113,14 +113,10 @@ class TimeFieldWidget(SchemaFieldWidget):
 
     def prepareContentValue(self, value):
         if value is NO_VALUE:
-            return {self.identifier + '.hour': u'',
-                    self.identifier + '.min': u'',
-                    self.identifier: u''}
-        if isinstance(value, DateTime):
-            value = value.asdatetime()
-        return {self.identifier + '.hour': u'%02d' % value.hour,
-                self.identifier + '.min': u'%02d' % value.minute,
-                self.identifier: u''}
+            return {self.identifier: u''}
+        value = value.strftime('%I:%M %p')
+        
+        return {self.identifier: value}
 
 
 class TimeWidgetExtractor(WidgetExtractor):
@@ -129,33 +125,35 @@ class TimeWidgetExtractor(WidgetExtractor):
     def extract(self):
         identifier = self.identifier
         value = self.request.form.get(identifier, None)
-        if value is None:
+        if value in (None,u""):
             return NO_VALUE, None
 
-        def extract(key, min_value=None, max_value=None, required=True):
-            value = self.request.form.get('.'.join((identifier, key)), None)
-            if not value:
-                if required:
-                    raise ValueError(u'Missing %s value' %key)
-                return min_value
-            try:
-                value = int(value)
-            except ValueError:
-                raise ValueError((u'%s is not a number' % key).capitalize())
-            if min_value and max_value:
-                if value < min_value or value > max_value:
-                    raise ValueError((u'%s is not within %d and %d' % (
-                                key, min_value, max_value)).capitalize())
-            return value
+        value = value.split()
+        if len(value) != 2 or value[1] not in ('AM', 'PM'):
+            return (None, u'Invalid time format')
+        ampm = value[1]
+        value = value[0]
+         
+        value = value.split(':')
+        if len(value) != 2:
+            return (None, u'Invalid time format')
+        
         try:
-            hour = extract('hour', 0, 23, False)
-            minute = extract('min', 0, 59, False)
-        except ValueError, error:
-            return (None, _(error))
-        if hour is None:
-            return (NO_VALUE, None)
+            value = [ int(t) for t in value ]
+        except ValueError:
+            return (None, u'Invalid time format')
+            
+        if value[0] > 12 or value[0] < 1:
+            return (None, u'Invalid time format')
+
+        if value[1] > 59 or value[1] < 0:
+            return (None, u'Invalid time format')
+
+        if ampm == 'PM':
+            #convert to 24-hour
+            value[0] = value[0] + 12
         try:
-            return (time(hour, minute), None)
+            return (time(*value), None)
         except ValueError, error:
             return (None, _(str(error).capitalize()))
 

@@ -233,6 +233,27 @@ ZeamDateField.prototype.initialize = function () {
     this.field.datepicker(settings);
 };
 
+// this works for setting the date on both Date and DateTime fields
+var ZeamTimeField = function(field) {
+    this.field = $(field);
+    this.id = this.field.attr('id');
+    this.field.after('<button type="button" class="ui-timepicker-trigger" id="'+this.id+'-button"><img src="/++resource++silva.core.smi/clock.png" alt="set time" title="set time" /></button>');
+};
+
+ZeamTimeField.prototype.initialize = function () {
+    var number_reg = /^(\d)+$/;
+    var self = this;
+    var settings = {};
+    settings['showPeriod'] = true;
+    settings['showOn'] = 'button';
+    settings['button'] = '#' + this.id + '-button';
+    settings['onSelect'] = function(time, picker) {
+        debugger;
+    };
+    this.field.timepicker(settings);
+};
+
+
 (function() {
 // wrap the live in a closure, so this variable does not leak out
 // into the global scope
@@ -263,10 +284,10 @@ $('form').live('zeam-form-ready', function () {
         var field = new ZeamDateField($(this));
         field.initialize();
     });
-/*    form.find('.field-time').each(function(index) {
+    form.find('.field-time').each(function(index) {
         var field = new ZeamTimeField($(this));
         field.initialize();
-    });*/
+    });
     // Select all
     form.find('.zeam-select-all').bind('change', function() {
         var select = $(this);
