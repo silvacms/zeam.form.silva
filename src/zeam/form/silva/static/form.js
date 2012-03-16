@@ -260,7 +260,6 @@ $('form').live('zeam-form-ready', function () {
         field.initialize();
     });
     form.find('.field-date').each(function(index) {
-    debugger;
         var field = new ZeamDateField($(this));
         field.initialize();
     });

@@ -196,6 +196,7 @@ class ZMISubForm(composed.SubForm):
     """ZMI Composed forms.
     """
     grok.baseclass()
+    dataValidators = [validation.InvariantsValidation]
 
 
 class ZMISubFormTemplate(pt.PageTemplate):
@@ -252,6 +253,7 @@ class SMISubForm(SilvaFormData, composed.SubForm):
     """SMI Sub forms.
     """
     grok.baseclass()
+    dataValidators = [validation.InvariantsValidation]
     
     #set this to True to suppress the rendering of the form tag.  Useful
     # if the subform is being used to group data, but the ComposedForm

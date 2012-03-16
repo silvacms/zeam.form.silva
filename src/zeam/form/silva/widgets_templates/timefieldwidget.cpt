@@ -1,0 +1,13 @@
+<span tal:define="id widget.htmlId()"
+      i18n:domain="silva">
+  <input id="${id}-hour" name="${widget.identifier}.hour"
+         value="${widget.inputValue('hour')}"
+         type="text" size="2" maxlength="2" title="optional hour"
+         i18n:attributes="title" /> :
+  <input id="${id}-min" name="${widget.identifier}.min"
+         value="${widget.inputValue('min')}"
+         type="text" size="2" maxlength="2" title="optional minute"
+         i18n:attributes="title" />
+  <input type="hidden" value="" id="${id}" class="${widget.htmlClass()}"
+         name="${widget.identifier}" />
+</span>
