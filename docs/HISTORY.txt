@@ -12,6 +12,11 @@ Changes
 * add zeam widget for Date fields which uses the nice jquery-based
   datepicker
 
+* add a zeam widget for time fields which uses a nice jquery-based
+  time picker
+
+* smisubforms now process interface invariants
+
 1.2-bethel.4 (2011-09-28)
 -------------------------
 
