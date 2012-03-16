@@ -181,6 +181,7 @@ PopupZeamForm.prototype.display = function() {
 };
 
 
+// this works for setting the date on both Date and DateTime fields
 var ZeamDateField = function(field) {
     this.field = $(field);
     var id = this.field.attr('id');
@@ -258,6 +259,15 @@ $('form').live('zeam-form-ready', function () {
         var field = new ZeamDateField($(this));
         field.initialize();
     });
+    form.find('.field-date').each(function(index) {
+    debugger;
+        var field = new ZeamDateField($(this));
+        field.initialize();
+    });
+/*    form.find('.field-time').each(function(index) {
+        var field = new ZeamTimeField($(this));
+        field.initialize();
+    });*/
     // Select all
     form.find('.zeam-select-all').bind('change', function() {
         var select = $(this);

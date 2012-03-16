@@ -2,7 +2,7 @@
 # Copyright (c) 2010 Infrae. All rights reserved.
 # See also LICENSE.txt
 
-from datetime import datetime
+from datetime import datetime, date, time
 from DateTime import DateTime
 
 from ZPublisher.HTTPRequest import FileUpload
@@ -22,7 +22,8 @@ from zeam.form.ztk.fields import SchemaField, SchemaFieldWidget
 from zeam.form.ztk.fields import registerSchemaField
 from zeam.form.ztk.interfaces import ICollectionSchemaField
 from zeam.form.ztk.widgets.collection import newCollectionWidgetFactory
-from zeam.form.ztk.widgets.date import DatetimeSchemaField
+from zeam.form.ztk.widgets.date import DatetimeSchemaField, DateSchemaField
+from zeam.form.ztk.widgets.time import TimeSchemaField
 from zeam.form.ztk.widgets.textline import TextLineSchemaField
 
 def register():
@@ -50,6 +51,60 @@ class FileWidgetExtractor(WidgetExtractor):
         if not isinstance(value, FileUpload) or not value:
             value = NO_VALUE
         return value, None
+
+
+class DateFieldWidget(SchemaFieldWidget):
+    grok.adapts(DateSchemaField, Interface, ISMILayer)
+    
+    def prepareContentValue(self, value):
+        if value is NO_VALUE:
+            return {self.identifier + '.year': u'',
+                    self.identifier + '.month': u'',
+                    self.identifier + '.day': u'',
+                    self.identifier: u''}
+        if isinstance(value, DateTime):
+            value = value.asdatetime()
+        return {self.identifier + '.year': u'%d' % value.year,
+                self.identifier + '.month': u'%02d' % value.month,
+                self.identifier + '.day': u'%02d' % value.day,
+                self.identifier: u''}
+
+class DateTimeWidgetExtractor(WidgetExtractor):
+    grok.adapts(DateSchemaField, Interface, ISMILayer)
+
+    def extract(self):
+        identifier = self.identifier
+        value = self.request.form.get(identifier, None)
+        if value is None:
+            return NO_VALUE, None
+
+        def extract(key, min_value=None, max_value=None, required=True):
+            value = self.request.form.get('.'.join((identifier, key)), None)
+            if not value:
+                if required:
+                    raise ValueError(u'Missing %s value' %key)
+                return min_value
+            try:
+                value = int(value)
+            except ValueError:
+                raise ValueError((u'%s is not a number' % key).capitalize())
+            if min_value and max_value:
+                if value < min_value or value > max_value:
+                    raise ValueError((u'%s is not within %d and %d' % (
+                                key, min_value, max_value)).capitalize())
+            return value
+        try:
+            year = extract('year', None, None, self.component.required)
+            day = extract('day', 1, 31, year is not None)
+            month = extract('month', 1, 12, year is not None)
+        except ValueError, error:
+            return (None, _(error))
+        if year is None:
+            return (NO_VALUE, None)
+        try:
+            return (date(year, month, day), None)
+        except ValueError, error:
+            return (None, _(str(error).capitalize()))
 
 
 class DateTimeFieldWidget(SchemaFieldWidget):

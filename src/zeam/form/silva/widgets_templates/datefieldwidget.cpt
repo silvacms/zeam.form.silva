@@ -1,0 +1,17 @@
+<span tal:define="id widget.htmlId()"
+      i18n:domain="silva">
+  <input id="${id}-day" name="${widget.identifier}.day"
+         value="${widget.inputValue('day')}"
+         type="text" size="2" maxlength="2" title="day"
+         i18n:attributes="title"/> /
+  <input id="${id}-month" name="${widget.identifier}.month"
+         value="${widget.inputValue('month')}"
+         type="text" size="2" maxlength="2" title="month"
+         i18n:attributes="title"/> /
+  <input id="${id}-year" name="${widget.identifier}.year"
+         value="${widget.inputValue('year')}"
+         type="text" size="4" maxlength="4" title="year"
+         i18n:attributes="title" /> &nbsp;
+  <input type="hidden" value="" id="${id}" class="${widget.htmlClass()}"
+         name="${widget.identifier}" />
+</span>
