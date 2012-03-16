@@ -247,9 +247,6 @@ ZeamTimeField.prototype.initialize = function () {
     settings['showPeriod'] = true;
     settings['showOn'] = 'button';
     settings['button'] = '#' + this.id + '-button';
-    settings['onSelect'] = function(time, picker) {
-        debugger;
-    };
     this.field.timepicker(settings);
 };
 
