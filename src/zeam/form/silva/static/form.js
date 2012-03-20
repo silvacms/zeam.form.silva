@@ -314,4 +314,29 @@ $(document).ready(function() {
         form.display();
         return false;
     });
+    
+    $('.zeam-fixed-controls').waypoint(function(event, direction) {
+        var o = $(this),
+            p = o.parent(),
+            left_margin = (p.parent().width() - p.width())/2,
+            top_margin = (p.parent().height() - p.height())/2;
+            
+        if (direction === 'down') {
+            p.height(p.outerHeight() + 'px');
+            o.css({
+                'position': 'fixed',
+                'top': '0',
+                'left': p.offset()['left'],
+                'width': (p.outerWidth() - left_margin) + 'px',
+                'padding-left': left_margin,
+                'padding-top': top_margin,
+                'padding-bottom': top_margin
+            });
+        } else {
+            o.css({'position': 'static',
+                   'width': 'auto',
+                   'padding': '0'});
+        }
+    });
+    
 });

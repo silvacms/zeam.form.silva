@@ -17,6 +17,11 @@ Changes
 
 * smisubforms now process interface invariants
 
+* smicomposedform action row is now fixed on the screen using
+  jquery.waypoint.  Other forms can be configured to do this
+  by adding a <div class="zeam-fixed-controls"> around the
+  controls in the action row
+
 1.2-bethel.4 (2011-09-28)
 -------------------------
 

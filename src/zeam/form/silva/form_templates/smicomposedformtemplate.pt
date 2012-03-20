@@ -44,8 +44,10 @@
     <tfoot tal:condition="view/actionWidgets">
       <tr class="controls" tal:condition="view/actionWidgets">
         <td colspan="2">
-          <input tal:repeat="widget view/actionWidgets"
-                 tal:replace="structure widget/render" />
+          <div class="zeam-fixed-controls">
+            <input tal:repeat="widget view/actionWidgets"
+                   tal:replace="structure widget/render" />
+          </div>
         </td>
       </tr>
     </tfoot>
