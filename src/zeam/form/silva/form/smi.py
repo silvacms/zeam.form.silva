@@ -2,7 +2,6 @@
 # See also LICENSE.txt
 # $Id$
 
-from Acquisition import aq_base
 from AccessControl.security import checkPermission
 
 from five import grok
@@ -14,7 +13,6 @@ from zope.configuration.name import resolve
 from zeam.form.base.form import FormCanvas
 from zeam.form.base.actions import Actions, action
 from zeam.form import composed, table
-from zeam.form.base.datamanager import BaseDataManager
 from zeam.form.base.fields import Fields
 from zeam.form.base.markers import DISPLAY, SUCCESS, FAILURE, NO_VALUE
 from zeam.form.ztk import validation
@@ -22,6 +20,7 @@ from zeam.form.composed.form import SubFormGroupBase
 
 from zeam.form.silva.actions import CancelAddAction, CancelEditAction
 from zeam.form.silva.actions import EditAction, ExtractedDecoratedAction
+from zeam.form.silva.datamanager import SilvaDataManager
 from zeam.form.silva.interfaces import ISMIForm, IDefaultAction
 from zeam.form.silva.utils import SilvaFormData
 from zeam.form.silva.utils import convert_request_form_to_unicode
@@ -36,26 +35,6 @@ from silva.core.interfaces.content import IVersionedContent
 from silva.ui.interfaces import ISilvaUIDependencies
 from silva.translations import translate as _
 from silva.ui.rest import PageREST, RedirectToPage
-
-
-class SilvaDataManager(BaseDataManager):
-    """Try to use in priority set_ and get_ methods when setting and
-    getting values on an object, paying attention to the Acquisition.
-    """
-
-    def get(self, identifier):
-        if hasattr(aq_base(self.content), 'get_%s' % identifier):
-            getter = getattr(self.content, 'get_%s' % identifier)
-            return getter()
-        if not hasattr(aq_base(self.content), identifier):
-            raise KeyError(identifier)
-        return getattr(self.content, identifier)
-
-    def set(self, identifier, value):
-        if hasattr(aq_base(self.content), 'set_%s' % identifier):
-            setter = getattr(self.content, 'set_%s' % identifier)
-            return setter(value)
-        return setattr(self.content, identifier, value)
 
 
 class IFormSilvaUIResources(ISilvaUIDependencies):

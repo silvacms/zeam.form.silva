@@ -4,9 +4,9 @@
 # $Id$
 
 from five import grok
-from zope.i18n.interfaces import IUserPreferredLanguages
-from zope import component
 from zope.cachedescriptors.property import CachedProperty
+from zope.component import getUtility
+from zope.i18n.interfaces import IUserPreferredLanguages
 
 from zeam.form.silva.interfaces import ISilvaFormData
 from silva.core.messages.interfaces import IMessageService
@@ -24,7 +24,7 @@ class SilvaFormData(object):
         return 'en'
 
     def send_message(self, message, type=u""):
-        service = component.getUtility(IMessageService)
+        service = getUtility(IMessageService)
         service.send(message, self.request, namespace=type)
 
 

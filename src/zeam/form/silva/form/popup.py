@@ -26,7 +26,6 @@ REST_ACTIONS_TO_TOKEN = [
     (interfaces.IAction, 'send')]
 
 
-
 class RefreshExtraPayload(grok.Adapter):
     grok.context(interfaces.IRESTRefreshAction)
     grok.provides(interfaces.IRESTExtraPayloadProvider)
@@ -47,10 +46,11 @@ class PopupCanvas(SilvaFormData, FormCanvas, UIHelper):
             for rest_action, action_type in REST_ACTIONS_TO_TOKEN:
                 if rest_action.providedBy(action.component):
                     break
-            return {'label': self.translate(action.title),
-                    'name': action.identifier,
-                    'action': action_type,
-                    'default': interfaces.IDefaultAction.providedBy(action.component)}
+            return {
+                'label': self.translate(action.title),
+                'name': action.identifier,
+                'action': action_type,
+                'default': interfaces.IDefaultAction.providedBy(action.component)}
 
         return map(renderAction, self.actionWidgets)
 

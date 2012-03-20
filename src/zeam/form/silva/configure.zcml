@@ -4,8 +4,10 @@
    xmlns:grok="http://namespaces.zope.org/grok">
 
   <include package="five.grok" />
+  <include package="zeam.component" />
   <include package="grokcore.chameleon" />
 
+  <include package="zeam.component" />
   <include package="zeam.form.base" />
   <include package="zeam.form.ztk" />
   <include package="zeam.form.composed" />

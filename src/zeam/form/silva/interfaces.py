@@ -73,3 +73,35 @@ class IRESTExtraPayloadProvider(interface.Interface):
     def get_extra_payload(form):
         """Return the extra payload for the given form.
         """
+
+# This is used by the data manager FieldValueDataManager
+
+
+class IFieldValueWriter(interface.Interface):
+    """Write a field value on a content.
+    """
+
+    def __init__(field, form, content):
+        """Adapt the given field and content.
+        """
+
+    def delete():
+        """Remove the value.
+        """
+
+    def __call__(value):
+        """Save value on the given content.
+        """
+
+
+class IFieldValueReader(interface.Interface):
+    """Read a field value from a content.
+    """
+
+    def __init__(field, form, content):
+        """Adapt the given field and content.
+        """
+
+    def __call__():
+        """Read the given value.
+        """

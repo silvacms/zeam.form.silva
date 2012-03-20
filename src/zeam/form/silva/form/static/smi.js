@@ -80,13 +80,11 @@
     };
 
     $(document).bind('load-smiplugins', function(event, smi) {
-
         /**
          * Popup form.
          */
         var Popup = function($popup, extra_array) {
             var popup = {};
-            var ready = false;
             var popup_close = $.Deferred();
 
             var create_callback = function($form, form_url, data) {
@@ -98,17 +96,11 @@
                     switch (action_type) {
                     case 'send':
                     case 'close_on_success':
-                        var form_array = $form.serializeArray();
-                        var form_data = {};
+                        var form_data = $form.serializeArray();
 
-                        form_data[action_name] = action_label;
-                        for (var j=0; j < form_array.length; j++) {
-                            form_data[form_array[j]['name']] = form_array[j]['value'];
-                        };
+                        form_data.push({name: action_name, value: action_label});
                         if (extra_array !== undefined) {
-                            for (j=0; j < extra_array.length; j++) {
-                                form_data[extra_array[j]['name']] = extra_array[j]['value'];
-                            };
+                            form_data = form_data.concat(extra_array);
                         };
 
                         // Send request
@@ -118,7 +110,10 @@
                                     if (action_type == 'close_on_success' && data['success']) {
                                         return popup.close(data);
                                     };
-                                    return popup.from_data(data);
+                                    return $.when(popup.from_data(data)).pipe(function ($form) {
+                                        infrae.ui.ResizeDialog($popup);
+                                        return $form;
+                                    });
                                 };
                                 return popup.close(data).done(function(data) {
                                     return $(document).render({data: data, args: [smi]});
@@ -199,7 +194,6 @@
                     };
                     $popup.dialog('option', 'buttons', buttons);
                     $form.trigger('load-smiform', {form: $form, container: $form});
-                    ready = true;
                     return $form;
                 }
             });
@@ -221,7 +215,7 @@
             } else {
                 url = $(this).attr('href');
             };
-            var popup = new Popup($popup, options.payload);
+            var popup = Popup($popup, options.payload);
             var builder = null;
             if (infrae.interfaces.is_implemented_by('popup', options)) {
                 builder = popup.from_data(options);
