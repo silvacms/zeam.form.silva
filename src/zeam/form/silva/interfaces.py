@@ -105,3 +105,29 @@ class IFieldValueReader(interface.Interface):
     def __call__():
         """Read the given value.
         """
+
+
+class IXMLFieldSerializer(interface.Interface):
+    identifier = interface.Attribute(u"Field identifier")
+
+    def __call__(producer):
+        """Serialize field.
+        """
+
+
+class IXMLFieldDeserializer(interface.Interface):
+
+    def __call__(data, context=None):
+        """Deserialize field.
+        """
+
+
+class IXMLFormSerialization(interface.Interface):
+
+    def getSerializer():
+        """Return field XML serializer.
+        """
+
+    def getDeserializer():
+        """Return field XML deserializer.
+        """

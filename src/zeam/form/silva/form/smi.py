@@ -205,7 +205,7 @@ class SMIAddForm(SMIForm):
 
     @property
     def _content_type(self):
-        return self.__name__.split('/')[1]
+        return self.__name__.split('/')[0]
 
     def _add(self, parent, data):
         """Purely create the object. This method can be overriden to
