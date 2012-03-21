@@ -521,6 +521,13 @@ class SMIComposedEditForm(SMIEditFormBase, SMIComposedForm):
 
     prefix = 'editform'
     tab = 'edit'
+    
+    def update(self):
+        """ If we have a versioned content and it has a published/approved
+        version, the we set the form in display mode.
+        """
+        super(SMIComposedEditForm, self).update()
+        SMIComposedForm.update(self)
 
 
 class SMISubEditForm(SMIEditFormBase, SMISubForm):
