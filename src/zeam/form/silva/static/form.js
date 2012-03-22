@@ -245,8 +245,10 @@ ZeamTimeField.prototype.initialize = function () {
     var self = this;
     var settings = {};
     settings['showPeriod'] = true;
-    settings['showOn'] = 'button';
+    settings['showOn'] = 'both';
     settings['button'] = '#' + this.id + '-button';
+    settings['showLeadingZero'] = false;
+    settings['minutes'] = {starts: 0, ends: 59, interval: 5};
     this.field.timepicker(settings);
 };
 

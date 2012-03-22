@@ -149,7 +149,7 @@ class TimeWidgetExtractor(WidgetExtractor):
         if value[1] > 59 or value[1] < 0:
             return (None, u'Invalid time format')
 
-        if ampm == 'PM':
+        if ampm == 'PM' and value[0] < 12:
             #convert to 24-hour
             value[0] = value[0] + 12
         try:
