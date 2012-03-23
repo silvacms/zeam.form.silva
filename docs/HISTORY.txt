@@ -1,7 +1,7 @@
 Changes
 =======
 
-1.2-bethel.5 (unreleased)
+1.2-bethel.5 (2012-03-23)
 -------------------------
 
 * added support for smi composed edit forms
