@@ -1,6 +1,11 @@
 Changes
 =======
 
+1.2-bethel.6 (unreleased)
+-------------------------
+
+*  fix js error when there are no fixed zeam controls on an smi page
+
 1.2-bethel.5 (2012-03-23)
 -------------------------
 
