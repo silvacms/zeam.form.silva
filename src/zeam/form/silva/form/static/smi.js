@@ -85,9 +85,18 @@
          */
         var Popup = function($popup, extra_array) {
             var popup = {};
-            var popup_close = $.Deferred();
+            var close = $.Deferred();
+            var $form = null;
 
-            var create_callback = function($form, form_url, data) {
+            var cleanup_form = function() {
+                if ($form !== null) {
+                    $form.trigger('clean-smiform', {form: $form, container: $form, popup: $popup});
+                    $form.remove();
+                    $form = null;
+                };
+            };
+
+            var create_callback = function(form_url, data) {
                 var action_label = data['label'];
                 var action_name = data['name'];
                 var action_type = data['action'];
@@ -96,6 +105,8 @@
                     switch (action_type) {
                     case 'send':
                     case 'close_on_success':
+                        $form.trigger('serialize-smiform',
+                                      {form: $form, container: $form, popup: $popup});
                         var form_data = $form.serializeArray();
 
                         form_data.push({name: action_name, value: action_label});
@@ -135,6 +146,7 @@
             });
             // When the popup is closed, clean its HTML and bindings
             $popup.bind('dialogclose', function() {
+                cleanup_form();
                 $popup.remove();
             });
 
@@ -153,10 +165,10 @@
                 },
                 close: function(data) {
                     $popup.dialog('close');
-                    return popup_close.resolve(data);
+                    return close.resolve(data);
                 },
                 promise: function() {
-                    return popup_close.promise();
+                    return close.promise();
                 },
                 from_url: function(url) {
                     return smi.ajax.query(url).pipe(
@@ -166,14 +178,16 @@
                             // trigger the cleaning), return an reject
                             // not to display it.
                             $popup.dialog('close');
-                            return popup_close.reject(request);
+                            return close.reject(request);
                         });
                 },
                 from_data: function(data) {
-                    var $form = $('<form class="form-content form-fields-container" />');
                     var buttons = {};
                     var submit_url = data.submit_url || data.url;
 
+                    // Start by cleaning any existing form
+                    cleanup_form();
+                    $form = $('<form class="form-content form-fields-container" />');
                     $form.attr('data-form-url', data.url);
                     $form.attr('name', data.prefix);
                     $form.html(data['widgets']);
@@ -181,11 +195,10 @@
                     $form.append('<input type="submit" style="display: none" />');
                     // Set the dialog content
                     $popup.dialog('option', 'title', data['label']);
-                    $popup.empty();
                     $popup.append($form);
                     for (var i=0; i < data['actions'].length; i++) {
                         var label = data['actions'][i]['label'];
-                        var callback = create_callback($form, submit_url, data['actions'][i]);
+                        var callback = create_callback(submit_url, data['actions'][i]);
 
                         buttons[label] = callback;
                         if (data['actions'][i]['name'] == data['default_action']) {
@@ -193,7 +206,7 @@
                         };
                     };
                     $popup.dialog('option', 'buttons', buttons);
-                    $form.trigger('load-smiform', {form: $form, container: $form});
+                    $form.trigger('load-smiform', {form: $form, container: $form, popup: $popup});
                     return $form;
                 }
             });
@@ -271,7 +284,7 @@
         $form.find('.form-section').each(create_validator);
     };
 
-    // Registeration code: Prepare forms
+    // Prepare forms
     $('.form-content').live('load-smiform', bootstrap_form);
 
     $(document).ready(function() {
