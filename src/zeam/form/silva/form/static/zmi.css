@@ -97,6 +97,9 @@ form .field-collection-lines div.line-actions {
   float: left;
   width: 60px;
 }
+form tr.field-collection-line .field-collection-lines div.line-data {
+  float: right;
+}
 form .field-collection-lines td.line-actions {
   width: 16px;
 }
