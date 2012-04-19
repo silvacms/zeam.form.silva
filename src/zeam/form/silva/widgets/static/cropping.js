@@ -111,15 +111,15 @@
             $popup.dialog({
                 autoOpen: false,
                 modal: true,
-                minWidth: 250,
                 width: original_width,
                 height: original_height,
                 open: create_cropping,
                 buttons: actions
             });
-            infrae.ui.ShowDialog($popup, {maxFactor: 0.9,
-                                          maxWidth: original_width,
-                                          maxHeight: original_height});
+            infrae.ui.ShowDialog($popup, {minWidth: 250,
+                                          maxFactor: 0.9,
+                                          maxWidth: original_width + 10,
+                                          maxHeight: original_height + 10});
         });
     };
 

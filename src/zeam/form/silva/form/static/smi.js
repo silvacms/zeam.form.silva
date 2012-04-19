@@ -161,7 +161,7 @@
                     return $.when(builder).pipe(
                         function ($form) {
                             // Initialize form and widgets JS, show the popup
-                            infrae.ui.ShowDialog($popup);
+                            infrae.ui.ShowDialog($popup, {maxFactor: 0.8});
                             return popup;
                         },
                         function (request) {
