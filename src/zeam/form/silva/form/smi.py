@@ -137,7 +137,7 @@ class SMIComposedForm(SilvaFormData, PageREST, SubFormGroupBase, FormCanvas):
             (self.context, self.request, self), name='portlets')
         if portlets is not None:
             portlets.update()
-            rendered_portlets = portlets.render()
+            rendered_portlets = portlets.render().strip()
             if rendered_portlets:
                 result['portlets'] = rendered_portlets
         return result
