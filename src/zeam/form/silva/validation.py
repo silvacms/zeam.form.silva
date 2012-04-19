@@ -4,6 +4,7 @@
 # $Id$
 
 from five import grok
+from zope.interface import Interface
 
 from silva.ui.rest.base import UIREST
 
@@ -12,6 +13,7 @@ from zeam.form.base.interfaces import IFormCanvas, ICollection, IError
 from zeam.form.base.widgets import getWidgetExtractor
 from zeam.form.composed.interfaces import ISubFormGroup
 from zeam.form.silva.utils import convert_request_form_to_unicode
+from zeam.form.silva.interfaces import IFormLookup
 
 
 def is_prefix(prefix, value):
@@ -28,24 +30,39 @@ def serialize_error(rest, errors):
     return result
 
 
+class DefaultFormLookup(grok.Adapter):
+    grok.context(Interface)
+    grok.provides(IFormLookup)
+    grok.implements(IFormLookup)
+
+    def __init__(self, form):
+        self.form = form
+
+    def fields(self):
+        return self.form.fields
+
+    def lookup(self, key):
+        if self.form.prefix == key:
+            return self
+        raise KeyError(key)
+
+
+class SubFormLookup(DefaultFormLookup):
+    grok.context(ISubFormGroup)
+
+    def lookup(self, key):
+        for subform in self.form.allSubforms:
+            if is_prefix(subform.prefix, key):
+                subfetcher = IFormLookup(subform)
+                if subform.prefix == key:
+                    return subfetcher
+                return subfetcher.lookup(key)
+        return super(SubFormLookup, self).lookup(key)
+
+
 class RESTValidatorForm(UIREST):
     grok.name('zeam.form.silva.validate')
     grok.context(IFormCanvas)
-
-    def get_form(self, prefix):
-
-        def getter(form):
-            if ISubFormGroup.providedBy(form):
-                for subform in form.allSubforms:
-                    if is_prefix(subform.prefix, prefix):
-                        if subform.prefix == prefix:
-                            return subform
-                        return getter(subform)
-            elif form.prefix == prefix:
-                return form
-            raise KeyError(prefix)
-
-        return getter(self.context)
 
     def validate(self):
         convert_request_form_to_unicode(self.request.form)
@@ -56,13 +73,14 @@ class RESTValidatorForm(UIREST):
         self.context.update()
 
         try:
-            form = self.get_form(self.request.form['prefix.form'])
+            lookup = IFormLookup(self.context).lookup(
+                self.request.form['prefix.form'])
         except KeyError:
             info['success'] = False
         else:
             # Look for extractor, extract and validate value.
-            for field in form.fields:
-                extractor = getWidgetExtractor(field, form, self.request)
+            for field in lookup.fields():
+                extractor = getWidgetExtractor(field, lookup.form, self.request)
                 if extractor is not None:
                     if extractor.identifier == fieldname:
                         value, error = extractor.extract()

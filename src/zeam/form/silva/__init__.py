@@ -22,6 +22,7 @@ from zeam.form.silva.datamanager import SilvaDataManager
 from zeam.form.silva.datamanager import FieldValueDataManagerFactory
 from zeam.form.silva.actions import ExtractedDecoratedAction, LinkAction
 from zeam.form.silva.actions import EditAction, CancelAction, PopupAction
+from zeam.form.silva.validation import DefaultFormLookup
 
 from zeam.form.silva.interfaces import IDefaultAction
 from zeam.form.silva.interfaces import IRESTCloseOnSuccessAction

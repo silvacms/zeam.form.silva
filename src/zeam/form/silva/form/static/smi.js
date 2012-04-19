@@ -37,14 +37,20 @@
 
                 var serialize_field = function() {
                     var $input = $(this);
-                    var add = true;
 
                     if (($input.is(':checkbox') || $input.is(':radio')) &&
                         !$input.is(':checked')) {
-                        add = false;
+                        return;
                     };
-                    if (add) {
-                        values.push({name: $input.attr('name'), value: $input.val()});
+                    var value = $input.val();
+
+                    if (value === null) {
+                        return;
+                    } else if (!$.isArray(value)) {
+                        value = [value];
+                    };
+                    for (var i=value.length; i > 0; i--) {
+                        values.push({name: $input.attr('name'), value: value[i - 1]});
                     };
                 };
 

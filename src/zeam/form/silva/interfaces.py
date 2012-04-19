@@ -107,6 +107,19 @@ class IFieldValueReader(interface.Interface):
         """
 
 
+class IFormLookup(interface.Interface):
+    """Return the correct form that match a prefix.
+    """
+
+    def fields(self):
+        """Return the associated fields.
+        """
+
+    def lookup(self, key):
+        """Return the associated form.
+        """
+
+
 class IXMLFieldSerializer(interface.Interface):
     identifier = interface.Attribute(u"Field identifier")
 
