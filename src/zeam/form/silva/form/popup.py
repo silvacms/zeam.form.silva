@@ -10,8 +10,8 @@ from five import grok
 from megrok import pagetemplate as pt
 from zope.traversing.browser import absoluteURL
 
-from silva.ui.rest.base import UIREST, UIHelper
-from silva.ui.rest.base import get_resources
+from silva.ui.rest.base import UIREST, SMITransaction
+from silva.ui.rest import helper
 from silva.ui.rest.exceptions import RESTRedirectHandler
 from zeam.form.base.form import FormCanvas, Form
 from zeam.form.base.markers import SUCCESS, FAILURE
@@ -34,7 +34,7 @@ class RefreshExtraPayload(grok.Adapter):
         return {'refresh': self.context.refresh}
 
 
-class PopupCanvas(SilvaFormData, FormCanvas, UIHelper):
+class PopupCanvas(helper.UIHelper, SilvaFormData, FormCanvas):
     grok.baseclass()
 
     def update(self):
@@ -86,17 +86,22 @@ class PopupCanvas(SilvaFormData, FormCanvas, UIHelper):
                  'actions': actions,
                  'url': absoluteURL(self, self.request),
                  'default_action': findDefault(actions)})
-        result = {'content': info}
-        notifications = self.get_notifications()
-        if notifications is not None:
-            result['notifications'] = notifications
-        resources = get_resources(self.request)
-        if resources is not None:
-            result['resources'] = resources
-        return result
+        return {'content': info}
+
+    def renderForm(self):
+        self.need(helper.get_resources)
+        self.need(helper.get_notifications)
+
+        with SMITransaction(self):
+            data = self.updateForm()
+
+        for provider in self.needed():
+            provider(self, data)
+
+        return data
 
 
-class RESTPopupForm(UIREST, PopupCanvas):
+class RESTPopupForm(PopupCanvas, UIREST):
     grok.baseclass()
 
     def __init__(self, context, request):
@@ -105,13 +110,13 @@ class RESTPopupForm(UIREST, PopupCanvas):
 
     def GET(self):
         try:
-            return self.json_response(self.updateForm())
+            return self.json_response(self.renderForm())
         except RESTRedirectHandler as handler:
             return handler.publish(self)
 
     def POST(self):
         try:
-            return self.json_response(self.updateForm())
+            return self.json_response(self.renderForm())
         except RESTRedirectHandler as handler:
             return handler.publish(self)
 
