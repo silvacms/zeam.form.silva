@@ -11,7 +11,7 @@ from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 
 import js.jqueryui
 
-from zeam.form import base, composed
+from zeam.form import base, composed, table
 from zeam.form.ztk import validation
 from zeam.form.silva.utils import convert_request_form_to_unicode
 
@@ -83,4 +83,13 @@ class ZMISubForm(composed.SubForm):
 class ZMISubFormTemplate(pt.PageTemplate):
     pt.view(ZMISubForm)
 
+
+class ZMISubTableForm(table.SubTableForm):
+    """ZMI table form.
+    """
+    grok.baseclass()
+
+
+class ZMISubTableFormTemplate(pt.PageTemplate):
+    pt.view(ZMISubTableForm)
 

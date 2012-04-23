@@ -1,0 +1,87 @@
+<form action="." tal:attributes="action request.URL" method="post"
+      enctype="multipart/form-data">
+
+  <p class="system-msg"
+     tal:condition="view.status"
+     tal:content="view.status">Status</p>
+  <p class="system-msg"
+     tal:condition="view.errors">
+    <tal:error tal:repeat="error view.formErrors">
+      <span tal:replace="error.title" />
+      <br tal:condition="not repeat.error.end" />
+    </tal:error>
+  </p>
+
+  <h3 tal:condition="view.label"
+      tal:content="view.label">Label</h3>
+
+  <p tal:condition="view.description"
+     tal:content="view.description">Description</p>
+
+  <table tal:define="columns len(view.tableFields) + 1">
+    <thead>
+      <tr tal:condition="view.lineWidgets">
+        <th>
+        </th>
+        <th tal:repeat="field view.tableFields"
+            tal:content="field.title">
+          Title
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tal:line tal:repeat="line view.lineWidgets">
+        <tr class="#"
+            tal:define="odd repeat.line.odd"
+            tal:attributes="class odd and 'odd' or 'even'">
+          <td tal:repeat="widget line"
+              tal:content="structure widget.render()">
+          </td>
+        </tr>
+      </tal:line>
+      <tr class="odd" tal:condition="not view.lineWidgets">
+        <td colspan="#"
+            tal:attributes="colspan columns"
+            tal:content="view.emptyDescription">
+          There are no items.
+        </td>
+      </tr>
+    </tbody>
+    <tfoot tal:condition="view.actionWidgets">
+      <tr tal:condition="view.batching">
+        <td colspan="#"
+            tal:attributes="colspan columns"
+            tal:content="structure view.batching">
+        </td>
+      </tr>
+      <tr>
+        <td colspan="3"
+            tal:attributes="colspan columns">
+          <span tal:repeat="widget view.fieldWidgets">
+            <label tal:attributes="for widget.htmlId()"
+                   tal:content="widget.title">
+              Field Name
+            </label>
+            <span class="required"
+                  tal:condition="widget.required"
+                  i18n:translate="">
+              required
+            </span>
+            <span class="error"
+                 tal:condition="widget.error"
+                 tal:content="structure widget.error.title">
+              Validation error.
+            </span>
+            <tal:widget tal:content="structure widget.render()">
+              Widget.
+            </tal:widget>
+          </span>
+
+          <input tal:repeat="widget view.actionWidgets"
+                 tal:replace="structure widget.render()" />
+
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+</form>
