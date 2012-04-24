@@ -4,6 +4,9 @@
 
 from five import grok
 from zope.interface import Interface
+from zope.publisher.interfaces.browser import IDefaultBrowserLayer
+
+from js.jqueryui import jqueryui
 
 from zeam.form.base.interfaces import IWidget, IWidgetExtractor
 from zeam.form.base.markers import NO_VALUE
@@ -14,8 +17,12 @@ from zeam.form.ztk.widgets.collection import newCollectionWidgetFactory
 from zeam.form.ztk.widgets.textline import TextLineSchemaField
 from zeam.form.ztk.widgets.object import ObjectSchemaField
 from zeam.form.ztk.widgets.object import ObjectFieldWidget
+from zeam.form.ztk.widgets.choice import ChoiceFieldWidget
 from zeam.form.silva.interfaces import ISMIForm
+
+from silva.core import conf as silvaconf
 from silva.core.interfaces.adapters import IIconResolver
+from silva.fanstatic import need
 
 
 class IconDisplayWidget(SchemaFieldWidget):
@@ -59,7 +66,8 @@ grok.global_adapter(
 
 
 class LinesWidget(SchemaFieldWidget):
-    grok.adapts(ICollectionSchemaField, TextLineSchemaField, Interface, Interface)
+    grok.adapts(
+        ICollectionSchemaField, TextLineSchemaField, Interface, Interface)
     grok.name('lines')
 
     def __init__(self, field, value_field,form, request):
@@ -71,7 +79,8 @@ class LinesWidget(SchemaFieldWidget):
 
 
 class LinesWidgetExtractor(WidgetExtractor):
-    grok.adapts(ICollectionSchemaField, TextLineSchemaField, Interface, Interface)
+    grok.adapts(
+        ICollectionSchemaField, TextLineSchemaField, Interface, Interface)
     grok.name('lines')
 
     def __init__(self, field, value_field,form, request):
@@ -87,3 +96,16 @@ class LinesWidgetExtractor(WidgetExtractor):
                            map(lambda s: s.strip('\r'),
                                value.split('\n'))))
         return (value, errors)
+
+
+class IComboBoxResources(IDefaultBrowserLayer):
+    silvaconf.resource(jqueryui)
+    silvaconf.resource('combobox.js')
+
+
+class ComboBoxFieldWidget(ChoiceFieldWidget):
+    grok.name('combobox')
+
+    def update(self):
+        need(IComboBoxResources)
+        super(ComboBoxFieldWidget, self).update()
