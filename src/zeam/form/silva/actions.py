@@ -41,7 +41,10 @@ class EditAction(BaseEditAction):
         try:
             status = super(EditAction, self).__call__(form)
         except ValueError, error:
-            form.send_message(error.args[0], type="error")
+            if interfaces.ISilvaFormData.providedBy(form):
+                form.send_message(error.args[0], type="error")
+            else:
+                form.status = error.args[0]
             return FAILURE
         if interfaces.ISilvaFormData.providedBy(form):
             if status is SUCCESS:
