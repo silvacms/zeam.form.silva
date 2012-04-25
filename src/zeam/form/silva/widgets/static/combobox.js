@@ -1,4 +1,4 @@
-(function($) {
+(function($, infrae) {
 
     var create_combobox_field = function() {
         var $field = $(this);
@@ -15,7 +15,9 @@
 			source: function(request, response) {
 				var matcher = new RegExp($.ui.autocomplete.escapeRegex(request.term), "i");
 				response($select.children("option").map(function() {
-					var text = $(this).text();
+                    var $option = $(this);
+					var text = $option.text();
+
 					if (this.value && (!request.term || matcher.test(text)))
 						return {
 							label: text.replace(
@@ -24,6 +26,7 @@
 										$.ui.autocomplete.escapeRegex(request.term) +
 										")(?![^<>]*>)(?![^&;]+;)", "gi"
 								), "<strong>$1</strong>" ),
+                            icon: $option.data('combobox-icon'),
 							value: text,
 							option: this
 						};
@@ -56,10 +59,24 @@
 			}
 		});
 
+        $input.data("autocomplete")._resizeMenu = function() {
+		    var $ul = this.menu.element;
+		    $ul.outerWidth( Math.max(
+			    $ul.width( "" ).outerWidth() + 20,
+			    this.element.outerWidth()
+		    ) );
+	    };
+
 		$input.data("autocomplete")._renderItem = function(ul, item) {
-			return $("<li><a>" + item.label + "</a></li>")
-				.data("item.autocomplete", item)
-				.appendTo(ul);
+            var $item = $('<li><a>' + item.label + "</a></li>");
+
+            if (item.icon) {
+                var $icon = $('<ins class="icon" />');
+
+                infrae.ui.icon($icon, item.icon);
+                $item.prepend($icon);
+            };
+			return $item.data("item.autocomplete", item).appendTo(ul);
 		};
 		$opener.click(function() {
 			// close if already visible
@@ -83,4 +100,4 @@
         $('.field-combobox').each(create_combobox_field);
     });
 
-})(jQuery);
+})(jQuery, infrae);

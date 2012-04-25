@@ -10,10 +10,11 @@
   <input class="combobox-input" value="" />
   <select name="#" class="combobox-values"
           tal:attributes="name widget.identifier">
-    <option value="#"
+    <option value="#" data-combobox-icon="#"
             tal:repeat="choice widget.choices()"
             tal:attributes="value choice.token;
-                            selected choice.token == value and 'selected' or None"
+                            selected choice.token == value and 'selected' or None;
+                            data-combobox-icon getattr(choice, 'icon', None)"
             tal:content="choice.title or choice.value">
       Option
     </option>
