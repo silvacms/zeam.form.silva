@@ -61,8 +61,9 @@
 
         $input.data("autocomplete")._resizeMenu = function() {
 		    var $ul = this.menu.element;
+            // 20 pixels to let place for icon, 20 for scroll bar
 		    $ul.outerWidth( Math.max(
-			    $ul.width( "" ).outerWidth() + 20,
+			    $ul.width( "" ).outerWidth() + 40,
 			    this.element.outerWidth()
 		    ) );
 	    };
