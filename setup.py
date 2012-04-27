@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '1.2-bethel.6'
+version = '1.2-bethel.7'
 
 
 setup(name='zeam.form.silva',

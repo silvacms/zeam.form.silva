@@ -1,6 +1,13 @@
 Changes
 =======
 
+1.2-bethel.7 (unreleased)
+-------------------------
+
+* zmisubforms now include a 'name' attribute on <form>, which is
+  the prefix of the form.  Useful for functional tests with
+  zope.testbrowser.
+
 1.2-bethel.6 (2012-03-27)
 -------------------------
 
