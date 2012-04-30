@@ -1,7 +1,7 @@
 Changes
 =======
 
-1.2-bethel.7 (unreleased)
+1.2-bethel.7 (2012-04-30)
 -------------------------
 
 * zmisubforms now include a 'name' attribute on <form>, which is
