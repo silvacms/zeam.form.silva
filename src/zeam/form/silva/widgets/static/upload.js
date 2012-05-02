@@ -81,7 +81,7 @@
             };
         }
 
-        var poll_error = function(jqXHR, textStatus, errorThrown) { 
+        var poll_error = function(jqXHR, textStatus, errorThrown) {
             retries += 1;
             if (retries > options.max_retries) {
                 abort_upload(options.errors.too_many_retries);
@@ -91,14 +91,14 @@
         }
 
         var _poll_status = function() {
-            var url = (options.stat_url + upload_id + '?q=' + (Math.random() * 1000000000000000000));
+            var url = options.stat_url + upload_id;
             $.ajax({
                 type: 'GET',
                 dataType: 'json',
                 timeout: options.stat_timeout,
                 url: url,
                 success: poll_success,
-                error: poll_error, 
+                error: poll_error
             });
         }
 
