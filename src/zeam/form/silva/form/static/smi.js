@@ -92,6 +92,7 @@
         var Popup = function($popup, extra_array) {
             var popup = {};
             var close = $.Deferred();
+            var closing = false;
             var $form = null;
 
             var cleanup_form = function() {
@@ -154,6 +155,11 @@
             $popup.bind('dialogclose', function() {
                 cleanup_form();
                 $popup.remove();
+                // If closing is false, that means the user closed the
+                // popup by clicking on the close on top of the popup.
+                if (closing === false) {
+                    close.reject({});
+                };
             });
 
             $.extend(popup, {
@@ -170,6 +176,7 @@
                         });
                 },
                 close: function(data) {
+                    closing = true;
                     $popup.dialog('close');
                     return close.resolve(data);
                 },
