@@ -190,6 +190,7 @@
                             // In case of error, close the popup (to
                             // trigger the cleaning), return an reject
                             // not to display it.
+                            closing = true;
                             $popup.dialog('close');
                             return close.reject(request);
                         });
