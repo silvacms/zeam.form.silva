@@ -185,7 +185,12 @@
                 },
                 from_url: function(url) {
                     return smi.ajax.query(url).pipe(
-                        popup.from_data,
+                        function (data) {
+                            if (infrae.interfaces.is_implemented_by('popup', data)) {
+                                return popup.from_data(data);
+                            };
+                            return popup.close(data);
+                        },
                         function (request) {
                             // In case of error, close the popup (to
                             // trigger the cleaning), return an reject
