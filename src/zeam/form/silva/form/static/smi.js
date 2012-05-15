@@ -161,6 +161,9 @@
                     close.reject({});
                 };
             });
+            $popup.delegate('a.open-screen', 'click', function(event) {
+                $popup.dialog('close');
+            });
 
             $.extend(popup, {
                 display: function(builder) {
