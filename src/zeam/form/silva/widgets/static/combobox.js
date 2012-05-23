@@ -99,8 +99,4 @@
         event.stopPropagation();
     });
 
-    $(document).ready(function() {
-        $('.field-combobox').each(create_combobox_field);
-    });
-
 })(jQuery, infrae);

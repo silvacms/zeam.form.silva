@@ -128,8 +128,4 @@
         event.stopPropagation();
     });
 
-    $(document).ready(function(){
-        $('div.widget-crop').each(create_cropping_field);
-    });
-
 })(infrae, jQuery);

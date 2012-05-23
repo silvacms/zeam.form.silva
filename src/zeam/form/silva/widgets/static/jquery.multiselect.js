@@ -305,7 +305,10 @@ $.widget("ui.multiselect", {
 		})
 		.keyup(function() {
 			that._filter.apply(this, [that.availableList]);
-		});
+		})
+        .bind('search', function() {
+            that._filter.apply(this, [that.availableList]);
+        });
 	}
 });
 

@@ -80,8 +80,4 @@
         event.stopPropagation();
     });
 
-    $(document).ready(function() {
-        $('.field-datetime').each(create_datetime_field);
-    });
-
 })(jQuery);

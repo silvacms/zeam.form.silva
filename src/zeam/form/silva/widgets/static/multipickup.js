@@ -11,8 +11,4 @@
         event.stopPropagation();
     });
 
-    $(document).ready(function() {
-        $('.field-multipickup').each(create_multipickup_field);
-    });
-
 })(jQuery, infrae);
