@@ -3,7 +3,7 @@
 
     var create_multipickup_field = function() {
         var $field = $(this);
-        $field.multiselect({sortable: false, doubleClickable: false});
+        $field.multiselect({sortable: false});
     };
 
     $('.form-fields-container').live('loadwidget-smiform', function(event) {

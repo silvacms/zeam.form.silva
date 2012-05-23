@@ -7,7 +7,7 @@
         var $opener = $field.children('a.combobox-opener');
 
 	    var selected = $select.children(":selected");
-	    var value = selected.val() ? selected.text() : "";
+	    var value = selected.text();
 
 		$input.val(value).autocomplete({
 			delay: 0,
@@ -18,7 +18,7 @@
                     var $option = $(this);
 					var text = $option.text();
 
-					if (this.value && (!request.term || matcher.test(text)))
+					if (!request.term || matcher.test(text)) {
 						return {
 							label: text.replace(
 								new RegExp(
@@ -30,6 +30,7 @@
 							value: text,
 							option: this
 						};
+                    };
 				}));
 			},
 			select: function(event, ui) {
@@ -79,6 +80,7 @@
             };
 			return $item.data("item.autocomplete", item).appendTo(ul);
 		};
+        $input.autocomplete('widget').zIndex($input.zIndex() + 1);
 		$opener.click(function() {
 			// close if already visible
 			if ($input.autocomplete("widget").is(":visible") ) {

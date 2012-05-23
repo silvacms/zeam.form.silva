@@ -106,7 +106,6 @@ class LinesWidgetExtractor(WidgetExtractor):
 
 class IMultiPickupFieldResources(IDefaultBrowserLayer):
     silvaconf.resource(jqueryui)
-    silvaconf.resource('jquery.multiselect.css')
     silvaconf.resource('jquery.multiselect.js')
     silvaconf.resource('multipickup.js')
 
