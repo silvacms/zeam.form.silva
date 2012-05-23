@@ -1,0 +1,107 @@
+/* Multiselect
+----------------------------------*/
+
+.ui-multiselect {
+    font-size: 0.8em;
+}
+.ui-multiselect div.ui-multiselect-container {
+    position: relative;
+    float:left;
+    height: 228px;
+    padding: 0;
+    margin: 0;
+    border: solid 1px #CCC;
+    background: #FFF;
+}
+.ui-multiselect ul {
+    -moz-user-select: none;
+    position: relative;
+    display: block;
+    max-height: 200px;
+    overflow: auto;
+    overflow-x: hidden;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    list-style: none;
+}
+.ui-multiselect li {
+    margin: 0; padding: 0;
+    cursor: default;
+    line-height: 20px;
+    height: 20px;
+    font-size: 11px;
+    list-style: none;
+}
+.ui-multiselect li a {
+    color: #999;
+    text-decoration: none;
+    padding: 0;
+    display: block;
+    float: left;
+    cursor: pointer;
+}
+.ui-multiselect li.ui-draggable-dragging {
+    padding-left: 10px;
+}
+
+.ui-multiselect div.ui-multiselect-selected {
+}
+.ui-multiselect ul.ui-multiselect-selected {
+}
+.ui-multiselect div.ui-multiselect-available {
+    border-left: 0px;
+}
+.ui-multiselect ul.ui-multiselect-available {
+}
+.ui-multiselect ul.ui-multiselect-available li {
+}
+
+.ui-multiselect .ui-state-default {
+    border: none;
+    margin-bottom: 1px;
+    position: relative;
+    padding-left: 20px;
+}
+.ui-multiselect .ui-state-hover {
+    border: none;
+}
+.ui-multiselect .ui-widget-header {
+    border: none;
+    font-size: 11px;
+    margin-bottom: 1px;
+}
+
+.ui-multiselect .add-all {
+    float: right;
+    padding: 7px;
+}
+.ui-multiselect .remove-all {
+    float: right;
+    padding: 7px;
+}
+.ui-multiselect .search {
+    float: left;
+    padding: 4px;
+}
+.ui-multiselect .count {
+    float: left;
+    padding: 7px;
+}
+
+.ui-multiselect li span.ui-icon-arrowthick-2-n-s {
+    position: absolute;
+    left: 2px;
+}
+.ui-multiselect li a.ui-multiselect-action {
+    position: absolute;
+    right: 2px;
+    top: 2px;
+}
+.ui-multiselect input.search {
+    height: 14px;
+    padding: 1px;
+    opacity: 0.5;
+    margin: 4px;
+    width: 100px;
+}

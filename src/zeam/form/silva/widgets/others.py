@@ -14,6 +14,7 @@ from zeam.form.base.widgets import WidgetExtractor
 from zeam.form.ztk.fields import SchemaFieldWidget
 from zeam.form.ztk.interfaces import ICollectionSchemaField
 from zeam.form.ztk.widgets.collection import newCollectionWidgetFactory
+from zeam.form.ztk.widgets.collection import MultiSelectFieldWidget
 from zeam.form.ztk.widgets.textline import TextLineSchemaField
 from zeam.form.ztk.widgets.object import ObjectSchemaField
 from zeam.form.ztk.widgets.object import ObjectFieldWidget
@@ -57,6 +58,11 @@ grok.global_adapter(
     provides=IWidget,
     name='lines')
 
+grok.global_adapter(
+    newCollectionWidgetFactory(mode='multipickup'),
+    adapts=(ICollectionSchemaField, Interface, Interface),
+    provides=IWidget,
+    name='multipickup')
 
 grok.global_adapter(
     newCollectionWidgetFactory(mode='lines', interface=IWidgetExtractor),
@@ -96,6 +102,25 @@ class LinesWidgetExtractor(WidgetExtractor):
                            map(lambda s: s.strip('\r'),
                                value.split('\n'))))
         return (value, errors)
+
+
+class IMultiPickupFieldResources(IDefaultBrowserLayer):
+    silvaconf.resource(jqueryui)
+    silvaconf.resource('jquery.multiselect.css')
+    silvaconf.resource('jquery.multiselect.js')
+    silvaconf.resource('multipickup.js')
+
+
+class MultiPickupFieldWidget(MultiSelectFieldWidget):
+    grok.name('multipickup')
+
+    def update(self):
+        need(IMultiPickupFieldResources)
+        super(MultiPickupFieldWidget, self).update()
+
+    def htmlClass(self):
+        return (super(MultiPickupFieldWidget, self).htmlClass() +
+                ' field-multipickup')
 
 
 class IComboBoxResources(IDefaultBrowserLayer):
