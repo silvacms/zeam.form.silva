@@ -232,4 +232,8 @@
         event.stopPropagation();
     });
 
+    $(document).ready(function() {
+        $('.upload-file').each(create_upload_field);
+    });
+
 })(jQuery);
