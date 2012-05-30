@@ -16,6 +16,7 @@ from zeam.form.ztk.interfaces import ICollectionSchemaField
 from zeam.form.ztk.widgets.collection import newCollectionWidgetFactory
 from zeam.form.ztk.widgets.collection import MultiSelectFieldWidget
 from zeam.form.ztk.widgets.textline import TextLineSchemaField
+from zeam.form.ztk.widgets.uri import URISchemaField
 from zeam.form.ztk.widgets.object import ObjectSchemaField
 from zeam.form.ztk.widgets.object import ObjectFieldWidget
 from zeam.form.ztk.widgets.choice import ChoiceFieldWidget
@@ -84,6 +85,10 @@ class LinesWidget(SchemaFieldWidget):
         return u'\n'.join(value)
 
 
+class LinesURIWidget(LinesWidget):
+    grok.adapts(ICollectionSchemaField, URISchemaField, Interface, Interface)
+
+
 class LinesWidgetExtractor(WidgetExtractor):
     grok.adapts(
         ICollectionSchemaField, TextLineSchemaField, Interface, Interface)
@@ -102,6 +107,10 @@ class LinesWidgetExtractor(WidgetExtractor):
                            map(lambda s: s.strip('\r'),
                                value.split('\n'))))
         return (value, errors)
+
+
+class LinesURIWidgetExtractor(LinesWidgetExtractor):
+    grok.adapts(ICollectionSchemaField, URISchemaField, Interface, Interface)
 
 
 class IMultiPickupFieldResources(IDefaultBrowserLayer):
