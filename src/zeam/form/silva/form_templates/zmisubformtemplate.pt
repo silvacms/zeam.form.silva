@@ -1,5 +1,7 @@
-<form action="." tal:attributes="action request/URL" method="post"
-      enctype="multipart/form-data">
+<form action="#" name="#"
+      enctype="multipart/form-data" method="post"
+      tal:attributes="name view/prefix;
+                      action request/URL" >
 
   <p class="system-msg"
      tal:condition="view/status"
