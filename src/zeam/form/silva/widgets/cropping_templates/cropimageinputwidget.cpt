@@ -1,7 +1,7 @@
 <div class="widget-crop"
      i18n:domain="silva">
   <div class="widget-crop-popup" title="${widget.title}" style="display:none">
-    <p>
+    <div>
       <img class="widget-crop-image" src="${widget.url}" />
       <div class="widget-crop-popup-options">
         <br />
@@ -13,7 +13,7 @@
                  i18n:translate="">keep proportions</label>
         </span>
       </div>
-    </p>
+    </div>
   </div>
   <input type="text"
          class="${widget.htmlClass()}"
