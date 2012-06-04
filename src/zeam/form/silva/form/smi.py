@@ -31,7 +31,7 @@ from silva.core import conf as silvaconf
 from silva.core.conf.interfaces import ITitledContent
 from silva.core.conf.utils import getFactoryName
 from silva.core.views import views as silvaviews
-from silva.core.interfaces.content import IVersionedContent
+from silva.core.interfaces.content import IVersionedObject
 from silva.ui.interfaces import ISilvaUIDependencies
 from silva.translations import translate as _
 from silva.ui.rest import PageREST, RedirectToPage
@@ -283,7 +283,7 @@ class SMIEditForm(SMIForm):
         the permission to edit it.
         """
         original_content = content
-        if IVersionedContent.providedBy(original_content):
+        if IVersionedObject.providedBy(original_content):
             content = original_content.get_editable()
             if content is None:
                 self.mode = DISPLAY
