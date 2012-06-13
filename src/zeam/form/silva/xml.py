@@ -1,10 +1,15 @@
 
+import logging
+
 from zeam import component
 from zeam.form.base.interfaces import IFormData
 from zeam.form.silva.interfaces import IXMLFormSerialization
 from zeam.form.silva.interfaces import IXMLFieldSerializer
 from zeam.form.silva.interfaces import IXMLFieldDeserializer
+from Products.Formulator.Errors import ValidationError
 from Products.Formulator.zeamsupport import IFormulatorField
+
+logger = logging.getLogger('silva.core.xml')
 
 
 class FieldSerializer(component.Component):
@@ -39,8 +44,13 @@ class FieldDeserializer(component.Component):
         self.form = form
 
     def deserialize(self, data, context=None):
-        return self.field.validator.deserializeValue(
-            self.field, data, context=context)
+        try:
+            return self.field.validator.deserializeValue(
+                self.field, data, context=context)
+        except ValidationError as error:
+            logger.error(
+                u'Cannot set Formulator field value %s: %s',
+                self.field.getId(), str(error.error_text))
 
     def write(self, value):
         self.form.getContentData().set(self.identifier, value)
