@@ -40,7 +40,6 @@ class SilvaForm(HTTPHeaderView, SilvaFormData):
         return self.render()
 
     def __call__(self):
-        self.setHTTPHeaders()
         convert_request_form_to_unicode(self.request.form)
 
         self.layout = component.getMultiAdapter(
