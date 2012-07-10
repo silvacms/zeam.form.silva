@@ -18,13 +18,6 @@ from zeam.form.base.markers import DISPLAY, SUCCESS, FAILURE, NO_VALUE
 from zeam.form.ztk import validation
 from zeam.form.composed.form import SubFormGroupBase
 
-from zeam.form.silva.actions import CancelAddAction, CancelEditAction
-from zeam.form.silva.actions import EditAction, ExtractedDecoratedAction
-from zeam.form.silva.datamanager import SilvaDataManager
-from zeam.form.silva.interfaces import ISMIForm, IDefaultAction
-from zeam.form.silva.utils import SilvaFormData
-from zeam.form.silva.utils import convert_request_form_to_unicode
-
 from Products.Silva.ExtensionRegistry import extensionRegistry
 
 from silva.core import conf as silvaconf
@@ -35,6 +28,13 @@ from silva.core.interfaces.content import IVersionedObject
 from silva.ui.interfaces import ISilvaUIDependencies
 from silva.translations import translate as _
 from silva.ui.rest import PageREST, RedirectToPage
+
+from ..actions import CancelAddAction, CancelEditAction, CancelAction
+from ..actions import EditAction, ExtractedDecoratedAction
+from ..datamanager import SilvaDataManager
+from ..interfaces import ISMIForm, IDefaultAction
+from ..utils import SilvaFormData
+from ..utils import convert_request_form_to_unicode
 
 
 class IFormSilvaUIResources(ISilvaUIDependencies):
@@ -157,6 +157,40 @@ class SMISubForm(SilvaFormData, composed.SubForm):
 
     def get_content_path(self, content):
         return self.parent.get_content_path(content)
+
+
+class SMISubEditForm(SMISubForm):
+    grok.baseclass()
+    grok.require('silva.ReadSilvaContent')
+
+    dataManager = SilvaDataManager
+    ignoreContent = False
+    actions = Actions(
+        CancelAction(),
+        EditAction())
+
+    def setContentData(self, content):
+        """Set edited content. If the content is a versioned content,
+        choose the correct version. This can change the form display
+        mode, if the content is only previewable, or if you don't have
+        the permission to edit it.
+        """
+        original = content
+        if IVersionedObject.providedBy(original):
+            content = original.get_editable()
+            if content is None:
+                self.mode = DISPLAY
+                content = original.get_previewable()
+
+        super(SMISubEditForm, self).setContentData(content)
+
+    def update(self):
+        # If you don't have the permission to edit the content, then
+        # you don't. This can't be done in setContentData, as this is
+        # called before security is verified.
+        content = self.getContentData().content
+        if not checkPermission('silva.ChangeSilvaContent', content):
+            self.mode = DISPLAY
 
 
 class SMISubFormTemplate(pt.PageTemplate):
@@ -282,17 +316,20 @@ class SMIEditForm(SMIForm):
         mode, if the content is only previewable, or if you don't have
         the permission to edit it.
         """
-        original_content = content
-        if IVersionedObject.providedBy(original_content):
-            content = original_content.get_editable()
+        original = content
+        if IVersionedObject.providedBy(original):
+            content = original.get_editable()
             if content is None:
                 self.mode = DISPLAY
-                content = original_content.get_previewable()
+                content = original.get_previewable()
 
         super(SMIEditForm, self).setContentData(content)
 
     def update(self):
         # If you don't have the permission to edit the content, then
-        # you don't.
-        if not checkPermission('silva.ChangeSilvaContent', self.getContentData().content):
+        # you don't. This can't be done in setContentData, as this is
+        # called before security is verified.
+        content = self.getContentData().content
+        if not checkPermission('silva.ChangeSilvaContent', content):
             self.mode = DISPLAY
+
