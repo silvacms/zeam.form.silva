@@ -8,6 +8,7 @@ from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 
 from js.jqueryui import jqueryui
 
+from zeam.form.base import DISPLAY
 from zeam.form.base.interfaces import IWidget, IWidgetExtractor
 from zeam.form.base.markers import NO_VALUE
 from zeam.form.base.widgets import WidgetExtractor
@@ -51,6 +52,10 @@ class IconEditDisplayWidget(IconDisplayWidget):
 
 class ObjectFieldWidget(ObjectFieldWidget):
     grok.adapts(ObjectSchemaField, Interface, Interface)
+
+
+class DisplayObjectFieldWidget(ObjectFieldWidget):
+    grok.name(unicode(DISPLAY))
 
 
 grok.global_adapter(
