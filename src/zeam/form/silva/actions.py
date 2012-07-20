@@ -108,7 +108,7 @@ class CancelAction(Action):
     """A action to cancel
     """
     grok.implements(interfaces.IRESTCloseAction, interfaces.ICancelerAction)
-    title = _(u"Cancel")
+    title = _(u"Back")
     description = _(u"go back to the folder view")
     accesskey = u'ctrl+z'
 
@@ -127,12 +127,9 @@ class CancelAddAction(CancelAction):
         u"go back to the folder view without adding the content")
 
 
-
 class CancelEditAction(CancelAction):
     """Cancel an edit action.
     """
-    description = _(
-        u"go back to the folder view without editing the content")
 
     def getRedirectedContent(self, form):
         content = form.context
