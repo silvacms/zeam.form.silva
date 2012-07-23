@@ -64,7 +64,7 @@
                     data: values,
                     success: function(data) {
                         var key, errors = data['errors'];
-                        $field.find('.form-error-detail').remove();
+                        $field.find('.form-error-message').remove();
 
                         if (data['success']) {
                             // Success, clear the errors
@@ -75,8 +75,8 @@
                         $field.addClass('form-error');
                         if (errors) {
                             for (key in errors) {
-                                find_sub_field('div[data-field-prefix="' + key + '"]').prepend(
-                                    '<div class="form-error-detail"><p>' + errors[key] +'</p></div>');
+                                find_sub_field('div[data-field-prefix="' + key + '"]').after(
+                                    '<div class="form-error-message"><div class="form-error-detail"><p>' + errors[key] +'</p></div></div>');
                             };
                         };
                     }
