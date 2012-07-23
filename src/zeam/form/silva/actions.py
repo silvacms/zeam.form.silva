@@ -86,7 +86,7 @@ class SMIActionWidget(ActionWidget):
         super(SMIActionWidget, self).update()
         self.is_default = interfaces.IDefaultAction.providedBy(self.component)
         self.css_class = ''
-        self.icon = 'ui-state-default ui-icon-radio-on'
+        self.icon = 'ui-icon ui-icon-radio-on'
         if self.is_default:
             self.icon = 'icon form_check'
             self.css_class = 'default-form-control'
