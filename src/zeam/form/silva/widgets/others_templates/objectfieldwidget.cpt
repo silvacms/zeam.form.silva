@@ -1,6 +1,6 @@
 <div class="field-object">
   <tal:widgets tal:repeat="objectWidget widget.objectWidgets">
-      <div class="form-section ${objectWidget.error and 'form-error' or ''}"
+      <div class="form-section ui-helper-clearfix ${objectWidget.error and 'form-error' or ''}"
            data-field-prefix="#"
            tal:condition="objectWidget.isVisible()"
            tal:attributes="data-field-prefix objectWidget.identifier">
