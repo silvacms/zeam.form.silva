@@ -36,6 +36,7 @@ class RefreshExtraPayload(grok.Adapter):
 
 class PopupCanvas(helper.UIHelper, SilvaFormData, FormCanvas):
     grok.baseclass()
+    novalidation = False
 
     def update(self):
         pass
@@ -85,7 +86,8 @@ class PopupCanvas(helper.UIHelper, SilvaFormData, FormCanvas):
                  'prefix': self.prefix,
                  'actions': actions,
                  'url': absoluteURL(self, self.request),
-                 'default_action': findDefault(actions)})
+                 'default': findDefault(actions),
+                 'validation': not self.novalidation})
         return {'content': info}
 
     def renderForm(self):
@@ -128,7 +130,7 @@ class PopupForm(PopupCanvas, Form):
         """Popup form as a view.
         """
         self.response.setHeader('Content-Type', 'application/json')
-        return json.dumps(self.updateForm())
+        return json.dumps(self.renderForm())
 
 
 class RESTFormTemplate(pt.PageTemplate):

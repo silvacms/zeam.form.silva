@@ -136,6 +136,9 @@
                                 return popup.close(data).done(function(data) {
                                     return $(document).render({data: data, args: [smi]});
                                 });
+                            }, function(request) {
+                                // On error, just close the popup.
+                                popup.close({});
                             });
                         break;
                     case 'close':
@@ -211,6 +214,9 @@
                     cleanup_form();
                     $form = $('<form class="form-content form-fields-container" />');
                     $form.attr('data-form-url', data.url);
+                    if (!data.validation) {
+                        $form.attr('data-form-novalidation', 'true');
+                    };
                     $form.attr('name', data.prefix);
                     $form.html(data['widgets']);
                     // Add an empty input submit to activate form submission with enter
@@ -223,7 +229,7 @@
                         var callback = create_callback(submit_url, data['actions'][i]);
 
                         buttons[label] = callback;
-                        if (data['actions'][i]['name'] == data['default_action']) {
+                        if (data['actions'][i]['name'] == data['default']) {
                             $form.bind('submit', callback);
                         };
                     };
@@ -303,7 +309,13 @@
         });
 
         // Inline Validation
-        $form.find('.form-section').each(create_validator);
+        $form.find('form').each(function() {
+            var $form = $(this);
+
+            if (!$form.data('form-novalidation')) {
+                $form.find('.form-section').each(create_validator);
+            };
+        });
     };
 
     // Prepare forms
