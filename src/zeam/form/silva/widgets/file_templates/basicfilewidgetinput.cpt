@@ -1,0 +1,31 @@
+<div class="upload-file"
+     tal:define="html_id widget.htmlId();
+                 present widget.valueStatus()"
+     i18n:domain="silva">
+  <tal:change tal:condition="present">
+    <input type="radio" value="change"
+           name="${widget.identifier}.change"
+           id="${html_id}-change" />
+    <label for="${html_id}-change" i18n:translate="">
+      Upload a new file
+    </label>
+    <br />
+    <input type="radio" value="keep" checked="checked"
+           name="${widget.identifier}.change"
+           id="${html_id}-keep" />
+    <label for="${html_id}-keep" i18n:translate="">
+      Keep the current file
+    </label>
+    <br />
+    <tal:erase>
+      <input type="radio" value="erase"
+             name="${widget.identifier}.change"
+             id="${html_id}-erase" />
+      <label for="${html_id}-erase" i18n:translate="">
+        Remove the current file
+      </label>
+      <br />
+    </tal:erase>
+  </tal:change>
+  <input type="file" name="${widget.identifier}" id="${html_id}" />
+</div>

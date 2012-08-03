@@ -22,10 +22,12 @@ from silva.core.interfaces.adapters import IIconResolver
 from silva.fanstatic import need
 from silva.translations import translate as _
 
+from zeam.form.base.errors import Error
 from zeam.form.base.markers import NO_VALUE, NO_CHANGE
 from zeam.form.base.widgets import WidgetExtractor
 from zeam.form.ztk.fields import SchemaField, SchemaFieldWidget
 from zeam.form.ztk.fields import registerSchemaField
+from zeam.form.silva.interfaces import ISMIForm
 
 
 logger = logging.getLogger('silva.upload')
@@ -42,13 +44,62 @@ class FileSchemaField(SchemaField):
     fileNotSetLabel = _(u'Not set, please upload a file.')
 
 
+class BasicFileWidgetInput(SchemaFieldWidget):
+    grok.adapts(FileSchemaField, Interface, Interface)
+    grok.name('input')
+
+    def prepareContentValue(self, value):
+        formatted_value = u''
+        if value is not NO_VALUE:
+            formatted_value = self.valueToUnicode(NO_CHANGE)
+        return {self.identifier: formatted_value}
+
+    def prepareRequestValue(self, value, extractor):
+        formatted_value = u''
+        if (value.get(self.identifier + '.change') in ['change', 'keep'] or
+            bool(value.get(self.identifier))):
+            formatted_value = self.valueToUnicode(NO_CHANGE)
+        return {self.identifier: formatted_value}
+
+    def valueStatus(self):
+        value = self.inputValue()
+        if value == u'__NO_CHANGE__':
+            return True
+        return False
+
+    def valueToUnicode(self, value):
+        if value is NO_CHANGE:
+            return u'__NO_CHANGE__'
+        return unicode(value)
+
+
+class BasicFileWidgetExtractor(WidgetExtractor):
+    grok.adapts(FileSchemaField, Interface, Interface)
+
+    def extract(self):
+        operation = self.request.form.get(self.identifier + '.change')
+        if operation == "keep":
+            return NO_CHANGE, None
+        if operation == "erase":
+            return NO_VALUE, None
+        if operation == "change":
+            value = self.request.form.get(self.identifier)
+            if value:
+                return value, None
+            return None, Error("Missing file", identifier=self.identifier)
+        value = self.request.form.get(self.identifier)
+        if value:
+            return value, None
+        return NO_VALUE, None
+
+
 class IUploadResources(IDefaultBrowserLayer):
     silvaconf.resource(jqueryui)
     silvaconf.resource('upload.js')
 
 
 class FileWidgetInput(SchemaFieldWidget):
-    grok.adapts(FileSchemaField, Interface, Interface)
+    grok.adapts(FileSchemaField, ISMIForm, Interface)
     grok.name('input')
 
     def update(self):
@@ -69,11 +120,11 @@ class FileWidgetInput(SchemaFieldWidget):
         value = self.inputValue()
         label = None
         if value:
+            label = self.component.fileSetLabel
             if value != u'__NO_CHANGE__':
                 return {'icon': None,
                         'message': None,
                         'filename': unicode(os.path.basename(value))}
-            label = self.component.fileSetLabel
         else:
             label = self.component.fileNotSetLabel
         icon = IIconResolver(self.request).get_tag(None)
@@ -86,7 +137,7 @@ class FileWidgetInput(SchemaFieldWidget):
 
 
 class FileWidgetExtractor(WidgetExtractor):
-    grok.adapts(FileSchemaField, Interface, Interface)
+    grok.adapts(FileSchemaField, ISMIForm, Interface)
 
     @classmethod
     def upload_dir(cls):
