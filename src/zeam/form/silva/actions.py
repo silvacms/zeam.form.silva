@@ -108,7 +108,7 @@ class CancelAction(Action):
     """A action to cancel
     """
     grok.implements(interfaces.IRESTCloseAction, interfaces.ICancelerAction)
-    title = _(u"Back")
+    title = _(u"Cancel")
     description = _(u"go back to the folder view")
     accesskey = u'ctrl+z'
 
