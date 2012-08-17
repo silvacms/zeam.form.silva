@@ -5,8 +5,6 @@
 from five import grok
 from megrok import pagetemplate as pt
 
-from zope.cachedescriptors.property import CachedProperty
-from zope.i18n.interfaces import IUserPreferredLanguages
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 
 import js.jqueryui
@@ -30,14 +28,6 @@ class ZopeForm(object):
     """
     grok.baseclass()
     dataValidators = [validation.InvariantsValidation]
-
-    @CachedProperty
-    def i18nLanguage(self):
-        adapter = IUserPreferredLanguages(self.request)
-        languages = adapter.getPreferredLanguages()
-        if languages:
-            return languages[0]
-        return 'en'
 
     def __init__(self, context, request):
         super(ZopeForm, self).__init__(context, request)

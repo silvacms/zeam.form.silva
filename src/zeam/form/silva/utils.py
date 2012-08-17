@@ -4,9 +4,7 @@
 # $Id$
 
 from five import grok
-from zope.cachedescriptors.property import CachedProperty
 from zope.component import getUtility
-from zope.i18n.interfaces import IUserPreferredLanguages
 
 from zeam.form.silva.interfaces import ISilvaFormData
 from silva.core.messages.interfaces import IMessageService
@@ -14,14 +12,6 @@ from silva.core.messages.interfaces import IMessageService
 
 class SilvaFormData(object):
     grok.implements(ISilvaFormData)
-
-    @CachedProperty
-    def i18nLanguage(self):
-        adapter = IUserPreferredLanguages(self.request)
-        languages = adapter.getPreferredLanguages()
-        if languages:
-            return languages[0]
-        return 'en'
 
     def send_message(self, message, type=u""):
         service = getUtility(IMessageService)
