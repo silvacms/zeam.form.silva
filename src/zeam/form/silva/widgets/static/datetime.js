@@ -75,9 +75,16 @@
         $field.datepicker($.extend({}, lang_settings, field_settings));
     };
 
-    $('.form-fields-container').live('loadwidget-smiform', function(event) {
-        $(this).find('.field-datetime').each(create_datetime_field);
-        event.stopPropagation();
-    });
+    if (window.smi !== undefined) {
+        $('.form-fields-container').live('loadwidget-smiform', function(event) {
+            $(this).find('.field-datetime').each(create_datetime_field);
+            event.stopPropagation();
+        });
+    } else {
+        // This widget can be used on the public view as well.
+        $(document).ready(function() {
+            $(this).find('.field-datetime').each(create_datetime_field);
+        });
+    };
 
 })(jQuery);
