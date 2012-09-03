@@ -10,7 +10,6 @@ from silva.ui.rest.base import UIREST
 
 from zeam.form.base.errors import Error
 from zeam.form.base.interfaces import IFormCanvas, ICollection, IError
-from zeam.form.base.widgets import getWidgetExtractor
 from zeam.form.composed.interfaces import ISubFormGroup
 from zeam.form.silva.utils import convert_request_form_to_unicode
 from zeam.form.silva.interfaces import IFormLookup
@@ -80,7 +79,7 @@ class RESTValidatorForm(UIREST):
         else:
             # Look for extractor, extract and validate value.
             for field in lookup.fields():
-                extractor = getWidgetExtractor(field, lookup.form, self.request)
+                extractor = lookup.form.widgetFactory.extractor(field)
                 if extractor is not None:
                     if extractor.identifier == fieldname:
                         value, error = extractor.extract()

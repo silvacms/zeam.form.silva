@@ -8,15 +8,17 @@ from five import grok
 from megrok import pagetemplate as pt
 from zope.interface import Interface
 from zope.component import queryMultiAdapter
+from zope.component import getMultiAdapter
 from zope.configuration.name import resolve
 
-from zeam.form.base.form import FormCanvas
-from zeam.form.base.actions import Actions, action
 from zeam.form import composed, table
+from zeam.form.base.actions import Actions, action
 from zeam.form.base.fields import Fields
+from zeam.form.base.form import FormCanvas
+from zeam.form.base.interfaces import IWidget, IAction
 from zeam.form.base.markers import DISPLAY, SUCCESS, FAILURE, NO_VALUE
-from zeam.form.ztk import validation
 from zeam.form.composed.form import SubFormGroupBase
+from zeam.form.ztk import validation
 
 from Products.Silva.ExtensionRegistry import extensionRegistry
 
@@ -32,7 +34,7 @@ from silva.ui.rest import PageREST, RedirectToPage
 from ..actions import CancelAddAction, CancelEditAction, CancelAction
 from ..actions import EditAction, ExtractedDecoratedAction
 from ..datamanager import SilvaDataManager
-from ..interfaces import ISMIForm, IDefaultAction
+from ..interfaces import ISMIForm, IDefaultAction, IDisplayWidgetFactory
 from ..utils import SilvaFormData
 from ..utils import convert_request_form_to_unicode
 
@@ -47,6 +49,26 @@ class SMIFormPortlets(silvaviews.ViewletManager):
     grok.context(Interface)
     grok.view(ISMIForm)
     grok.name('portlets')
+
+
+class SMIDisplayWidgetFactory(object):
+    grok.implements(IDisplayWidgetFactory)
+
+    def __init__(self, form, request):
+        self.form = form
+        self.request = request
+
+    def widget(self, field):
+        if not field.available(self.form):
+            return None
+        mode = 'input' if IAction.providedBy(field) else 'display'
+        return getMultiAdapter(
+            (field, self.form, self.request),
+            IWidget, name=mode)
+
+    def extractor(self, field):
+        # Read-only fields can not be extracted.
+        return None
 
 
 class SMIForm(SilvaFormData, PageREST, FormCanvas):
@@ -179,7 +201,7 @@ class SMISubEditForm(SMISubForm):
         if IVersionedObject.providedBy(original):
             content = original.get_editable()
             if content is None:
-                self.mode = DISPLAY
+                self.widgetFactoryFactory = SMIDisplayWidgetFactory
                 content = original.get_previewable()
 
         super(SMISubEditForm, self).setContentData(content)
@@ -320,7 +342,7 @@ class SMIEditForm(SMIForm):
         if IVersionedObject.providedBy(original):
             content = original.get_editable()
             if content is None:
-                self.mode = DISPLAY
+                self.widgetFactoryFactory = SMIDisplayWidgetFactory
                 content = original.get_previewable()
 
         super(SMIEditForm, self).setContentData(content)

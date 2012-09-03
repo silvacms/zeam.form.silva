@@ -4,7 +4,7 @@
 # $Id$
 
 from zope import interface
-from zeam.form.base.interfaces import IFormData, IAction
+from zeam.form.base.interfaces import IFormData, IAction, IWidgetFactory
 
 
 # Integrate a form in Silva.
@@ -20,6 +20,11 @@ class ISMIForm(ISilvaFormData, IFormData):
     def get_content_path(content):
         """Return the relative path of the content.
         """
+
+
+class IDisplayWidgetFactory(IWidgetFactory):
+    """Create widgets suitable for display only forms.
+    """
 
 
 # Define style for actions

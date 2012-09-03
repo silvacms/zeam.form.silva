@@ -15,38 +15,36 @@ from zeam.form.base import SUCCESS, FAILURE
 from zeam.form.base.actions import Action, DecoratedAction
 from zeam.form.base.interfaces import IFormData, IAction
 from zeam.form.base.widgets import ActionWidget
-from zeam.form.base.markers import getValue, DISPLAY
 from zeam.form.ztk.actions import EditAction as BaseEditAction
 
-from zeam.form.silva import interfaces
+from .interfaces import ISMIForm, ISilvaFormData, IDisplayWidgetFactory
+from .interfaces import IRemoverAction, ICancelerAction, IDefaultAction
+from .interfaces import IRESTCloseOnSuccessAction, IRESTCloseAction
 
 
 class EditAction(BaseEditAction):
     """Edit action
     """
     grok.implements(
-        interfaces.IRESTCloseOnSuccessAction,
-        interfaces.IDefaultAction)
+        IRESTCloseOnSuccessAction,
+        IDefaultAction)
     title = _(u"Save changes")
     description = _(u"save modifications")
     accesskey = u'ctrl+s'
 
     def available(self, form):
-        for field in form.fields:
-            if getValue(field, 'mode', form) != DISPLAY:
-                return True
-        return False
+        return not IDisplayWidgetFactory.providedBy(form.widgetFactory)
 
     def __call__(self, form):
         try:
             status = super(EditAction, self).__call__(form)
         except ValueError, error:
-            if interfaces.ISilvaFormData.providedBy(form):
+            if ISilvaFormData.providedBy(form):
                 form.send_message(error.args[0], type="error")
             else:
                 form.status = error.args[0]
             return FAILURE
-        if interfaces.ISilvaFormData.providedBy(form):
+        if ISilvaFormData.providedBy(form):
             if status is SUCCESS:
                 form.send_message(_(u"Changes saved."), type="feedback")
         return status
@@ -80,11 +78,11 @@ class PopupWidget(ActionWidget):
 
 
 class SMIActionWidget(ActionWidget):
-    grok.adapts(IAction, interfaces.ISMIForm, Interface)
+    grok.adapts(IAction, ISMIForm, Interface)
 
     def update(self):
         super(SMIActionWidget, self).update()
-        self.is_default = interfaces.IDefaultAction.providedBy(self.component)
+        self.is_default = IDefaultAction.providedBy(self.component)
         self.css_class = ''
         self.icon = 'ui-icon ui-icon-radio-on'
         if self.is_default:
@@ -93,7 +91,7 @@ class SMIActionWidget(ActionWidget):
 
 
 class SMILinkActionWidget(SMIActionWidget):
-    grok.adapts(LinkAction, interfaces.ISMIForm, Interface)
+    grok.adapts(LinkAction, ISMIForm, Interface)
 
     def update(self):
         super(SMILinkActionWidget, self).update()
@@ -101,13 +99,13 @@ class SMILinkActionWidget(SMIActionWidget):
 
 
 class SMIRemoverWidget(ActionWidget):
-    grok.adapts(interfaces.IRemoverAction, interfaces.ISMIForm, Interface)
+    grok.adapts(IRemoverAction, ISMIForm, Interface)
 
 
 class CancelAction(Action):
     """A action to cancel
     """
-    grok.implements(interfaces.IRESTCloseAction, interfaces.ICancelerAction)
+    grok.implements(IRESTCloseAction, ICancelerAction)
     title = _(u"Cancel")
     description = _(u"go back to the previous screen")
     accesskey = u'ctrl+z'
@@ -143,7 +141,7 @@ class CancelEditAction(CancelAction):
 class SMICancelWidget(ActionWidget):
     """Widget to style Cancel buttons
     """
-    grok.adapts(interfaces.ICancelerAction, interfaces.ISMIForm, Interface)
+    grok.adapts(ICancelerAction, ISMIForm, Interface)
 
     def update(self):
         super(SMICancelWidget, self).update()
