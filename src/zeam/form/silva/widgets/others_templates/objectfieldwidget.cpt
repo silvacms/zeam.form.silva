@@ -1,4 +1,5 @@
-<div class="field-object">
+<div class="field-object"
+     i18n:domain="silva">
   <tal:widgets tal:repeat="objectWidget widget.objectWidgets">
       <div class="form-section ui-helper-clearfix ${objectWidget.error and 'form-error' or ''}"
            data-field-prefix="#"
