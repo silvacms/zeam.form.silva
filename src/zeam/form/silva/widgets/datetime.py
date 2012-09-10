@@ -5,6 +5,7 @@
 from __future__ import absolute_import
 
 from datetime import datetime
+from datetime import date
 from DateTime import DateTime
 
 from five import grok
@@ -21,6 +22,8 @@ from zeam.form.base.markers import NO_VALUE
 from zeam.form.base.widgets import WidgetExtractor
 from zeam.form.ztk.fields import SchemaFieldWidget
 from zeam.form.ztk.widgets.date import DatetimeSchemaField
+from zeam.form.ztk.widgets.date import DateSchemaField
+
 
 
 class IDateTimeResources(IDefaultBrowserLayer):
@@ -30,6 +33,8 @@ class IDateTimeResources(IDefaultBrowserLayer):
 
 class DateTimeFieldWidget(SchemaFieldWidget):
     grok.adapts(DatetimeSchemaField, Interface, Interface)
+
+    displayTime = True
 
     def update(self):
         need(IDateTimeResources)
@@ -91,3 +96,30 @@ class DateTimeWidgetExtractor(WidgetExtractor):
             return (datetime(year, month, day, hour, minute), None)
         except ValueError, error:
             return (None, _(str(error).capitalize()))
+
+
+class DateFieldWidget(DateTimeFieldWidget):
+    grok.adapts(DateSchemaField, Interface, Interface)
+
+    displayTime = False
+
+    def prepareContentValue(self, value):
+        if value is NO_VALUE:
+            return {self.identifier + '.year': u'',
+                    self.identifier + '.month': u'',
+                    self.identifier + '.day': u'',
+                    self.identifier: u''}
+        return {self.identifier + '.year': u'%d' % value.year,
+                self.identifier + '.month': u'%02d' % value.month,
+                self.identifier + '.day': u'%02d' % value.day,
+                self.identifier: u''}
+
+
+class DateWidgetExtractor(DateTimeWidgetExtractor):
+    grok.adapts(DateSchemaField, Interface, Interface)
+
+    def extract(self):
+        value, error = super(DateWidgetExtractor, self).extract()
+        if error is None:
+            return date(value.year, value.month, value.day), None
+        return value, error

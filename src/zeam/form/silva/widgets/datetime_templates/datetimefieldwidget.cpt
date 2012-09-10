@@ -36,13 +36,16 @@
          size="2" maxlength="2" pattern="[0-9]{2}"
          title="optional hour in 24h format" placeholder="HH"
          tal:attributes="readonly readonly"
-         i18n:attributes="title; placeholder" /> :
+         tal:condition="widget.displayTime"
+         i18n:attributes="title; placeholder" />
+  <span tal:condition="widget.displayTime"> : </span>
   <input id="${id}-min" name="${widget.identifier}.min"
          value="${widget.inputValue('min')}"
          type="text" class="field"
          size="2" maxlength="2" pattern="[0-9]{2}"
          title="optional minute" placeholder="MM"
          tal:attributes="readonly readonly"
+         tal:condition="widget.displayTime"
          i18n:attributes="title; placeholder" />
   <input type="hidden" value="" id="${id}" class="${widget.htmlClass()}"
          name="${widget.identifier}"

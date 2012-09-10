@@ -16,6 +16,7 @@
         var $hour = $('#' + id + '-hour');
         var $minute = $('#' + id + '-min');
         var $remove = $('#' + id + '-remove');
+        var hasTime = ($hour.length > 0);
         var lang = $(document).find('html').attr('lang');
 
         var field_settings = {
@@ -33,12 +34,14 @@
                 $day.val(parts[2]);
                 $month.val(parts[1]);
                 $year.val(parts[0]);
-                if (!$hour.val()) {
-                    $hour.val('00');
-                };
-                if (!$minute.val()) {
-                    $minute.val('00');
-                };
+                if (hasTime) {
+                    if (!$hour.val()) {
+                        $hour.val('00');
+                    };
+                    if (!$minute.val()) {
+                        $minute.val('00');
+                    };
+                }
                 $field.trigger('change');
             },
             beforeShow: function() {
@@ -61,8 +64,10 @@
                 $day.val('');
                 $month.val('');
                 $year.val('');
-                $hour.val('');
-                $minute.val('');
+                if (hasTime) {
+                    $hour.val('');
+                    $minute.val('');
+                }
                 $field.datepicker('setDate', new Date());
                 return false;
             });
@@ -77,13 +82,13 @@
 
     if (window.smi !== undefined) {
         $('.form-fields-container').live('loadwidget-smiform', function(event) {
-            $(this).find('.field-datetime').each(create_datetime_field);
+            $(this).find('.field-datetime, .field-date').each(create_datetime_field);
             event.stopPropagation();
         });
     } else {
         // This widget can be used on the public view as well.
         $(document).ready(function() {
-            $(this).find('.field-datetime').each(create_datetime_field);
+            $(this).find('.field-datetime, .field-date').each(create_datetime_field);
         });
     };
 
