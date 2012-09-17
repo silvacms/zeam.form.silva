@@ -23,7 +23,8 @@
                                  checked checked" />
         </th>
         <th tal:repeat="field view.tableFields"
-            tal:content="field.title">
+            tal:content="field.title"
+            tal:condition="field.available(view)">
           Title
         </th>
       </tr>
