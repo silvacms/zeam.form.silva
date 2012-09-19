@@ -22,11 +22,12 @@
                  tal:attributes="name name;
                                  checked checked" />
         </th>
-        <th tal:repeat="field view.tableFields"
-            tal:content="field.title"
-            tal:condition="field.available(view)">
-          Title
-        </th>
+        <tal:field tal:repeat="field view.tableFields">
+          <th tal:content="field.title"
+              tal:condition="field.available(view)">
+            Title
+          </th>
+        </tal:field>
       </tr>
     </thead>
     <tbody class="form-body">
