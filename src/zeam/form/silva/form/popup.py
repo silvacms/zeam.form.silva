@@ -91,9 +91,6 @@ class PopupCanvas(helper.UIHelper, SilvaFormData, FormCanvas):
         return {'content': info}
 
     def renderForm(self):
-        self.need(helper.get_resources)
-        self.need(helper.get_notifications)
-
         with SMITransaction(self):
             data = self.updateForm()
 
