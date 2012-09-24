@@ -1,10 +1,17 @@
 Changes
 =======
 
-2.0 (unreleased)
-----------------
+2.0c1 (2012/09/24)
+------------------
 
-* ...
+* Add new widgets, combobox, multipickup and a date widget with the
+  jqueryUI date selector.
+
+* Add support for XML serialization.
+
+* Improve form templates and styling.
+
+* Improve the JS (inline validation and form popup) integration.
 
 2.0b1 (2011/11/10)
 ------------------

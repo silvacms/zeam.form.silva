@@ -9,3 +9,14 @@ This packages provides forms for SMI (including default add and edit
 forms for content), ZMI (service configuration forms), and public
 views usage (page forms, and viewlet/content provider forms).
 
+For more information about this, please check the `Silva developer
+documentation`_.
+
+Code repository
+===============
+
+You can find the code of this extension in Mercurial:
+https://hg.infrae.com/zeam.form.silva
+
+.. _Silva developer documentation: http://docs.infrae.com/silva/
+

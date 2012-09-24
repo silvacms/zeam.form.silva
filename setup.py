@@ -1,8 +1,10 @@
+# -*- coding: utf-8 -*-
+# Copyright (c) 2012  Infrae. All rights reserved.
+# See also LICENSE.txt
 from setuptools import setup, find_packages
 import os
 
-version = '2.0dev'
-
+version = '2.0c1'
 
 setup(name='zeam.form.silva',
       version=version,
@@ -44,17 +46,18 @@ setup(name='zeam.form.silva',
         'silva.fanstatic',
         'silva.translations',
         'silva.ui',
+        'zeam.component',
         'zeam.form.base',
         'zeam.form.composed',
         'zeam.form.table',
         'zeam.form.viewlet',
         'zeam.form.ztk [fanstatic]',
-        'zope.cachedescriptors',
+        'zope.configuration',
         'zope.component',
-        'zope.i18n',
         'zope.interface',
         'zope.publisher',
         'zope.traversing',
+        'zope.security',
         ],
       entry_points="""
       [zeam.form.components]
