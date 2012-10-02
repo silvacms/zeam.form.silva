@@ -3,7 +3,7 @@
    name="${widget.identifier}"
    target="${widget.target}"
    title="${widget.description}"
-   data-form-shortcut="${widget.accesskey}">
+   data-form-shortcut="${widget.htmlAttribute('accesskey')}">
   <ins class="${widget.icon}"></ins>
   <tal:label tal:content="widget.title">Label</tal:label>
 </a>

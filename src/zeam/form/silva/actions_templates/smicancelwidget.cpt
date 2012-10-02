@@ -3,7 +3,7 @@
    rel="${widget.screen}"
    title="${widget.description}"
    href="${widget.contentPath}"
-   data-form-shortcut="${widget.accesskey}">
+   data-form-shortcut="${widget.htmlAttribute('accesskey')}">
   <ins class="ui-icon ui-icon-arrowreturnthick-1-w"></ins>
   <tal:label tal:content="widget.title">Label</tal:label>
 </a>

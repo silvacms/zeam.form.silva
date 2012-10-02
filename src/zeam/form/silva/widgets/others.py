@@ -11,14 +11,13 @@ from js.jqueryui import jqueryui
 from zeam.form.base import DISPLAY
 from zeam.form.base.interfaces import IWidget, IWidgetExtractor
 from zeam.form.base.markers import NO_VALUE
-from zeam.form.base.widgets import WidgetExtractor
-from zeam.form.ztk.fields import SchemaFieldWidget
-from zeam.form.ztk.interfaces import ICollectionSchemaField
+from zeam.form.base.widgets import WidgetExtractor, FieldWidget
+from zeam.form.ztk.interfaces import ICollectionField
 from zeam.form.ztk.widgets.collection import newCollectionWidgetFactory
 from zeam.form.ztk.widgets.collection import MultiSelectFieldWidget
-from zeam.form.ztk.widgets.textline import TextLineSchemaField
-from zeam.form.ztk.widgets.uri import URISchemaField
-from zeam.form.ztk.widgets.object import ObjectSchemaField
+from zeam.form.ztk.widgets.textline import TextLineField
+from zeam.form.ztk.widgets.uri import URIField
+from zeam.form.ztk.widgets.object import ObjectField
 from zeam.form.ztk.widgets.object import ObjectFieldWidget
 from zeam.form.ztk.widgets.choice import ChoiceFieldWidget
 from zeam.form.silva.interfaces import ISMIForm
@@ -28,7 +27,7 @@ from silva.core.interfaces.adapters import IIconResolver
 from silva.fanstatic import need
 
 
-class IconDisplayWidget(SchemaFieldWidget):
+class IconDisplayWidget(FieldWidget):
     grok.name('silva.icon')
 
     def update(self):
@@ -51,7 +50,7 @@ class IconEditDisplayWidget(IconDisplayWidget):
 
 
 class ObjectFieldWidget(ObjectFieldWidget):
-    grok.adapts(ObjectSchemaField, Interface, Interface)
+    grok.adapts(ObjectField, Interface, Interface)
 
 
 class DisplayObjectFieldWidget(ObjectFieldWidget):
@@ -60,48 +59,38 @@ class DisplayObjectFieldWidget(ObjectFieldWidget):
 
 grok.global_adapter(
     newCollectionWidgetFactory(mode='lines'),
-    adapts=(ICollectionSchemaField, Interface, Interface),
+    adapts=(ICollectionField, Interface, Interface),
     provides=IWidget,
     name='lines')
 
 grok.global_adapter(
     newCollectionWidgetFactory(mode='multipickup'),
-    adapts=(ICollectionSchemaField, Interface, Interface),
+    adapts=(ICollectionField, Interface, Interface),
     provides=IWidget,
     name='multipickup')
 
 grok.global_adapter(
     newCollectionWidgetFactory(mode='lines', interface=IWidgetExtractor),
-    adapts=(ICollectionSchemaField, Interface, Interface),
+    adapts=(ICollectionField, Interface, Interface),
     provides=IWidgetExtractor,
     name='lines')
 
 
-class LinesWidget(SchemaFieldWidget):
-    grok.adapts(
-        ICollectionSchemaField, TextLineSchemaField, Interface, Interface)
+class LinesWidget(FieldWidget):
+    grok.adapts(ICollectionField, TextLineField, Interface, Interface)
     grok.name('lines')
-
-    def __init__(self, field, value_field,form, request):
-        super(LinesWidget, self).__init__(field, form, request)
-        self.text_component = value_field
 
     def valueToUnicode(self, value):
         return u'\n'.join(value)
 
 
 class LinesURIWidget(LinesWidget):
-    grok.adapts(ICollectionSchemaField, URISchemaField, Interface, Interface)
+    grok.adapts(ICollectionField, URIField, Interface, Interface)
 
 
 class LinesWidgetExtractor(WidgetExtractor):
-    grok.adapts(
-        ICollectionSchemaField, TextLineSchemaField, Interface, Interface)
+    grok.adapts(ICollectionField, TextLineField, Interface, Interface)
     grok.name('lines')
-
-    def __init__(self, field, value_field,form, request):
-        super(LinesWidgetExtractor, self).__init__(field, form, request)
-        self.text_component = value_field
 
     def extract(self):
         value, errors = super(LinesWidgetExtractor, self).extract()
@@ -115,7 +104,7 @@ class LinesWidgetExtractor(WidgetExtractor):
 
 
 class LinesURIWidgetExtractor(LinesWidgetExtractor):
-    grok.adapts(ICollectionSchemaField, URISchemaField, Interface, Interface)
+    grok.adapts(ICollectionField, URIField, Interface, Interface)
 
 
 class IMultiPickupFieldResources(IDefaultBrowserLayer):

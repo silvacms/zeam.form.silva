@@ -1,6 +1,6 @@
 <span tal:define="id widget.htmlId();
-                  required widget.required or None;
-                  readonly widget.readonly or None"
+                  required widget.htmlAttribute('required');
+                  readonly widget.htmlAttribute('readonly')"
       i18n:domain="silva">
   <input id="${id}-day"
          name="${widget.identifier}.day"

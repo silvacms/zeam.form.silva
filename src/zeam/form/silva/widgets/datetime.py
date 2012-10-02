@@ -19,11 +19,9 @@ from silva.translations import translate as _
 from silva.fanstatic import need
 
 from zeam.form.base.markers import NO_VALUE
-from zeam.form.base.widgets import WidgetExtractor
-from zeam.form.ztk.fields import SchemaFieldWidget
-from zeam.form.ztk.widgets.date import DatetimeSchemaField
-from zeam.form.ztk.widgets.date import DateSchemaField
-
+from zeam.form.base.widgets import WidgetExtractor, FieldWidget
+from zeam.form.ztk.widgets.date import DatetimeField
+from zeam.form.ztk.widgets.date import DateField
 
 
 class IDateTimeResources(IDefaultBrowserLayer):
@@ -31,8 +29,9 @@ class IDateTimeResources(IDefaultBrowserLayer):
     silvaconf.resource('datetime.js')
 
 
-class DateTimeFieldWidget(SchemaFieldWidget):
-    grok.adapts(DatetimeSchemaField, Interface, Interface)
+class DateTimeFieldWidget(FieldWidget):
+    grok.adapts(DatetimeField, Interface, Interface)
+    defaultHtmlClass = ['field', 'field-datetime']
 
     displayTime = True
 
@@ -59,7 +58,7 @@ class DateTimeFieldWidget(SchemaFieldWidget):
 
 
 class DateTimeWidgetExtractor(WidgetExtractor):
-    grok.adapts(DatetimeSchemaField, Interface, Interface)
+    grok.adapts(DatetimeField, Interface, Interface)
 
     def extract(self):
         identifier = self.identifier
@@ -99,7 +98,8 @@ class DateTimeWidgetExtractor(WidgetExtractor):
 
 
 class DateFieldWidget(DateTimeFieldWidget):
-    grok.adapts(DateSchemaField, Interface, Interface)
+    grok.adapts(DateField, Interface, Interface)
+    defaultHtmlClass = ['field', 'field-date']
 
     displayTime = False
 
@@ -116,7 +116,7 @@ class DateFieldWidget(DateTimeFieldWidget):
 
 
 class DateWidgetExtractor(DateTimeWidgetExtractor):
-    grok.adapts(DateSchemaField, Interface, Interface)
+    grok.adapts(DateField, Interface, Interface)
 
     def extract(self):
         value, error = super(DateWidgetExtractor, self).extract()

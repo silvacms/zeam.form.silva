@@ -11,7 +11,7 @@
             Field Name
           </label>
           <span class="form-required"
-                tal:condition="objectWidget.required and not objectWidget.readonly"
+                tal:condition="objectWidget.required"
                 i18n:translate="">
               required
           </span>

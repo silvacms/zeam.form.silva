@@ -29,7 +29,6 @@ from zeam.form.ztk.fields import SchemaField, SchemaFieldWidget
 from zeam.form.ztk.fields import registerSchemaField
 from zeam.form.silva.interfaces import ISMIForm
 
-
 logger = logging.getLogger('silva.upload')
 
 
