@@ -22,8 +22,10 @@
           class="upload-iframe"
           name="${widget.htmlId()}-upload-iframe">
   </iframe>
-  <a href="${widget.uploadURL()}"
-     onclick="return false" class="form-button upload-trigger ui-state-default">
+  <a href="${widget.uploadURL()}" onclick="return false"
+     title="Upload a new file in Silva"
+     class="form-button upload-trigger ui-state-default"
+     i18n:attributes="title">
     <ins class="ui-icon ui-icon-document"></ins>
     <tal:msg i18n:translate="">Upload</tal:msg>
   </a>
