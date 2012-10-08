@@ -29,7 +29,7 @@ class EditAction(BaseEditAction):
         IRESTCloseOnSuccessAction,
         IDefaultAction)
     title = _(u"Save changes")
-    description = _(u"save modifications")
+    description = _(u"Save modifications on the content")
     accesskey = u'ctrl+s'
 
     def available(self, form):
@@ -107,7 +107,7 @@ class CancelAction(Action):
     """
     grok.implements(IRESTCloseAction, ICancelerAction)
     title = _(u"Cancel")
-    description = _(u"go back to the previous screen")
+    description = _(u"Go back to the previous screen")
     accesskey = u'ctrl+z'
 
     def getRedirectedContent(self, form):
@@ -122,14 +122,14 @@ class CancelAddAction(CancelAction):
     """Cancel an add action.
     """
     description = _(
-        u"go back to the folder view without adding the content")
+        u"Go back to the folder view without adding the content")
 
 
 class CancelEditAction(CancelAction):
     """Cancel an edit action.
     """
     title = _(u"Back")
-    description = _(u"go back to the folder view")
+    description = _(u"Go back to the folder view")
 
     def getRedirectedContent(self, form):
         content = form.context

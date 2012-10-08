@@ -293,7 +293,7 @@ class SMIAddForm(SMIForm):
 
     @action(
         _(u'Save'),
-        description=_(u"create the content"),
+        description=_(u"Create a new content"),
         factory=ExtractedDecoratedAction,
         implements=IDefaultAction,
         accesskey=u'ctrl+s')
