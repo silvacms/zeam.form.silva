@@ -22,7 +22,9 @@
          id="${widget.htmlId()}" />
   <br />
   <a class="widget-crop-popup-button form-button ui-state-default"
-     href="#" onclick="return false;" i18n:translate="">
+     href="#" onclick="return false;"
+     title="Visually select new crop coordinates"
+     i18n:attributes="title" i18n:translate="">
     <ins class="ui-icon ui-icon-carat-1-sw"
          i18n:name="icon"></ins>
     Set crop coordinates...
