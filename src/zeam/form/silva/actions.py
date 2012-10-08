@@ -29,7 +29,7 @@ class EditAction(BaseEditAction):
         IRESTCloseOnSuccessAction,
         IDefaultAction)
     title = _(u"Save changes")
-    description = _(u"Save modifications on the content")
+    description = _(u"Save modifications on the item")
     accesskey = u'ctrl+s'
 
     def available(self, form):
@@ -122,7 +122,7 @@ class CancelAddAction(CancelAction):
     """Cancel an add action.
     """
     description = _(
-        u"Go back to the folder view without adding the content")
+        u"Go back to the folder view without adding the item")
 
 
 class CancelEditAction(CancelAction):
