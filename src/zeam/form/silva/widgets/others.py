@@ -3,6 +3,7 @@
 # See also LICENSE.txt
 
 from five import grok
+from zope.schema.interfaces import ITextLine
 from zope.interface import Interface
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 
@@ -12,6 +13,7 @@ from zeam.form.base import DISPLAY
 from zeam.form.base.interfaces import IWidget, IWidgetExtractor
 from zeam.form.base.markers import NO_VALUE
 from zeam.form.base.widgets import WidgetExtractor, FieldWidget
+from zeam.form.ztk.customizations import customize
 from zeam.form.ztk.interfaces import ICollectionField
 from zeam.form.ztk.widgets.collection import newCollectionWidgetFactory
 from zeam.form.ztk.widgets.collection import MultiSelectFieldWidget
@@ -25,6 +27,11 @@ from zeam.form.silva.interfaces import ISMIForm
 from silva.core import conf as silvaconf
 from silva.core.interfaces.adapters import IIconResolver
 from silva.fanstatic import need
+
+
+@customize(origin=ITextLine)
+def customize_textline(field):
+    field.htmlAttributes['size'] = '40'
 
 
 class IconDisplayWidget(FieldWidget):
