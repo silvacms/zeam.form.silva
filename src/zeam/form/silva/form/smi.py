@@ -212,7 +212,7 @@ class SMISubEditForm(SMISubForm):
         # called before security is verified.
         content = self.getContentData().content
         if not checkPermission('silva.ChangeSilvaContent', content):
-            self.mode = DISPLAY
+            self.widgetFactoryFactory = SMIDisplayWidgetFactory
 
 
 class SMISubFormTemplate(pt.PageTemplate):
@@ -353,5 +353,5 @@ class SMIEditForm(SMIForm):
         # called before security is verified.
         content = self.getContentData().content
         if not checkPermission('silva.ChangeSilvaContent', content):
-            self.mode = DISPLAY
+            self.widgetFactoryFactory = SMIDisplayWidgetFactory
 
