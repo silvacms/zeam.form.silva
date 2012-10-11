@@ -6,7 +6,7 @@
     <h4 tal:condition="view.label" tal:content="view.label">label</h4>
     <p tal:condition="view.description"
        tal:content="structure view.description">
-       Description
+      Description
     </p>
   </div>
   <div class="form-body">
@@ -15,32 +15,47 @@
            data-field-prefix="#"
            tal:condition="widget.isVisible()"
            tal:attributes="data-field-prefix widget.identifier">
-        <div class="form-label">
-          <label tal:attributes="for widget.htmlId()"
-                 tal:content="widget.title">
-            Field Name
-          </label>
-          <span class="form-required"
-                tal:condition="widget.required"
-                i18n:translate="">
+        <tal:regular tal:condition="not widget.alternateLayout">
+          <div class="form-label">
+            <label tal:attributes="for widget.htmlId()"
+                   tal:content="widget.title">
+              Field Name
+            </label>
+            <span class="form-required"
+                  tal:condition="widget.required"
+                  i18n:translate="">
               required
-          </span>
-          <p tal:condition="widget.description"
-             tal:content="widget.description">
-            Description
-          </p>
-        </div>
-        <div class="form-field">
-          <tal:widget tal:content="structure widget.render()"/>
-        </div>
-        <div class="form-error-message">
-          <div class="form-error-detail"
-               tal:condition="widget.error">
-            <p tal:content="structure widget.error.title">
-              Validation error.
+            </span>
+            <p tal:condition="widget.description"
+               tal:content="widget.description">
+              Description
             </p>
           </div>
-        </div>
+          <div class="form-field">
+            <tal:widget tal:content="structure widget.render()"/>
+          </div>
+          <div class="form-error-message">
+            <div class="form-error-detail"
+                 tal:condition="widget.error">
+              <p tal:content="structure widget.error.title">
+                Validation error.
+              </p>
+            </div>
+          </div>
+        </tal:regular>
+        <tal:checkbox tal:condition="widget.alternateLayout">
+          <div class="form-checkbox">
+            <tal:widget tal:content="structure widget.render()" />
+            <label tal:attributes="for widget.htmlId()"
+                   tal:content="widget.title">
+              Field Name
+            </label>
+            <p tal:condition="widget.description"
+               tal:content="widget.description">
+              Description
+            </p>
+          </div>
+        </tal:checkbox>
       </div>
       <tal:hidden
          tal:condition="not widget.isVisible()"
@@ -49,10 +64,10 @@
   </div>
   <div class="form-footer">
     <div class="form-controls" tal:condition="view.actionWidgets">
-        <input tal:repeat="widget view.actionWidgets"
-               tal:replace="structure widget.render()" />
-        <!-- This empty submit trigger the form submission with enter -->
-        <input type="submit" style="display: none" />
+      <input tal:repeat="widget view.actionWidgets"
+             tal:replace="structure widget.render()" />
+      <!-- This empty submit trigger the form submission with enter -->
+      <input type="submit" style="display: none" />
     </div>
   </div>
 </form>

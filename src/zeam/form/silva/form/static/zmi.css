@@ -34,9 +34,8 @@ body .upload-file .upload-progress {
 
 /* Generic and Error */
 
-form label.form-label {
-  padding-top: 1.5em;
-  display: block;
+form div.field {
+  padding-bottom: 1em;
 }
 
 form span.field-error {
@@ -51,7 +50,7 @@ form span.field-error {
 }
 
 form div.actions {
-  margin: 2em 0;
+  padding: 0.5em 0;
 }
 
 /* Collection CSS */
