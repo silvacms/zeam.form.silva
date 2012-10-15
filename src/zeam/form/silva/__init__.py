@@ -28,7 +28,7 @@ from .actions import ExtractedDecoratedAction, LinkAction
 from .actions import EditAction, CancelAction, PopupAction
 from .validation import DefaultFormLookup
 
-from .interfaces import IDefaultAction
+from .interfaces import IDefaultAction, IRemoverAction
 from .interfaces import IRESTCloseOnSuccessAction
-from .interfaces import IRESTExtraPayloadProvider
+from .interfaces import IRESTExtraPayloadProvider, IRESTRefreshAction
 
