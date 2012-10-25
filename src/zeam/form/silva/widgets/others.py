@@ -87,6 +87,9 @@ class LinesWidget(FieldWidget):
     grok.adapts(ICollectionField, TextLineField, Interface, Interface)
     grok.name('lines')
 
+    def __init__(self, field, value_field, form, request):
+        super(LinesWidget, self).__init__(field, form, request)
+
     def valueToUnicode(self, value):
         return u'\n'.join(value)
 
@@ -98,6 +101,9 @@ class LinesURIWidget(LinesWidget):
 class LinesWidgetExtractor(WidgetExtractor):
     grok.adapts(ICollectionField, TextLineField, Interface, Interface)
     grok.name('lines')
+
+    def __init__(self, field, value_field, form, request):
+        super(LinesWidgetExtractor, self).__init__(field, form, request)
 
     def extract(self):
         value, errors = super(LinesWidgetExtractor, self).extract()
