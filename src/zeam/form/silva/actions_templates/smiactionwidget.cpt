@@ -2,7 +2,8 @@
    id="${widget.htmlId()}"
    name="${widget.identifier}"
    title="${widget.description}"
-   data-form-shortcut="${widget.htmlAttribute('accesskey')}">
+   data-form-shortcut="${widget.htmlAttribute('accesskey')}"
+   data-confirmation="${widget.htmlAttribute('data-confirmation')}">
   <ins class="${widget.icon}"></ins>
   <tal:label tal:content="widget.title">Label</tal:label>
 </a>

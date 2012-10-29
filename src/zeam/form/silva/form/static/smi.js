@@ -307,13 +307,18 @@
             });
         });
 
-        // Inline Validation
+        // Inline Validation and action confirmation
         $form.find('form').each(function() {
             var $form = $(this);
 
             if (!$form.data('form-novalidation')) {
                 $form.find('.form-section').each(create_validator);
             };
+
+            $('a.form-control[data-confirmation]', $form).click(function(){
+                $button = $(this);
+                return confirm($button.attr('data-confirmation'));
+            });
         });
     };
 
@@ -329,6 +334,5 @@
             return false;
         });
     });
-
 
 })(jQuery, infrae);
