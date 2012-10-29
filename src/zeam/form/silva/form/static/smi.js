@@ -315,9 +315,13 @@
                 $form.find('.form-section').each(create_validator);
             };
 
-            $('a.form-control[data-confirmation]', $form).click(function(){
+            $('a.form-control[data-confirmation]', $form).click(function(event){
                 $button = $(this);
-                return confirm($button.attr('data-confirmation'));
+                if(confirm($button.attr('data-confirmation'))) {
+                    return true;
+                }
+                event.stopPropagation();
+                return false;
             });
         });
     };
