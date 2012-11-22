@@ -6,6 +6,11 @@ import os
 
 version = '2.0dev'
 
+tests_require = [
+    'zope.testing',
+    'zeam.form.ztk [test]'
+]
+
 setup(name='zeam.form.silva',
       version=version,
       description="Integration of the Grok-based form system into Silva",
@@ -59,6 +64,8 @@ setup(name='zeam.form.silva',
         'zope.traversing',
         'zope.security',
         ],
+      tests_require = tests_require,
+      extras_require = {'test': tests_require,},
       entry_points="""
       [zeam.form.components]
       file = zeam.form.silva.widgets.file:register
