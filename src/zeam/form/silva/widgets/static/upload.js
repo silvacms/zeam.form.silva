@@ -79,7 +79,7 @@
                 clear_status();
                 break;
             };
-        }
+        };
 
         var poll_error = function(jqXHR, textStatus, errorThrown) {
             retries += 1;
@@ -88,7 +88,7 @@
                 return;
             }
             poll_status();
-        }
+        };
 
         var _poll_status = function() {
             var url = options.stat_url + upload_id;
@@ -100,7 +100,7 @@
                 success: poll_success,
                 error: poll_error
             });
-        }
+        };
 
         var poll_status = function() {
             clear_status();
