@@ -28,8 +28,9 @@ class FieldSerializer(component.Component):
         self.value = value
 
     def serialize(self, producer):
-        self.field.validator.serializeValue(
-            self.field, self.value, producer)
+        if self.value is not None:
+            self.field.validator.serializeValue(
+                self.field, self.value, producer)
 
     def __call__(self, producer):
         self.serialize(producer)
