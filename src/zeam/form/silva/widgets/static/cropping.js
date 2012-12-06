@@ -9,12 +9,19 @@
         var required = $input.hasClass('field-required');
         infrae.ui.selection.disable($template);
 
+        // We use this preload image instead of the $img to get the
+        // size as a fix to an IE loading issue: in IE the image is
+        // not loaded before it is displayed, if it is created inside
+        // an HTML piece.
+        var preload = new Image();
+        preload.src = $template.data('image-url');
+
+
         $opener.bind('click', function(event){
             var $popup = $template.clone();
             var $img = $popup.find('img.widget-crop-image');
-
-            var image_width = $img.get(0).width;
-            var image_height = $img.get(0).height;
+            var image_width = preload.width; // Use size from the preload.
+            var image_height = preload.height;
             var original_width = Math.max(40 + image_width, 250);
             var original_height = 145 + image_height;
             var ratio = 0;
