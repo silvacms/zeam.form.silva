@@ -1,10 +1,21 @@
 Changes
 =======
 
-2.0 (unreleased)
+2.0 (2012/12/11)
 ----------------
 
-* ...
+* Use alternate layout for checkbox: they are displayed before the
+  label and not after.
+
+* Add more contextual help in SMI special widgets.
+
+* Update to Zeam form 1.3.
+
+* IE and Webkit fixes for some Javascript widgets.
+
+* Add a custom widget for the identifier field.
+
+* Add support for a confirmation dialog when an action is clicked on.
 
 2.0c1 (2012/09/24)
 ------------------
