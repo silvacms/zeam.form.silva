@@ -17,9 +17,10 @@ class IDField(TextLineField):
         error = super(IDField, self).validate(value, form)
         if error:
             return error
-        if not isinstance(value, Marker) and len(value) and form.context \
-                and ISilvaObject.providedBy(form.context):
-            container = form.context.get_container()
+        if not isinstance(value, Marker) and len(value) and form.context:
+            container = form.context
+            if ISilvaObject.providedBy(form.context):
+                container = form.context.get_container()
             try:
                 ISilvaNameChooser(container).checkName(value, None)
             except ContentError as error:
