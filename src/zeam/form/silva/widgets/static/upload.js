@@ -3,7 +3,7 @@
 
     function basename(path) {
         return path.replace(/^.*[\/\\](.*)/, '$1');
-    }
+    };
 
     var default_options = {
         stat_url: '/gp.fileupload.stat/',
@@ -18,7 +18,7 @@
 
     var FileUploader = function($progress, options){
         var deferred = $.Deferred();
-        var progress_value = 0;
+        var progress = 0;
         var retries = 0;
 
         var upload_id = Math.random() * 10000000000000000000;
@@ -36,8 +36,8 @@
         };
 
         var set_progress = function(value) {
-            if (progress_value != value) {
-                progress_value = value;
+            if (progress != value) {
+                progress = value;
                 $progress.progressbar('option', 'value', value);
             }
         };
@@ -197,6 +197,7 @@
                             $iframe.attr('name'), $upload_button.attr('href')));
                 },
                 autoOpen: false,
+                zIndex: 12500,
                 buttons: {
                     Send: function(event){
                         disable_upload_button();
