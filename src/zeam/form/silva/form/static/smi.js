@@ -307,7 +307,12 @@
             });
         });
 
-        // Inline Validation and action confirmation
+        // Invalid Validation on the form.
+        if ($form.is('form') && ! $form.data('form-novalidation')) {
+            $form.find('.form-section').each(create_validator);
+        };
+
+        // Inline Validation on the sub-forms.
         $form.find('form').each(function() {
             var $form = $(this);
 

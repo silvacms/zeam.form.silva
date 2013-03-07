@@ -1,10 +1,14 @@
 Changes
 =======
 
-2.0.1 (unreleased)
+2.0.1 (2013/03/06)
 ------------------
 
-* ...
+* Update ID widget to work in a Zope context (for the *Add a Silva
+  Root* Zope homepage).
+
+* Update default z-index for the upload widget, in order to make it
+  usuable via the reference windows inside the text editor.
 
 2.0 (2012/12/11)
 ----------------
