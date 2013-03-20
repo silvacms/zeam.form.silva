@@ -10,8 +10,7 @@
     </p>
   </div>
   <table class="form-table"
-         tal:define="haveActions len(view.actionWidgets);
-                     availableFields filter(lambda f: f.available(view), view.tableFields);
+         tal:define="availableFields filter(lambda f: f.available(view), view.tableFields);
                      columns len(availableFields) + 1">
     <thead>
       <tr tal:condition="view.lineWidgets">
@@ -49,14 +48,14 @@
         </td>
       </tr>
     </tbody>
-    <tfoot tal:condition="haveActions or view.batching">
+    <tfoot tal:condition="view.actionWidgets or view.batching">
       <tr tal:condition="view.batching">
         <td colspan="#"
             tal:attributes="colspan columns"
             tal:content="structure view.batching">
         </td>
       </tr>
-      <tr class="form-controls" tal:condition="haveActions">
+      <tr class="form-controls" tal:condition="view.actionWidgets">
         <td colspan="#"
             tal:attributes="colspan columns">
           <span class="footer-fields"

@@ -61,8 +61,8 @@
          tal:content="structure widget.render()" />
     </tal:repeat>
   </div>
-  <div class="form-footer">
-    <div class="form-controls" tal:condition="view.actionWidgets">
+  <div class="form-footer" tal:condition="view.actionWidgets">
+    <div class="form-controls">
       <input tal:repeat="widget view.actionWidgets"
              tal:replace="structure widget.render()" />
       <!-- This empty submit trigger the form submission with enter -->
