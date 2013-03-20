@@ -1,6 +1,11 @@
 Changes
 =======
 
+2.0.2 (2013/03/07)
+------------------
+
+* Fix inline validation that was not activated inside dialogs.
+
 2.0.1 (2013/03/06)
 ------------------
 
