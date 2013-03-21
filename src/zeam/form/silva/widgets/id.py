@@ -12,17 +12,24 @@ from silva.core.interfaces import ISilvaNameChooser, ContentError
 
 
 class IDField(TextLineField):
+    # Custom interface to pass the ID validator
+    validateForInterface = None
+
+    def getValidationContext(self, context):
+        # Return the context object to pass to the ID validator
+        if ISilvaObject.providedBy(context):
+            return context.get_container()
+        return context
 
     def validate(self, value, form):
         error = super(IDField, self).validate(value, form)
         if error:
             return error
         if not isinstance(value, Marker) and len(value) and form.context:
-            container = form.context
-            if ISilvaObject.providedBy(form.context):
-                container = form.context.get_container()
+            container = self.getValidationContext(form.context)
             try:
-                ISilvaNameChooser(container).checkName(value, None)
+                ISilvaNameChooser(container).checkName(
+                    value, None, interface=self.validateForInterface)
             except ContentError as error:
                 return error.reason
         return None
