@@ -8,6 +8,7 @@ from five import grok
 from zope.interface import Interface
 
 from silva.core.interfaces import IRoot
+from silva.core.interfaces.errors import ContentError
 from silva.translations import translate as _
 
 from zope.traversing.browser import absoluteURL
@@ -38,7 +39,7 @@ class EditAction(BaseEditAction):
     def __call__(self, form):
         try:
             status = super(EditAction, self).__call__(form)
-        except ValueError, error:
+        except (ContentError, ValueError), error:
             if ISilvaFormData.providedBy(form):
                 form.send_message(error.args[0], type="error")
             else:
