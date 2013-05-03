@@ -6,7 +6,7 @@
         $field.multiselect({sortable: false});
     };
 
-    $('.form-fields-container').live('loadwidget-smiform', function(event) {
+    $(document).on('loadwidget-smiform', '.form-fields-container', function(event) {
         $(this).find('.field-multipickup').each(create_multipickup_field);
         event.stopPropagation();
     });

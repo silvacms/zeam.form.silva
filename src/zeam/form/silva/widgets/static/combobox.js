@@ -94,7 +94,7 @@
 		});
     };
 
-    $('.form-fields-container').live('loadwidget-smiform', function(event) {
+    $(document).on('loadwidget-smiform', '.form-fields-container', function(event) {
         $(this).find('.field-combobox').each(create_combobox_field);
         event.stopPropagation();
     });

@@ -121,13 +121,13 @@
                         };
 
                         // Send request
-                        smi.ajax.query(form_url, form_data).pipe(
+                        smi.ajax.query(form_url, form_data).then(
                             function(data) {
                                 if (infrae.interfaces.is_implemented_by('popup', data)) {
                                     if (action_type == 'close_on_success' && data['success']) {
                                         return popup.close(data);
                                     };
-                                    return $.when(popup.from_data(data)).pipe(function ($form) {
+                                    return $.when(popup.from_data(data)).then(function ($form) {
                                         infrae.ui.ResizeDialog($popup);
                                         return $form;
                                     });
@@ -169,7 +169,7 @@
 
             $.extend(popup, {
                 display: function(builder) {
-                    return $.when(builder).pipe(
+                    return $.when(builder).then(
                         function ($form) {
                             // Initialize form and widgets JS, show the popup
                             infrae.ui.ShowDialog($popup, {maxFactor: 0.8});
@@ -189,7 +189,7 @@
                     return close.promise();
                 },
                 from_url: function(url) {
-                    return smi.ajax.query(url).pipe(
+                    return smi.ajax.query(url).then(
                         function (data) {
                             if (infrae.interfaces.is_implemented_by('popup', data)) {
                                 return popup.from_data(data);
@@ -275,13 +275,13 @@
     });
 
     // Support for collection widget
-    $('.field-collection-line').live('addline-zeamform', function() {
+    $(document).on('addline-zeamform', '.field-collection-line', function() {
         var $line = $(this);
 
         $line.addClass('form-fields-container');
         $line.trigger('loadwidget-smiform');
     });
-    $('.form-fields-container').live('loadwidget-smiform', function(event) {
+    $(document).on('loadwidget-smiform', '.form-fields-container', function(event) {
         $(this).find('div.field-collection').each(function() {
             if ($(this).ZeamCollectionWidget !== undefined) {
                 $(this).ZeamCollectionWidget();
@@ -324,13 +324,13 @@
     };
 
     // Prepare forms
-    $('.form-content').live('load-smiform', bootstrap_form);
+    $(document).on('load-smiform', '.form-content', bootstrap_form);
 
     $(document).ready(function() {
         $('.form-content').each(bootstrap_form);
 
         // Prepare Popup
-        $('.form-popup').live('click', function() {
+        $(document).on('click', '.form-popup', function() {
             $(this).SMIFormPopup();
             return false;
         });
