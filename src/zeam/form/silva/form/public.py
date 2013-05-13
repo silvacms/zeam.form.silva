@@ -5,6 +5,7 @@
 from zExceptions import Redirect
 
 from five import grok
+from megrok import pagetemplate as pt
 from zope import component
 from zope.publisher.publish import mapply
 
@@ -65,6 +66,10 @@ class PublicForm(SilvaForm, base.Form):
     grok.baseclass()
     grok.layer(ISilvaLayer)
     grok.require('zope.Public')
+
+
+class PublicFormTemplate(pt.PageTemplate):
+    pt.view(PublicForm)
 
 
 class PublicViewletForm(SilvaFormData, viewlet.ViewletForm):
