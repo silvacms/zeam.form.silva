@@ -6,18 +6,31 @@ from zExceptions import Redirect
 
 from five import grok
 from megrok import pagetemplate as pt
+from grokcore.layout.interfaces import IPage, ILayout
+
 from zope import component
+from zope.interface import Interface
 from zope.publisher.publish import mapply
+from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 
 from zeam.form import base, viewlet
 from zeam.form.silva.utils import SilvaFormData
 from zeam.form.silva.utils import convert_request_form_to_unicode
+from zeam.form.silva.interfaces import IPublicForm, ICancelerAction
 from zeam.form.ztk import validation
+from zeam.form.base.widgets import ActionWidget
+from zeam.form.base.interfaces import IAction
 
-from grokcore.layout.interfaces import IPage, ILayout
+from silva.core import conf as silvaconf
 from silva.core.layout.interfaces import ISilvaLayer
 from silva.core.views.views import HTTPHeaderView
+from silva.fanstatic import need
 
+
+class ISilvaFormResources(IDefaultBrowserLayer):
+    """Resources for Silva forms.
+    """
+    silvaconf.resource('silvaforms.css')
 
 
 class SilvaForm(HTTPHeaderView, SilvaFormData):
@@ -38,6 +51,7 @@ class SilvaForm(HTTPHeaderView, SilvaFormData):
         return namespace
 
     def content(self):
+        need(ISilvaFormResources)
         return self.render()
 
     def __call__(self):
@@ -45,7 +59,6 @@ class SilvaForm(HTTPHeaderView, SilvaFormData):
 
         self.layout = component.getMultiAdapter(
             (self.request, self.context), ILayout)
-
 
         mapply(self.update, (), self.request)
         if self.request.response.getStatus() in (302, 303):
@@ -66,10 +79,21 @@ class PublicForm(SilvaForm, base.Form):
     grok.baseclass()
     grok.layer(ISilvaLayer)
     grok.require('zope.Public')
+    grok.implements(IPublicForm)
 
 
 class PublicFormTemplate(pt.PageTemplate):
     pt.view(PublicForm)
+
+
+class PublicActionWidget(ActionWidget):
+    grok.adapts(IAction, IPublicForm, Interface)
+
+    ## ovverride ActionWidget function
+    def htmlClass(self):
+        if ICancelerAction.providedBy(self.component):
+            return 'action cancel'
+        return 'action submit'
 
 
 class PublicViewletForm(SilvaFormData, viewlet.ViewletForm):
@@ -104,4 +128,3 @@ class PublicContentProviderForm(SilvaFormData, viewlet.ViewletManagerForm):
         # Raise redirect exception to be not to render the current
         # page anymore.
         raise Redirect(url)
-

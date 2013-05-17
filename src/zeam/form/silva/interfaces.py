@@ -26,6 +26,11 @@ class IDisplayWidgetFactory(IWidgetFactory):
     """
 
 
+class IPublicForm(ISilvaFormData, IFormData):
+    """A form for public display.
+    """
+
+
 # Define style for actions
 class IRemoverAction(IAction):
     """An action that appear in red.

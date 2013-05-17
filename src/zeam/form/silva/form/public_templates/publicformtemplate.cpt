@@ -1,62 +1,77 @@
-<form action="." tal:attributes="action request.URL" method="post"
-      enctype="multipart/form-data"
-      i18n:domain="zeam.form.base">
+<div class="login-form" i18n:domain="silva">
 
-  <h1 tal:condition="view.label"
-      tal:content="view.label">Label</h1>
+    <h1 tal:condition="view.label"
+        tal:content="view.label">Label
+    </h1>
 
-  <p tal:condition="view.description"
-     tal:content="view.description">Description</p>
+    <p tal:condition="view.description" 
+       tal:content="view.description">Description
+    </p>
 
-  <p class="form-status"
-     tal:condition="view.status"
-     tal:content="view.status">Status</p>
+    <p class="form-status" 
+       tal:condition="view.status"
+       tal:content="view.status">Status
+    </p>
 
-  <div class="form-error"
-       tal:condition="view.errors">
-    <ul tal:condition="view.formErrors"
-        tal:repeat="error view.formErrors">
-      <li> <span tal:replace="error.title" /> </li>
-    </ul>
-  </div>
-
-  <div class="fields"
-       tal:condition="view.fieldWidgets">
-    <div class="field" tal:repeat="widget view.fieldWidgets">
-      <tal:presentation
-         tal:condition="widget.isVisible()">
-        <label class="field-label" for="#"
-               tal:attributes="for widget.htmlId()"
-               tal:content="widget.title">
-          Label
-        </label>
-        <span class="field-required"
-              i18n:translate=""
-              tal:condition="widget.required">(required)</span>
-        <br />
-        <tal:description tal:condition="widget.description">
-          <span class="field-description"
-                tal:content="widget.description">
-          </span><br />
-        </tal:description>
-        <tal:error tal:define="error widget.error"
-                   tal:condition="error">
-          <span class="field-error"
-                tal:content="error.title">
-            Error
-          </span>
-          <br />
-        </tal:error>
-      </tal:presentation>
-      <tal:widget tal:content="structure widget.render()" />
+    <div class="form-error"
+         tal:condition="view.errors"> 
+       
+        <div tal:condition="view.formErrors" 
+             class="feedback warning"
+             tal:repeat="error view.formErrors"> 
+             <span tal:replace="error.title" /> 
+        </div> 
     </div>
-  </div>
+    
+    <form action="." 
+          tal:attributes="action request.URL" 
+          method="post" 
+          enctype="multipart/form-data"
+          i18n:domain="zeam.form.base">
+    
+        <div class="fields form" 
+             tal:condition="view.fieldWidgets">
+    
+            <div class="field form-element" 
+                 tal:repeat="widget view.fieldWidgets">
 
-  <div class="actions"
-       tal:condition="view.actionWidgets">
-    <div class="action" tal:repeat="widget view.actionWidgets">
-      <tal:widget tal:content="structure widget.render()" />
-    </div>
-  </div>
+                <tal:presentation tal:condition="widget.isVisible()">
 
-</form>
+                    <tal:description tal:condition="widget.description"> 
+                        <p class="field-description" 
+                           tal:content="widget.description"> 
+                        </p>
+                    </tal:description>
+
+                    <tal:error tal:define="error widget.error" 
+                               tal:condition="error"> 
+                        <p class="field-error" tal:content="error.title"> Error </p> 
+                    </tal:error>
+
+                    <div class="form-label"> 
+                        <label class="field-label" for="#"
+                               tal:attributes="for widget.htmlId()" 
+                               tal:content="widget.title"> Label 
+                        </label>
+                    </div>
+                    
+                </tal:presentation>
+
+                <div class="form-field"> 
+                    <tal:widget tal:content="structure widget.render()" /> 
+                </div>
+                <br /> 
+            </div>
+            <br /> 
+            <br />
+            <div class="actions form-element" tal:condition="view.actionWidgets"> 
+                <div class="form-field form-actions"> 
+                    <tal:widget 
+                     tal:repeat="widget view.actionWidgets" 
+                     tal:content="structure widget.render()" /> 
+                </div>
+            </div>
+            
+        </div>
+    </form>
+</div>
