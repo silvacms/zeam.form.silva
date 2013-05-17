@@ -30,7 +30,7 @@ from silva.fanstatic import need
 class ISilvaFormResources(IDefaultBrowserLayer):
     """Resources for Silva forms.
     """
-    silvaconf.resource('silvaforms.css')
+    silvaconf.resource('public.css')
 
 
 class SilvaForm(HTTPHeaderView, SilvaFormData):
