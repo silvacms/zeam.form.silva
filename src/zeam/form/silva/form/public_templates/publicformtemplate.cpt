@@ -1,4 +1,4 @@
-<div class="login-form" i18n:domain="silva">
+<div class="public-form" i18n:domain="silva">
 
     <h1 tal:condition="view.label"
         tal:content="view.label">Label

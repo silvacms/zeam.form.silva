@@ -1,6 +1,6 @@
-/* Login form */
-/* This css file will be loaded before the skin css, so it can be overridden */
+/* Public and Login forms */
 
+.public-form,
 .login-form {
   width: 35em;
 }
