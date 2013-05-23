@@ -30,7 +30,7 @@ from silva.fanstatic import need
 class ISilvaFormResources(IDefaultBrowserLayer):
     """Resources for Silva forms.
     """
-    silvaconf.resource('public.css')
+    silvaconf.resource('publicforms.css')
 
 
 class SilvaForm(HTTPHeaderView, SilvaFormData):
@@ -51,7 +51,6 @@ class SilvaForm(HTTPHeaderView, SilvaFormData):
         return namespace
 
     def content(self):
-        need(ISilvaFormResources)
         return self.render()
 
     def __call__(self):
