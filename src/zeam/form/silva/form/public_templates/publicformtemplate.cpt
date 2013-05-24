@@ -13,13 +13,11 @@
        tal:content="view.status">Status
     </p>
 
-    <div class="form-error"
-         tal:condition="view.errors"> 
-       
-        <div tal:condition="view.formErrors" 
-             tal:repeat="error view.formErrors"> 
+    <div class="form-error" tal:condition="view.errors">       
+        <p tal:condition="view.formErrors" 
+           tal:repeat="error view.formErrors"> 
              <span tal:replace="error.title" /> 
-        </div> 
+        </p> 
     </div>
     
     <form action="." 

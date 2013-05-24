@@ -1,4 +1,4 @@
-/* Public and Login forms */
+/* Public Forms */
 
 .public-form,
 .login-form {
@@ -9,7 +9,6 @@
   padding: 0.2em 0.5em 0.3em;
   border: 1px solid #808080;
 }
-/* for a stacked form remove floats and heights */
 .form-title {
   height: 1.6em;
   font-size: 15px;
@@ -34,10 +33,6 @@
   float: right;
   width: 22em;
 }
-/* if stacked
-div.form-actions {
-  margin: 0.5em 0 0;
-}*/
 .form-actions .submit {
   float: right;
   padding: 0.1em 1.5em;
