@@ -24,13 +24,12 @@ from zeam.form.base.interfaces import IAction
 from silva.core import conf as silvaconf
 from silva.core.layout.interfaces import ISilvaLayer
 from silva.core.views.views import HTTPHeaderView
-from silva.fanstatic import need
 
 
-class ISilvaFormResources(IDefaultBrowserLayer):
+class IPublicFormResources(IDefaultBrowserLayer):
     """Resources for Silva forms.
     """
-    silvaconf.resource('publicforms.css')
+    silvaconf.resource('public.css')
 
 
 class SilvaForm(HTTPHeaderView, SilvaFormData):

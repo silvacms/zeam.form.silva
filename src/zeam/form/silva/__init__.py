@@ -19,7 +19,7 @@ from .form.smi import SMIFormPortlets
 
 from .form.public import PublicViewletForm
 from .form.public import PublicContentProviderForm
-from .form.public import PublicForm
+from .form.public import PublicForm, IPublicFormResources
 
 from .form.popup import RESTPopupForm, PopupForm
 
