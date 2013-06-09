@@ -6,8 +6,11 @@
 }
 .form {
   margin: 1em 0;
-  padding: 0.2em 0.5em 0.3em;
+  padding: 0.5em 0.5em 0em;
   border: 1px solid #808080;
+}
+.form-element {
+  clear: both;
 }
 .form-title {
   height: 1.6em;
@@ -27,11 +30,16 @@
 .form-field {
   height: 2.2em;
 }
-.form-field input[type="text"], 
+.form-field input[type="text"],
 .form-field input[type="password"],
-.form-field input[type="email"] {
+.form-field input[type="email"],
+.form-field textarea {
   float: right;
   width: 22em;
+  padding: 2px;
+}
+.form-field textarea {
+  height: 3.5em;
 }
 .form-actions .submit {
   float: right;
