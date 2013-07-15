@@ -23,6 +23,7 @@ from .form.public import PublicForm, IPublicFormResources
 
 from .form.popup import RESTPopupForm, PopupForm
 
+from .datamanager import MultiDataManagerFactory, FieldValueDataManager
 from .datamanager import SilvaDataManager, FieldValueDataManagerFactory
 from .actions import ExtractedDecoratedAction, LinkAction
 from .actions import EditAction, CancelAction, PopupAction

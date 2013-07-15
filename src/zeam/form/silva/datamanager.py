@@ -8,6 +8,7 @@ from persistent.interfaces import IPersistent
 from zope.interface import Interface
 from zeam.form.base.datamanager import ObjectDataManager
 from zeam.form.base.datamanager import BaseDataManager
+from zeam.form.base.interfaces import IFields
 from zeam.form.silva import interfaces
 from zeam import component
 
@@ -115,3 +116,47 @@ class FieldValueDataManager(BaseDataManager):
 
 def FieldValueDataManagerFactory(self, content):
     return FieldValueDataManager(self, content)
+
+
+class MultiDataManager(BaseDataManager):
+
+    def __init__(self, configuration, content):
+        self._managers = managers = {}
+        for field, factory in configuration:
+            manager = factory(content)
+            if isinstance(field, basestring):
+                managers[field] = manager
+            elif IFields.providedBy(field):
+                for unique_field in field:
+                    manager[unique_field.identifier] = manager
+            elif field is None:
+                if None in managers:
+                    raise ValueError('More than one default manager')
+                managers[None] = manager
+        self.content = content
+
+    def get(self, identifier):
+        manager = self._managers.get(identifier)
+        if manager is None:
+            manager = self._managers[None]
+        return manager.get(identifier)
+
+    def set(self, identifier, value):
+        manager = self._managers.get(identifier)
+        if manager is None:
+            manager = self._managers[None]
+        manager.set(identifier, value)
+
+    def delete(self, identifier):
+        manager = self._managers.get(identifier)
+        if manager is None:
+            manager = self._managers[None]
+        manager.delete(identifier)
+
+
+def MultiDataManagerFactory(configuration):
+
+    def Factory(content):
+        return MultiDataManager(configuration, content)
+
+    return Factory
