@@ -5,18 +5,18 @@
 import os.path
 import logging
 import json
+import uuid
 
 from five import grok
 from zope.interface import Interface
 from zope.traversing.browser import absoluteURL
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 
-from App.config import getConfiguration
-
 from js.jqueryui import jqueryui
 
 from infrae import rest
 from silva.core import conf as silvaconf
+from silva.core import interfaces
 from silva.core.conf import schema as silvaschema
 from silva.core.interfaces.adapters import IIconResolver
 from silva.fanstatic import need
@@ -25,6 +25,7 @@ from silva.translations import translate as _
 from zeam.form.base.errors import Error
 from zeam.form.base.markers import NO_VALUE, NO_CHANGE
 from zeam.form.base.widgets import WidgetExtractor
+from zeam.form.composed.interfaces import ISubForm
 from zeam.form.ztk.fields import SchemaField, SchemaFieldWidget
 from zeam.form.ztk.fields import registerSchemaField
 from zeam.form.silva.interfaces import ISMIForm
@@ -105,9 +106,16 @@ class FileWidgetInput(SchemaFieldWidget):
         need(IUploadResources)
         super(FileWidgetInput, self).update()
 
+    def uploadIdentifier(self):
+        return str(uuid.uuid1())
+
     def uploadURL(self):
-        return absoluteURL(self.form.context, self.request) + \
-            '/++rest++zeam.form.silva.upload'
+        if ISubForm.providedBy(self.form):
+            form = self.form.getComposedForm()
+        else:
+            form = self.form
+        return absoluteURL(form, self.request) + \
+            '/upload'
 
     def prepareContentValue(self, value):
         formatted_value = u''
@@ -117,17 +125,25 @@ class FileWidgetInput(SchemaFieldWidget):
 
     def displayValue(self):
         value = self.inputValue()
+        status = None
         label = None
+        icon = IIconResolver(self.request).get_tag(None)
         if value:
             label = self.component.fileSetLabel
             if value != u'__NO_CHANGE__':
-                return {'icon': None,
-                        'message': None,
-                        'filename': unicode(os.path.basename(value))}
+                manager = self.request.environ.get('infrae.fileupload.manager')
+                if manager is None:
+                    raise interfaces.Error(
+                        'The upload component is not available.')
+                bucket = manager.access_upload_bucket(value)
+                if bucket is not None:
+                    status = json.dumps(bucket.get_status())
         else:
             label = self.component.fileNotSetLabel
-        icon = IIconResolver(self.request).get_tag(None)
-        return {'icon': icon, 'message': label, 'filename': None}
+        return {'icon': icon,
+                'message': label,
+                'status': status,
+                'empty': status is None}
 
     def valueToUnicode(self, value):
         if value is NO_CHANGE:
@@ -135,52 +151,58 @@ class FileWidgetInput(SchemaFieldWidget):
         return unicode(value)
 
 
+class UploadedFile(object):
+
+    def __init__(self, bucket):
+        metadata = bucket.get_status()
+        self.name = metadata.get('filename') # Python filename
+        self.filename = metadata.get('filename') # Zope filename
+        self.__descriptor = open(bucket.get_filename(), 'r')
+
+    def __getattr__(self, name):
+        return getattr(self.__descriptor, name)
+
+
 class FileWidgetExtractor(WidgetExtractor):
     grok.adapts(FileSchemaField, ISMIForm, Interface)
-
-    @classmethod
-    def upload_dir(cls):
-        if hasattr(cls, '_upload_dir_cache'):
-            return cls._upload_dir_cache
-        zconf = getattr(getConfiguration(), 'product_config', {})
-        config = zconf.get('zeam.form.silva', {})
-        upload_dir = config.get('upload-directory', None)
-        if upload_dir is None:
-            raise RuntimeError(
-                '(zeam.form.silva) upload directory no configured')
-        cls._upload_dir_cache = upload_dir
-        return upload_dir
 
     def extract(self):
         value = self.request.form.get(self.identifier, u'')
         if value == "__NO_CHANGE__":
             return NO_CHANGE, None
-        if value:
-            return open(os.path.join(self.upload_dir(), value), 'r'), None
-        return NO_VALUE, None
+        if not value:
+            return NO_VALUE, None
+        manager = self.request.environ.get('infrae.fileupload.manager')
+        if manager is None:
+            raise interfaces.Error('The upload component is not available')
+        bucket = manager.access_upload_bucket(value)
+        if bucket is not None:
+            if not bucket.is_complete():
+                return NO_VALUE, _(u"Upload is incomplete.")
+            return UploadedFile(bucket), None
+        return NO_VALUE, _(u"Upload failed.")
 
 
 class Upload(rest.REST):
     """ Check security and return information about gp.fileupload upload
     """
-    grok.context(Interface)
+    grok.adapts(ISMIForm, Interface)
     grok.require('silva.ChangeSilvaContent')
-    grok.name('zeam.form.silva.upload')
+    grok.name('upload')
 
     def POST(self):
         """ get information about file upload
         """
-        upload_id = long(self.request.get('gp.fileupload.id'))
-        paths = self.request.environ.get('HTTP_STORED_PATHS', '').split(':')
-        path = paths[0]
-        logger.info("upload paths: %r" % paths)
+        info = self.request.environ['infrae.fileupload.current'].get_status()
+        info['message'] = 'File uploaded'
         return """
             <html>
                 <body>
                     <script>
                         var $ = window.parent.jQuery;
-                        $(window.parent.document).trigger('done-%d-upload', %s);
+                        $(window.parent.document).trigger(
+                            'done-%s-upload', %s);
                     </script>
                 </body>
             </html>
-        """ % (upload_id, json.dumps({'path': path, 'upload-id': upload_id}))
+        """ % (info['identifier'], json.dumps(info))
