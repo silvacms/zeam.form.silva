@@ -1,7 +1,7 @@
 (function($, jsontemplate) {
     var POLL_RETRIES = 5,
         POLL_DELAY = 500,
-        NEED_POPUP = (function () {
+        DONT_NEED_POPUP = (function () {
             // Test if we need a Javascript POPUP to display the file input or not.
             var $test = $('<div style="display:none;"><form id="testform1">' +
                       '<input type="file" form="testform2" /></form><form id="testform2">' +
@@ -14,84 +14,17 @@
         return supported;
     })();
 
-    var UploadForm = function($field, identifier, url) {
-        // Upload a file input using the given identifier at the given URL.
-        // It will trigger callbacks uring various steps of the progress.
-        var $upload = $('<div style="display:none">' +
-                        '<iframe width="0" height="0" style="display:none"' +
-                        'src="about:blank" class="upload-iframe" name="upload-' +
-                        identifier + '-iframe"></iframe>' +
-                        '<form class="upload-form" enctype="multipart/form-data"' +
-                        'method="POST" action="' + url + '?identifier=' + identifier +
-                        '" target="upload-' + identifier +
-                        '-iframe" id="upload-' + identifier + '-form">' +
-                        '<input type="reset" class="upload-reset" /></form></div>'),
-            poll_retries = POLL_RETRIES,
-            poll_timeout = null,
-            result = $.Deferred().fail(function() {
-                $upload.find('.upload-reset').click();
-                $upload.find('.upload-iframe').attr('src', 'javascript:false;');
-            }).always(function() {
-                if (poll_timeout !== null) {
-                    clearTimeout(poll_timeout);
-                    poll_timeout = null;
-                };
-                $upload.remove();
-                $field.removeAttr('form');
-            }),
-            start = $.Deferred().done(function() {
-                poll_timeout = setTimeout(poll, POLL_DELAY);
-            });
 
-        var poll = function() {
-            // Poll status from the server.
-            $.ajax({
-                type: 'GET',
-                dataType: 'json',
-                url: url + '?status&identifier=' + identifier
-            }).then(function(info){
-                result.notify(info);
-                if (!info['upload-finished'] && result.state() == "pending") {
-                    // Unless the file is completely uploaded or
-                    // cancel request status again.
-                    poll_retries = POLL_RETRIES;
-                    poll_timeout = setTimeout(poll, POLL_DELAY);
-                };
-            }, function() {
-                if (result.state() == "pending") {
-                    if (poll_retries) {
-                        poll_retries -= 1;
-                        poll_timeout = setTimeout(poll, POLL_DELAY);
-                    } else {
-                        result.reject({message: 'Status check failed: cannot upload file.'});
-                    }
-                }
-            });
-        };
-        return {
-            start: function() {
-                $(document).one('done-' + identifier + '-upload', function(event, data) {
-                    result.resolve(data);
-                });
-                $('body').append($upload);
-                $field.attr('form', 'upload-' + identifier + '-form');
-                $upload.find('form').submit();
-                start.resolve({
-                    'uploaded-length': 0, 'content-type': 'n/a', 'request-length': 0, 'filename': ''});
-            },
-            cancel: function() {
-                result.reject({});
-            },
-            register: function(plugin) {
-                if (plugin.start !== undefined) {
-                    start.done(plugin.start);
-                };
-                for (var event in {progress: 1, done: 1, fail: 1, always: 1}) {
-                    if (plugin[event] !== undefined) {
-                        result[event](plugin[event]);
-                    };
-                };
-            }
+    var on_iframe_load = function($iframe, handler)  {
+        // helper to bind an event on iframe load
+        var iframe_window = $iframe.get(0).contentWindow,
+            iframe_document = iframe_window.document;
+        if (iframe_document.readyState == "complete") {
+            handler();
+        } else if (iframe_window.addEventListener) {
+            iframe_window.addEventListener("load", handler, false);
+        } else {
+            iframe_window.attachEvent("onload", handler);
         };
     };
 
@@ -117,7 +50,7 @@
                 }
             },
             progress: function(data) {
-                if (state != 'uploading') {
+                if (state != 'uploading' && !data.missing) {
                     // Refresh information on the first notification of progress.
                     $uploading.children('i').text(uploading.expand(data));
                     state = 'uploading';
@@ -176,16 +109,26 @@
         };
     };
 
-    var UploadField = function ($field, set_objection) {
+    var UploadUI = function($field, set_objection, get_upload) {
+        // Manage the controls of the upload widget.
         var $input = $field.children('.upload-input'),
-            $trigger = $field.children('.upload-trigger'),
             $cancel = $field.children('.upload-cancel'),
-            $clear = $field.children('.upload-clear'),
-            $file = $field.children('.upload-file-input');
+            $clear = $field.children('.upload-clear');
         var upload = null,
             objection = null,
             progress = UploadProgress($field.children('.upload-progress')),
             status = UploadStatusMessage($field.children('.upload-display')),
+            api = {
+                get: function(create) {
+                    if (upload == null && create) {
+                        upload = get_upload();
+                        upload.register(status);
+                        upload.register(progress);
+                        upload.register(ui);
+                    }
+                    return upload;
+                }
+            },
             ui = {
                 start: function() {
                     if (set_objection !== undefined) {
@@ -210,7 +153,6 @@
                             return null;
                         });
                     };
-                    $file.hide();
                     $cancel.show();
                 },
                 done: function(data) {
@@ -220,40 +162,241 @@
                     if (objection !== null) {
                         objection.resolve();
                     };
-                    $file.show();
                     $cancel.hide();
                     upload = null;
                 }
             };
 
-        var get_upload = function(create) {
-            if (upload == null && create) {
-                upload = UploadForm($file, $field.data('upload-identifier'), $field.data('upload-url'));
-                upload.register(status);
-                upload.register(progress);
-                upload.register(ui);
-            }
-            return upload;
-        };
-
-        $trigger.remove();
         $cancel.on('click', function() {
-            var upload = get_upload();
+            var upload = api.get();
             if (upload !== null) {
                 upload.cancel();
             };
         });
         $clear.on('click', function() {
-            var upload = get_upload(true);
+            var upload = api.get(true);
             upload.cancel();
             $input.attr('value', '');
         });
+        return api;
+    };
+
+    var UploadForm = function($field, identifier, url) {
+        // Upload a file input using the given identifier at the given URL.
+        // It will trigger callbacks uring various steps of the progress.
+        var $upload = $('<div style="display:none">' +
+                        '<iframe width="0" height="0" style="display:none"' +
+                        'src="about:blank" class="upload-iframe" name="upload-' +
+                        identifier + '-iframe"></iframe>' +
+                        '<form class="upload-form" enctype="multipart/form-data"' +
+                        'method="POST" action="' + url + '?identifier=' + identifier +
+                        '" target="upload-' + identifier +
+                        '-iframe" id="upload-' + identifier + '-form">' +
+                        '<input type="reset" class="upload-reset" /></form></div>'),
+            poll_retries = POLL_RETRIES,
+            poll_timeout = null,
+            result = $.Deferred().fail(function() {
+                $upload.find('.upload-reset').click();
+                $upload.find('.upload-iframe').attr('src', 'javascript:false;');
+            }).always(function() {
+                if (poll_timeout !== null) {
+                    clearTimeout(poll_timeout);
+                    poll_timeout = null;
+                };
+                $upload.remove();
+                $field.removeAttr('form');
+            }),
+            start = $.Deferred().done(function() {
+                poll_timeout = setTimeout(poll, POLL_DELAY);
+            }),
+            poll = function() {
+                // Poll status from the server.
+                $.ajax({
+                    type: 'GET',
+                    dataType: 'json',
+                    url: url + '?status&identifier=' + identifier
+                }).then(function(info){
+                    result.notify(info);
+                    if (!info['upload-finished'] && result.state() == "pending") {
+                        // Unless the file is completely uploaded or
+                        // cancel request status again.
+                        poll_retries = POLL_RETRIES;
+                        poll_timeout = setTimeout(poll, POLL_DELAY);
+                    };
+                }, function() {
+                    if (result.state() == "pending") {
+                        if (poll_retries) {
+                            poll_retries -= 1;
+                            poll_timeout = setTimeout(poll, POLL_DELAY);
+                        } else {
+                            result.reject({message: 'Status check failed: cannot upload file.'});
+                        }
+                    }
+                });
+            },
+            api = {
+                start: function() {
+                    $(document).one('done-' + identifier + '-upload', function(event, data) {
+                        result.resolve(data);
+                    });
+                    $('body').append($upload);
+                    $field.attr('form', 'upload-' + identifier + '-form');
+                    $upload.find('form').submit();
+                    on_iframe_load($upload.find('iframe'), function() {
+                        result.reject({message: 'Upload failed (file too big or server error).'});
+                    });
+                    start.resolve({
+                        'uploaded-length': 0, 'content-type': 'n/a', 'request-length': 0, 'filename': ''});
+                },
+                cancel: function() {
+                    result.reject({});
+                },
+                register: function(plugin) {
+                    if (plugin.start !== undefined) {
+                        start.done(plugin.start);
+                    };
+                    for (var event in {progress: 1, done: 1, fail: 1, always: 1}) {
+                        if (plugin[event] !== undefined) {
+                            result[event](plugin[event]);
+                        };
+                    };
+                    return api;
+                }
+            };
+        return api;
+    };
+
+    var UploadPopup = function(identifier, url) {
+        // Upload a file input using the given identifier at the given URL.
+        // It will trigger callbacks uring various steps of the progress.
+        var $popup = $('<div  title="Upload da file">' +
+                       '<form class="upload-form" enctype="multipart/form-data"' +
+                       'method="POST" action="' + url + '?identifier=' + identifier +
+                        '" target="upload-' + identifier +
+                       '-iframe" id="upload-' + identifier + '-form">' +
+                       '<input type="file" name="file-we-are-uploading" class="upload-file" /></form>'+
+                       '<iframe width="0" height="0" style="display:none"' +
+                       'src="about:blank" class="upload-iframe" name="upload-' +
+                       identifier + '-iframe"></iframe></div>'),
+            poll_retries = POLL_RETRIES,
+            poll_timeout = null,
+            result = $.Deferred().fail(function() {
+                $popup.find('.upload-iframe').attr('src', 'javascript:false;');
+            }).always(function() {
+                if (poll_timeout !== null) {
+                    clearTimeout(poll_timeout);
+                    poll_timeout = null;
+                };
+                $popup.remove();
+            }),
+            start = $.Deferred().done(function() {
+                poll_timeout = setTimeout(poll, POLL_DELAY);
+            }),
+            poll = function() {
+                // Poll status from the server.
+                $.ajax({
+                    type: 'GET',
+                    dataType: 'json',
+                    url: url + '?status&identifier=' + identifier
+                }).then(function(info){
+                    result.notify(info);
+                    if (!info['upload-finished'] && result.state() == "pending") {
+                        // Unless the file is completely uploaded or
+                        // cancel request status again.
+                        poll_retries = POLL_RETRIES;
+                        poll_timeout = setTimeout(poll, POLL_DELAY);
+                    };
+                }, function() {
+                    if (result.state() == "pending") {
+                        if (poll_retries) {
+                            poll_retries -= 1;
+                            poll_timeout = setTimeout(poll, POLL_DELAY);
+                        } else {
+                            result.reject({message: 'Status check failed: cannot upload file.'});
+                        }
+                    }
+                });
+            },
+            api = {
+                start: function() {
+                    var send = function() {
+                        $(document).one('done-' + identifier + '-upload', function(event, data) {
+                            result.resolve(data);
+                        });
+                        $popup.find('form').submit();
+                        on_iframe_load($popup.find('iframe'), function() {
+                            result.reject({message: 'Upload failed (file too big or server error).'});
+                        });
+                        start.resolve({
+                            'uploaded-length': 0, 'content-type': 'n/a', 'request-length': 0, 'filename': ''});
+                        $popup.dialog('close');
+                    };
+                    $popup.find('.upload-file').on('change', function() {
+                        send();
+                    });
+                    $popup.dialog({
+                        buttons: {
+                            Send: function() {
+                                send();
+                            }
+                        }
+                    });
+                },
+                cancel: function() {
+                    result.reject({});
+                },
+                register: function(plugin) {
+                    if (plugin.start !== undefined) {
+                        start.done(plugin.start);
+                    };
+                    for (var event in {progress: 1, done: 1, fail: 1, always: 1}) {
+                        if (plugin[event] !== undefined) {
+                            result[event](plugin[event]);
+                        };
+                    };
+                    return api;
+                }
+            };
+        return api;
+    };
+
+    var UploadField = DONT_NEED_POPUP ?
+            function ($field, set_objection) {
+        var $trigger = $field.children('.upload-trigger'),
+            $file = $field.children('.upload-file-input'),
+            ui = UploadUI($field, set_objection, function() {
+                return UploadForm($file, $field.data('upload-identifier'), $field.data('upload-url')).register({
+                    start: function() {
+                        $file.hide();
+                    },
+                    always: function() {
+                        $file.show();
+                    }
+                });
+            });
+
+        $trigger.remove();
         $file.on('change', function() {
-            upload = UploadForm($file, $field.data('upload-identifier'), $field.data('upload-url'));
-            upload.register(status);
-            upload.register(progress);
-            upload.register(ui);
-            upload.start();
+            ui.get(true).start();
+        });
+    } : function($field, set_objection) {
+        var $trigger = $field.children('.upload-trigger'),
+            $file = $field.children('.upload-file-input'),
+            ui = UploadUI($field, set_objection, function() {
+                return UploadPopup($field.data('upload-identifier'), $field.data('upload-url')).register({
+                    start: function() {
+                        $trigger.hide();
+                    },
+                    always: function() {
+                        $trigger.show();
+                    }
+                });
+            });
+
+        $file.detach();
+        $trigger.show();
+        $trigger.on('click', function(){
+            ui.get(true).start();
         });
     };
 

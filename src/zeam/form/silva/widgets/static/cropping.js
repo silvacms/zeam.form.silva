@@ -2,10 +2,10 @@
 (function(infrae, $) {
 
     var create_cropping_field = function() {
-        var $field = $(this);
-        var $input = $field.find('input.field-cropcoordinates');
-        var $opener = $field.find('a.widget-crop-popup-button');
-        var $template = $field.find('div.widget-crop-popup').detach();
+        var $field = $(this),
+            $input = $field.find('input.field-cropcoordinates'),
+            $opener = $field.find('a.widget-crop-popup-button'),
+            $template = $field.find('div.widget-crop-popup').detach();
         var required = $input.hasClass('field-required');
         infrae.ui.selection.disable($template);
 
@@ -22,8 +22,8 @@
             var $img = $popup.find('img.widget-crop-image');
             var image_width = preload.width; // Use size from the preload.
             var image_height = preload.height;
-            var original_width = Math.max(40 + image_width, 250);
-            var original_height = 145 + image_height;
+            var original_width = Math.max(40 + image_width, 250),
+                original_height = 145 + image_height;
             var ratio = 0;
 
             var $proportional = $popup.find('input.crop-proportional');
