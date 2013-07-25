@@ -33,7 +33,7 @@ setup(name='zeam.form.silva',
       zip_safe=False,
       install_requires=[
         'five.grok',
-        'gp.fileupload',
+        'infrae.fileupload',
         'grokcore.layout',
         'grokcore.security',
         'infrae.rest',
