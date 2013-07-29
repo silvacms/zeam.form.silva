@@ -21,9 +21,7 @@
         var iframe = $iframe.get(0),
             iframe_window = iframe.contentWindow,
             iframe_document = iframe_window.document;
-        if (iframe_document.readyState == "complete") {
-            handler();
-        } else if (iframe_window.addEventListener) {
+        if (iframe_window.addEventListener) {
             iframe_window.addEventListener("load", handler, false);
             iframe_window.addEventListener("error", handler, false);
         } else {
