@@ -193,14 +193,13 @@ class Upload(rest.REST):
         """ get information about file upload
         """
         info = self.request.environ['infrae.fileupload.current'].get_status()
-        info['message'] = 'File uploaded'
         return """
             <html>
                 <body>
                     <script>
-                        var $ = window.parent.jQuery;
-                        $(window.parent.document).trigger(
-                            'done-%s-upload', %s);
+                        (function($, document) {
+                            $(document).trigger('upload-%s-done', %s);
+                        })(window.parent.jQuery, window.parent.document);
                     </script>
                 </body>
             </html>

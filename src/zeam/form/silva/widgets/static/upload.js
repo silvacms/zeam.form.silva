@@ -16,23 +16,28 @@
     })();
 
 
-    var on_iframe_load = function($iframe, handler)  {
+    var IFrameLoad = function($iframe, name)  {
         // helper to bind an event on iframe load
         var iframe = $iframe.get(0),
             iframe_window = iframe.contentWindow,
-            iframe_document = iframe_window.document;
-        var invoke = function() {
-            setTimeout(handler, 50);
+            iframe_document = iframe_window.document,
+            deferred = $.Deferred();
+
+        var fail = function() {
+            deferred.reject();
         };
-        if (iframe_document.readyState == "complete" && iframe.src != 'about:blank') {
-            invoke();
-        } else if (iframe_window.addEventListener) {
-            iframe_window.addEventListener("load", invoke, false);
-            iframe_window.addEventListener("error", invoke, false);
+
+        $(document).one(name, function(event, data) {
+            deferred.resolve(data);
+        });
+        if (iframe_window.addEventListener) {
+            iframe_window.addEventListener("load", fail, false);
+            iframe_window.addEventListener("error", fail, false);
         } else {
-            iframe_window.attachEvent("onload", invoke);
-            iframe_window.attachEvent("onerror", invoke);
+            iframe_window.attachEvent("onload", fail);
+            iframe_window.attachEvent("onerror", fail);
         };
+        return deferred.promise();
     };
 
     var UploadStatusMessage = function($display) {
@@ -266,16 +271,16 @@
             },
             api = {
                 start: function() {
-                    $(document).one('done-' + identifier + '-upload', function(event, data) {
-                        result.resolve(data);
-                    });
                     $('body').append($upload);
                     $field.attr('form', 'upload-' + identifier + '-form');
-                    $upload.find('form').submit();
                     start.done(function() {
-                        on_iframe_load($upload.find('iframe'), function() {
-                            result.reject({message: 'Upload failed (file too big or server error).'});
-                        });
+                        IFrameLoad($upload.find('iframe'), 'upload-' + identifier + '-done').fail(
+                            function() {
+                                result.reject({message: 'Upload failed (file too big or server error).'});
+                            }).done(function (data) {
+                                result.resolve(data);
+                            });
+                        $upload.find('form').submit();
                     }).resolve({
                         'uploaded-length': 0, 'content-type': 'n/a', 'request-length': 0, 'filename': ''});
                 },
@@ -358,15 +363,15 @@
             api = {
                 start: function() {
                     var send = function() {
-                        $(document).one('done-' + identifier + '-upload', function(event, data) {
-                            result.resolve(data);
-                        });
-                        $popup.find('form').submit();
                         start.done(function() {
                             $popup.dialog('close');
-                            on_iframe_load($popup.find('iframe'), function() {
-                                result.reject({message: 'Upload failed (file too big or server error).'});
-                            });
+                            IFrameLoad($popup.find('iframe'), 'upload-' + identifier + '-done').fail(
+                                function() {
+                                    result.reject({message: 'Upload failed (file too big or server error).'});
+                                }).done(function (data) {
+                                    result.resolve(data);
+                                });
+                            $popup.find('form').submit();
                         }).resolve({
                             'uploaded-length': 0, 'content-type': 'n/a', 'request-length': 0, 'filename': ''});
                     };
