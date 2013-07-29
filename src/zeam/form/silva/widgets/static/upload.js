@@ -1,6 +1,7 @@
 (function($, jsontemplate) {
-    var POLL_RETRIES = 5,
-        POLL_DELAY = 500,
+    var POLL_NETWORK_RETRIES = 5,
+        POLL_NETWORK_DELAY = 500,
+        POLL_MISSING_RETRIES = 20,
         DONT_NEED_POPUP = (function () {
             // Test if we need a Javascript POPUP to display the file input or not.
             var $test = $('<div style="display:none;"><form id="testform1">' +
@@ -17,14 +18,17 @@
 
     var on_iframe_load = function($iframe, handler)  {
         // helper to bind an event on iframe load
-        var iframe_window = $iframe.get(0).contentWindow,
+        var iframe = $iframe.get(0),
+            iframe_window = iframe.contentWindow,
             iframe_document = iframe_window.document;
         if (iframe_document.readyState == "complete") {
             handler();
         } else if (iframe_window.addEventListener) {
             iframe_window.addEventListener("load", handler, false);
+            iframe_window.addEventListener("error", handler, false);
         } else {
             iframe_window.attachEvent("onload", handler);
+            iframe_window.attachEvent("onerror", handler);
         };
     };
 
@@ -135,7 +139,9 @@
                         objection = $.Deferred();
                         set_objection(function () {
                             if (objection.state() == 'pending') {
-                                var $dialog = $('<div title="Uploading file">Please wait until the upload is finished ...</div>');
+                                var $dialog = $('<div title="Uploading file"><p>Please wait until the upload is finished ...</p><p class="progress"></p></div>'),
+                                    $progress = $dialog.find('p.progress'),
+                                    progress = 0;
 
                                 $dialog.dialog({
                                     modal: true,
@@ -145,6 +151,20 @@
                                     beforeClose: function() {
                                         return false;
                                 }});
+                                $progress.progressbar({value: 0});
+                                api.get().register({
+                                    progress: function(data) {
+                                        var updated = 0;
+
+                                        if (!data['missing']) {
+                                            updated = data['uploaded-length'] * 100 / data['request-length'];
+                                        };
+                                        if (updated != progress) {
+                                            $progress.progressbar({value: updated});
+                                            progress = updated;
+                                        };
+                                    }
+                                });
                                 return objection.always(function() {
                                     $dialog.dialog('close').remove();
                                     objection = null;
@@ -193,8 +213,9 @@
                         '" target="upload-' + identifier +
                         '-iframe" id="upload-' + identifier + '-form">' +
                         '<input type="reset" class="upload-reset" /></form></div>'),
-            poll_retries = POLL_RETRIES,
+            poll_retries = POLL_NETWORK_RETRIES,
             poll_timeout = null,
+            missing_retries = POLL_MISSING_RETRIES,
             result = $.Deferred().fail(function() {
                 $upload.find('.upload-reset').click();
                 $upload.find('.upload-iframe').attr('src', 'javascript:false;');
@@ -207,7 +228,7 @@
                 $field.removeAttr('form');
             }),
             start = $.Deferred().done(function() {
-                poll_timeout = setTimeout(poll, POLL_DELAY);
+                poll_timeout = setTimeout(poll, POLL_NETWORK_DELAY);
             }),
             poll = function() {
                 // Poll status from the server.
@@ -217,17 +238,23 @@
                     url: url + '?status&identifier=' + identifier
                 }).then(function(info){
                     result.notify(info);
-                    if (!info['upload-finished'] && result.state() == "pending") {
+                    if(info['missing']) {
+                        missing_retries -= 1;
+                        if (!missing_retries) {
+                            result.reject({message: 'File does not upload. (is it too big ?)'});
+                        };
+                    };
+                    if (!info['upload-finished'] && result.state() == "pending" && missing_retries) {
                         // Unless the file is completely uploaded or
                         // cancel request status again.
-                        poll_retries = POLL_RETRIES;
-                        poll_timeout = setTimeout(poll, POLL_DELAY);
+                        poll_retries = POLL_NETWORK_RETRIES;
+                        poll_timeout = setTimeout(poll, POLL_NETWORK_DELAY);
                     };
                 }, function() {
                     if (result.state() == "pending") {
                         if (poll_retries) {
                             poll_retries -= 1;
-                            poll_timeout = setTimeout(poll, POLL_DELAY);
+                            poll_timeout = setTimeout(poll, POLL_NETWORK_DELAY);
                         } else {
                             result.reject({message: 'Status check failed: cannot upload file.'});
                         }
@@ -242,10 +269,11 @@
                     $('body').append($upload);
                     $field.attr('form', 'upload-' + identifier + '-form');
                     $upload.find('form').submit();
-                    on_iframe_load($upload.find('iframe'), function() {
-                        result.reject({message: 'Upload failed (file too big or server error).'});
-                    });
-                    start.resolve({
+                    start.done(function() {
+                        on_iframe_load($upload.find('iframe'), function() {
+                            result.reject({message: 'Upload failed (file too big or server error).'});
+                        });
+                    }).resolve({
                         'uploaded-length': 0, 'content-type': 'n/a', 'request-length': 0, 'filename': ''});
                 },
                 cancel: function() {
@@ -269,7 +297,7 @@
     var UploadPopup = function(identifier, url) {
         // Upload a file input using the given identifier at the given URL.
         // It will trigger callbacks uring various steps of the progress.
-        var $popup = $('<div  title="Upload da file">' +
+        var $popup = $('<div  title="Upload a file">' +
                        '<form class="upload-form" enctype="multipart/form-data"' +
                        'method="POST" action="' + url + '?identifier=' + identifier +
                         '" target="upload-' + identifier +
@@ -278,8 +306,9 @@
                        '<iframe width="0" height="0" style="display:none"' +
                        'src="about:blank" class="upload-iframe" name="upload-' +
                        identifier + '-iframe"></iframe></div>'),
-            poll_retries = POLL_RETRIES,
+            poll_retries = POLL_NETWORK_RETRIES,
             poll_timeout = null,
+            missing_retries = POLL_MISSING_RETRIES,
             result = $.Deferred().fail(function() {
                 $popup.find('.upload-iframe').attr('src', 'javascript:false;');
             }).always(function() {
@@ -290,7 +319,7 @@
                 $popup.remove();
             }),
             start = $.Deferred().done(function() {
-                poll_timeout = setTimeout(poll, POLL_DELAY);
+                poll_timeout = setTimeout(poll, POLL_NETWORK_DELAY);
             }),
             poll = function() {
                 // Poll status from the server.
@@ -300,17 +329,23 @@
                     url: url + '?status&identifier=' + identifier
                 }).then(function(info){
                     result.notify(info);
-                    if (!info['upload-finished'] && result.state() == "pending") {
+                    if (info['missing']) {
+                        missing_retries -= 1;
+                        if (!missing_retries) {
+                            result.reject({message: 'File does not upload. (is it too big ?)'});
+                        };
+                    };
+                    if (!info['upload-finished'] && result.state() == "pending" && missing_retries) {
                         // Unless the file is completely uploaded or
                         // cancel request status again.
-                        poll_retries = POLL_RETRIES;
-                        poll_timeout = setTimeout(poll, POLL_DELAY);
+                        poll_retries = POLL_NETWORK_RETRIES;
+                        poll_timeout = setTimeout(poll, POLL_NETWORK_DELAY);
                     };
                 }, function() {
                     if (result.state() == "pending") {
                         if (poll_retries) {
                             poll_retries -= 1;
-                            poll_timeout = setTimeout(poll, POLL_DELAY);
+                            poll_timeout = setTimeout(poll, POLL_NETWORK_DELAY);
                         } else {
                             result.reject({message: 'Status check failed: cannot upload file.'});
                         }
@@ -324,12 +359,13 @@
                             result.resolve(data);
                         });
                         $popup.find('form').submit();
-                        on_iframe_load($popup.find('iframe'), function() {
-                            result.reject({message: 'Upload failed (file too big or server error).'});
-                        });
-                        start.resolve({
+                        start.done(function() {
+                            $popup.dialog('close');
+                            on_iframe_load($popup.find('iframe'), function() {
+                                result.reject({message: 'Upload failed (file too big or server error).'});
+                            });
+                        }).resolve({
                             'uploaded-length': 0, 'content-type': 'n/a', 'request-length': 0, 'filename': ''});
-                        $popup.dialog('close');
                     };
                     $popup.find('.upload-file').on('change', function() {
                         send();
