@@ -2,7 +2,6 @@
 # Copyright (c) 2010-2013 Infrae. All rights reserved.
 # See also LICENSE.txt
 
-import os.path
 import logging
 import json
 import uuid
