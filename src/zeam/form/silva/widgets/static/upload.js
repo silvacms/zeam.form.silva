@@ -21,12 +21,17 @@
         var iframe = $iframe.get(0),
             iframe_window = iframe.contentWindow,
             iframe_document = iframe_window.document;
-        if (iframe_window.addEventListener) {
-            iframe_window.addEventListener("load", handler, false);
-            iframe_window.addEventListener("error", handler, false);
+        var invoke = function() {
+            setTimeout(handler, 50);
+        };
+        if (iframe_document.readyState == "complete" && iframe.src != 'about:blank') {
+            invoke();
+        } else if (iframe_window.addEventListener) {
+            iframe_window.addEventListener("load", invoke, false);
+            iframe_window.addEventListener("error", invoke, false);
         } else {
-            iframe_window.attachEvent("onload", handler);
-            iframe_window.attachEvent("onerror", handler);
+            iframe_window.attachEvent("onload", invoke);
+            iframe_window.attachEvent("onerror", invoke);
         };
     };
 
