@@ -37,7 +37,7 @@
                     if (info['missing']) {
                         missing_retries -= 1;
                         if (!missing_retries) {
-                            error = info['upload-error'] || 'unknow error';
+                            error = info['upload-error'] || 'Upload does not start';
                             deferred.reject({message: 'Upload failed ('+ error + ').'});
                         };
                     };
@@ -45,7 +45,7 @@
                         if (info['upload-finished'] && !info['upload-error']) {
                             deferred.resolve(info);
                         } else {
-                            error = info['upload-error'] || 'unknow error';
+                            error = info['upload-error'] || 'Unknow error';
                             deferred.reject({message: 'Upload failed ('+ error + ').'});
                         };
                     } else if (result.state() == "pending" && missing_retries) {
@@ -60,8 +60,8 @@
                             poll_retries -= 1;
                             poll_timeout = setTimeout(poll, POLL_NETWORK_DELAY);
                         } else {
-                            deferred.reject({message: 'Status check failed: cannot upload file.'});
-                        }
+                            deferred.reject({message: 'Upload failed (Cannot check the status of the upload).'});
+                        };
                     }
                 });
             };
@@ -87,7 +87,7 @@
             deferred = $.Deferred();
 
         var fail = function() {
-            deferred.reject({message: 'Upload failed (file too big or server error).'});
+            deferred.reject({message: 'Upload failed (File too big or server error).'});
         };
 
         $(document).one(name, function(event, data) {
@@ -304,14 +304,21 @@
             start = $.Deferred(),
             api = {
                 start: function() {
-                    $('body').append($upload);
-                    $field.attr('form', 'upload-' + identifier + '-form');
-                    start.done(function() {
-                        api.register(IFrameStatusChecker($upload.find('iframe'), 'upload-' + identifier + '-done'));
-                        api.register(PollStatusChecker(url, identifier, result));
-                        $upload.find('form').submit();
-                    }).resolve({
-                        'uploaded-length': 0, 'content-type': 'n/a', 'request-length': 0, 'filename': ''});
+                    $.ajax({
+                        type: 'GET',
+                        dataType: 'json',
+                        url: url + '?clear&identifier=' + identifier}).then(function () {
+                            $('body').append($upload);
+                            $field.attr('form', 'upload-' + identifier + '-form');
+                            start.done(function() {
+                                api.register(IFrameStatusChecker($upload.find('iframe'), 'upload-' + identifier + '-done'));
+                                api.register(PollStatusChecker(url, identifier, result));
+                                $upload.find('form').submit();
+                            }).resolve({
+                                'uploaded-length': 0, 'content-type': 'n/a', 'request-length': 0, 'filename': ''});
+                        }, function() {
+                            result.reject({message: 'Upload failed.'});
+                        });
                 },
                 cancel: function() {
                     result.reject({});
@@ -359,13 +366,20 @@
             api = {
                 start: function() {
                     var send = function() {
-                        start.done(function() {
-                            $popup.dialog('close');
-                            api.register(IFrameStatusChecker($popup.find('iframe'), 'upload-' + identifier + '-done'));
-                            api.register(PollStatusChecker(url, identifier, result));
-                            $popup.find('form').submit();
-                        }).resolve({
-                            'uploaded-length': 0, 'content-type': 'n/a', 'request-length': 0, 'filename': ''});
+                        $.ajax({
+                            type: 'GET',
+                            dataType: 'json',
+                            url: url + '?clear&identifier=' + identifier}).then(function() {
+                                start.done(function() {
+                                    $popup.dialog('close');
+                                    api.register(IFrameStatusChecker($popup.find('iframe'), 'upload-' + identifier + '-done'));
+                                    api.register(PollStatusChecker(url, identifier, result));
+                                    $popup.find('form').submit();
+                                }).resolve({
+                                    'uploaded-length': 0, 'content-type': 'n/a', 'request-length': 0, 'filename': ''});
+                            }, function() {
+                                result.reject({message: 'Upload failed.'});
+                            });
                     };
                     $popup.find('.upload-file').on('change', function() {
                         send();
