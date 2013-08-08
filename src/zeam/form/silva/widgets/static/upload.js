@@ -1,5 +1,6 @@
 (function($, jsontemplate) {
-    var POLL_NETWORK_RETRIES = 5,
+    var IDENTIFIER_KEY = 'X-Progress-ID',
+        POLL_NETWORK_RETRIES = 5,
         POLL_NETWORK_DELAY = 500,
         POLL_MISSING_RETRIES = 20,
         DONT_NEED_POPUP = (function () {
@@ -28,24 +29,24 @@
                 // Poll status from the server.
                 $.ajax({
                     type: 'GET',
-                    dataType: 'json',
-                    url: url + '?status&identifier=' + identifier
+                    dataType: 'jsonp',
+                    url: url + '/status?' + IDENTIFIER_KEY + '=' + identifier
                 }).then(function(info){
                     var error = null;
 
                     result.notify(info);
-                    if (info['missing']) {
+                    if (info['state'] == 'starting') {
                         missing_retries -= 1;
                         if (!missing_retries) {
-                            error = info['upload-error'] || 'Upload does not start';
+                            error = info['error'] || 'Upload does not start';
                             deferred.reject({message: 'Upload failed ('+ error + ').'});
                         };
                     };
-                    if (info['upload-finished'] || info['upload-error']) {
-                        if (info['upload-finished'] && !info['upload-error']) {
+                    if (info['state'] == 'done'|| info['state'] == 'error') {
+                        if (info['state'] == 'done') {
                             deferred.resolve(info);
                         } else {
-                            error = info['upload-error'] || 'Unknow error';
+                            error = info['error'] || 'Unknow error';
                             deferred.reject({message: 'Upload failed ('+ error + ').'});
                         };
                     } else if (result.state() == "pending" && missing_retries) {
@@ -79,25 +80,33 @@
         };
     };
 
-    var IFrameStatusChecker = function($iframe, name, result)  {
-        // helper to bind an event on iframe load
+    var IFrameStatusChecker = function($iframe, identifier, result)  {
+        // Check the status of the upload with the iframe. This never works.
         var iframe = $iframe.get(0),
             iframe_window = iframe.contentWindow,
             iframe_document = iframe_window.document,
             deferred = $.Deferred();
 
         var fail = function() {
-            deferred.reject({message: 'Upload failed (File too big or server error).'});
+            setTimeout(function() {
+                deferred.reject({message: 'Upload failed (File too big or server error).'});
+            }, POLL_NETWORK_DELAY);
+        };
+        var load = function() {
+            var $body = $(iframe_document.body);
+
+            if ($body.data('upload-identifier') == identifier) {
+                deferred.resolve($body.data('upload-info'));
+            } else {
+                fail();
+            };
         };
 
-        $(document).one(name, function(event, data) {
-            deferred.resolve(data);
-        });
         if (iframe_window.addEventListener) {
-            iframe_window.addEventListener("load", fail, false);
+            iframe_window.addEventListener("load", load, false);
             iframe_window.addEventListener("error", fail, false);
         } else {
-            iframe_window.attachEvent("onload", fail);
+            iframe_window.attachEvent("onload", load);
             iframe_window.attachEvent("onerror", fail);
         };
         return {
@@ -118,12 +127,13 @@
             uploading = jsontemplate.Template($uploading.children('i').text(), {}),
             done = jsontemplate.Template($done.children('i').text(), {}),
             state = 'empty',
+            defaults = {'filename': '', 'content-type': 'n/a'},
             original = $display.data('upload-status');
 
         var api = {
             start: function(data) {
                 if (state != 'starting') {
-                    $uploading.children('i').text(uploading.expand(data));
+                    $uploading.children('i').text(uploading.expand($.extend({}, defaults, data)));
                     $empty.hide();
                     $done.hide();
                     $uploading.show();
@@ -131,15 +141,15 @@
                 }
             },
             progress: function(data) {
-                if (state != 'uploading' && !data.missing) {
+                if (state != 'uploading' && data.state == 'uploading') {
                     // Refresh information on the first notification of progress.
-                    $uploading.children('i').text(uploading.expand(data));
+                    $uploading.children('i').text(uploading.expand($.extend({}, defaults, data)));
                     state = 'uploading';
                 };
             },
             done: function(data) {
                 if (state != 'done') {
-                    $done.children('i').text(done.expand(data));
+                    $done.children('i').text(done.expand($.extend({}, defaults, data)));
                     $empty.hide();
                     $uploading.hide();
                     $done.show();
@@ -175,8 +185,8 @@
             progress: function(data) {
                 var updated = 0;
 
-                if (!data['missing']) {
-                    updated = data['uploaded-length'] * 100 / data['request-length'];
+                if (data['state'] == 'uploading') {
+                    updated = data['received'] * 100 / data['size'];
                 };
                 if (updated != progress) {
                     $progress.progressbar({value: updated});
@@ -233,8 +243,8 @@
                                     progress: function(data) {
                                         var updated = 0;
 
-                                        if (!data['missing']) {
-                                            updated = data['uploaded-length'] * 100 / data['request-length'];
+                                        if (data['state'] == 'uploading') {
+                                            updated = data['received'] * 100 / data['size'];
                                         };
                                         if (updated != progress) {
                                             $progress.progressbar({value: updated});
@@ -290,7 +300,7 @@
                         'src="about:blank" class="upload-iframe" name="upload-' +
                         identifier + '-iframe"></iframe>' +
                         '<form class="upload-form" enctype="multipart/form-data"' +
-                        'method="POST" action="' + url + '?identifier=' + identifier +
+                        'method="POST" action="' + url + '?' + IDENTIFIER_KEY + '=' + identifier +
                         '" target="upload-' + identifier +
                         '-iframe" id="upload-' + identifier + '-form">' +
                         '<input type="reset" class="upload-reset" /></form></div>'),
@@ -306,16 +316,15 @@
                 start: function() {
                     $.ajax({
                         type: 'GET',
-                        dataType: 'json',
-                        url: url + '?clear&identifier=' + identifier}).then(function () {
+                        dataType: 'jsonp',
+                        url: url + '?clear&' + IDENTIFIER_KEY + '=' + identifier}).then(function () {
                             $('body').append($upload);
                             $field.attr('form', 'upload-' + identifier + '-form');
                             start.done(function() {
-                                api.register(IFrameStatusChecker($upload.find('iframe'), 'upload-' + identifier + '-done'));
+                                api.register(IFrameStatusChecker($upload.find('iframe'), identifier, result));
                                 api.register(PollStatusChecker(url, identifier, result));
                                 $upload.find('form').submit();
-                            }).resolve({
-                                'uploaded-length': 0, 'content-type': 'n/a', 'request-length': 0, 'filename': ''});
+                            }).resolve({state: 'starting', received: 0, size: 0});
                         }, function() {
                             result.reject({message: 'Upload failed.'});
                         });
@@ -350,7 +359,7 @@
         // It will trigger callbacks uring various steps of the progress.
         var $popup = $('<div  title="Upload a file">' +
                        '<form class="upload-form" enctype="multipart/form-data"' +
-                       'method="POST" action="' + url + '?identifier=' + identifier +
+                       'method="POST" action="' + url + '?' + IDENTIFIER_KEY+ '=' + identifier +
                         '" target="upload-' + identifier +
                        '-iframe" id="upload-' + identifier + '-form">' +
                        '<input type="file" name="file-we-are-uploading" class="upload-file" /></form>'+
@@ -368,15 +377,14 @@
                     var send = function() {
                         $.ajax({
                             type: 'GET',
-                            dataType: 'json',
-                            url: url + '?clear&identifier=' + identifier}).then(function() {
+                            dataType: 'jsonp',
+                            url: url + '?clear&' + IDENTIFIER_KEY + '=' + identifier}).then(function() {
                                 start.done(function() {
                                     $popup.dialog('close');
-                                    api.register(IFrameStatusChecker($popup.find('iframe'), 'upload-' + identifier + '-done'));
+                                    api.register(IFrameStatusChecker($popup.find('iframe'), identifier, result));
                                     api.register(PollStatusChecker(url, identifier, result));
                                     $popup.find('form').submit();
-                                }).resolve({
-                                    'uploaded-length': 0, 'content-type': 'n/a', 'request-length': 0, 'filename': ''});
+                                }).resolve({state: 'starting', received: 0, size: 0});
                             }, function() {
                                 result.reject({message: 'Upload failed.'});
                             });

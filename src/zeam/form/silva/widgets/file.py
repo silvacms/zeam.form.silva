@@ -109,6 +109,11 @@ class FileWidgetInput(SchemaFieldWidget):
         return str(uuid.uuid1())
 
     def uploadURL(self):
+        manager = self.request.environ.get('infrae.fileupload.manager')
+        if manager is None:
+            raise interfaces.Error('The upload component is not available')
+        if manager.upload_url:
+            return manager.upload_url
         if ISubForm.providedBy(self.form):
             form = self.form.getComposedForm()
         else:
@@ -195,12 +200,7 @@ class Upload(rest.REST):
         info = self.request.environ['infrae.fileupload.current'].get_status()
         return """
             <html>
-                <body>
-                    <script>
-                        (function($, document) {
-                            $(document).trigger('upload-%s-done', %s);
-                        })(window.parent.jQuery, window.parent.document);
-                    </script>
+                <body data-upload-identifier="%s" data-upload-info="%s">
                 </body>
             </html>
-        """ % (info['identifier'], json.dumps(info))
+        """ % (str(info['identifier']), json.dumps(info).replace('"', '\\"'))
