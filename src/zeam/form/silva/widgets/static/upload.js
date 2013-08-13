@@ -317,14 +317,19 @@
                     $.ajax({
                         type: 'GET',
                         dataType: 'jsonp',
-                        url: url + '?clear&' + IDENTIFIER_KEY + '=' + identifier}).then(function () {
-                            $('body').append($upload);
-                            $field.attr('form', 'upload-' + identifier + '-form');
-                            start.done(function() {
-                                api.register(IFrameStatusChecker($upload.find('iframe'), identifier, result));
-                                api.register(PollStatusChecker(url, identifier, result));
-                                $upload.find('form').submit();
-                            }).resolve({state: 'starting', received: 0, size: 0});
+                        url: url + '?clear&' + IDENTIFIER_KEY + '=' + identifier}).then(function(info) {
+                            if (info['success']) {
+                                $('body').append($upload);
+                                $field.attr('form', 'upload-' + identifier + '-form');
+                                start.done(function() {
+                                    api.register(IFrameStatusChecker($upload.find('iframe'), identifier, result));
+                                    api.register(PollStatusChecker(url, identifier, result));
+                                    $upload.find('form').submit();
+                                }).resolve({state: 'starting', received: 0, size: 0});
+                            } else {
+                                var error = info['error'] || 'Unknow error';
+                                result.reject({message: 'Upload failed ('+ error + ').'});
+                            };
                         }, function() {
                             result.reject({message: 'Upload failed.'});
                         });
@@ -378,13 +383,18 @@
                         $.ajax({
                             type: 'GET',
                             dataType: 'jsonp',
-                            url: url + '?clear&' + IDENTIFIER_KEY + '=' + identifier}).then(function() {
-                                start.done(function() {
-                                    $popup.dialog('close');
-                                    api.register(IFrameStatusChecker($popup.find('iframe'), identifier, result));
-                                    api.register(PollStatusChecker(url, identifier, result));
-                                    $popup.find('form').submit();
-                                }).resolve({state: 'starting', received: 0, size: 0});
+                            url: url + '?clear&' + IDENTIFIER_KEY + '=' + identifier}).then(function(info) {
+                                if (info['success']) {
+                                    start.done(function() {
+                                        $popup.dialog('close');
+                                        api.register(IFrameStatusChecker($popup.find('iframe'), identifier, result));
+                                        api.register(PollStatusChecker(url, identifier, result));
+                                        $popup.find('form').submit();
+                                    }).resolve({state: 'starting', received: 0, size: 0});
+                                } else {
+                                    var error = info['error'] || 'Unknow error';
+                                    result.reject({message: 'Upload failed ('+ error + ').'});
+                                };
                             }, function() {
                                 result.reject({message: 'Upload failed.'});
                             });
