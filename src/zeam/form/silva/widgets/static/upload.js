@@ -314,16 +314,19 @@
             start = $.Deferred(),
             api = {
                 start: function() {
+                    console !== undefined && console.log('Start called.');
                     $.ajax({
                         type: 'GET',
                         dataType: 'jsonp',
                         url: url + '?clear&' + IDENTIFIER_KEY + '=' + identifier}).then(function(info) {
+                            console !== undefined && console.log('Clear succeed.');
                             if (info['success']) {
                                 $('body').append($upload);
                                 $field.attr('form', 'upload-' + identifier + '-form');
                                 start.done(function() {
                                     api.register(IFrameStatusChecker($upload.find('iframe'), identifier, result));
                                     api.register(PollStatusChecker(url, identifier, result));
+                                    console !== undefined && console.log('Submit upload form.');
                                     $upload.find('form').submit();
                                 }).resolve({state: 'starting', received: 0, size: 0});
                             } else {
@@ -384,11 +387,13 @@
                             type: 'GET',
                             dataType: 'jsonp',
                             url: url + '?clear&' + IDENTIFIER_KEY + '=' + identifier}).then(function(info) {
+                                console !== undefined && console.log('Clear success.');
                                 if (info['success']) {
                                     start.done(function() {
                                         $popup.dialog('close');
                                         api.register(IFrameStatusChecker($popup.find('iframe'), identifier, result));
                                         api.register(PollStatusChecker(url, identifier, result));
+                                        console !== undefined && console.log('Submit upload form.');
                                         $popup.find('form').submit();
                                     }).resolve({state: 'starting', received: 0, size: 0});
                                 } else {
@@ -452,6 +457,7 @@
 
         $trigger.remove();
         $file.on('change', function() {
+            console !== undefined && console.log('Start upload on change event.');
             ui.get(true).start();
         });
     } : function($field, set_objection) {
