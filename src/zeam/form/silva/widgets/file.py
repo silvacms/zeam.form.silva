@@ -4,7 +4,6 @@
 
 import logging
 import json
-import uuid
 
 from five import grok
 from zope.interface import Interface
@@ -106,7 +105,10 @@ class FileWidgetInput(SchemaFieldWidget):
         super(FileWidgetInput, self).update()
 
     def uploadIdentifier(self):
-        return str(uuid.uuid1())
+        manager = self.request.environ.get('infrae.fileupload.manager')
+        if manager is None:
+            raise interfaces.Error('The upload component is not available')
+        return manager.create_identifier()
 
     def uploadURL(self):
         manager = self.request.environ.get('infrae.fileupload.manager')
