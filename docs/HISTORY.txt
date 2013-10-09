@@ -1,10 +1,10 @@
 Changes
 =======
 
-2.0.4 (unreleased)
+2.0.4 (2013/10/09)
 ------------------
 
-* ...
+* Implement a new upload widget based on a different extension than before.
 
 2.0.3 (2013/05/24)
 ------------------
