@@ -7,7 +7,7 @@ from Acquisition import aq_inner, aq_parent
 from five import grok
 from zope.interface import Interface
 
-from silva.core.interfaces import IRoot
+from silva.core.interfaces import IRoot, ISilvaService
 from silva.core.interfaces.errors import ContentError
 from silva.translations import translate as _
 
@@ -104,12 +104,13 @@ class SMIRemoverWidget(ActionWidget):
 
 
 class CancelAction(Action):
-    """A action to cancel
+    """An action to cancel
     """
     grok.implements(IRESTCloseAction, ICancelerAction)
     title = _(u"Cancel")
     description = _(u"Go back to the previous screen")
     accesskey = u'ctrl+z'
+    screen = 'content'
 
     def getRedirectedContent(self, form):
         return form.context
@@ -124,6 +125,17 @@ class CancelAddAction(CancelAction):
     """
     description = _(
         u"Go back to the folder view without adding the item")
+
+
+class CancelConfigurationAction(CancelAction):
+    description = _(u'Go back to the site preferences')
+    screen = 'admin'
+
+    def getRedirectedContent(self, form):
+        content = form.context
+        if ISilvaService.providedBy(content):
+            return aq_parent(aq_inner(content))
+        return content
 
 
 class CancelEditAction(CancelAction):
@@ -146,7 +158,7 @@ class SMICancelWidget(ActionWidget):
 
     def update(self):
         super(SMICancelWidget, self).update()
-        self.screen = 'content'
+        self.screen = self.component.screen
         self.contentPath = self.form.get_content_path(
             self.component.getRedirectedContent(self.form))
 

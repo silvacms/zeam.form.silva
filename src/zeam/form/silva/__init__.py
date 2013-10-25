@@ -28,6 +28,7 @@ from .datamanager import MultiDataManagerFactory, FieldValueDataManager
 from .datamanager import SilvaDataManager, FieldValueDataManagerFactory
 from .actions import ExtractedDecoratedAction, LinkAction
 from .actions import EditAction, CancelAction, PopupAction
+from .actions import CancelConfigurationAction
 from .validation import DefaultFormLookup
 
 from .interfaces import IDefaultAction, IRemoverAction
