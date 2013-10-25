@@ -118,6 +118,16 @@ class SMIFormTemplate(pt.PageTemplate):
     pt.view(SMIForm)
 
 
+class ConfigurationForm(SMIForm):
+    grok.baseclass()
+    grok.name('admin')
+    grok.require('zope2.ViewManagementScreens')
+    ignoreContent = False
+
+    def get_menu_title(self):
+        return self.label
+
+
 class SMITableForm(SMIForm, table.TableForm):
     """SMI table forms.
     """
@@ -167,6 +177,16 @@ class SMIComposedForm(SilvaFormData, PageREST, SubFormGroupBase, FormCanvas):
 
 class SMIComposedFormTemplate(pt.PageTemplate):
     pt.view(SMIComposedForm)
+
+
+class ComposedConfigurationForm(SMIComposedForm):
+    grok.baseclass()
+    grok.name('admin')
+    grok.require('zope2.ViewManagementScreens')
+    ignoreContent = False
+
+    def get_menu_title(self):
+        return self.label
 
 
 class SMISubForm(SilvaFormData, composed.SubForm):

@@ -16,6 +16,7 @@ from .form.smi import SMIForm, SMIAddForm, SMIEditForm, SMIComposedForm
 from .form.smi import SMISubForm, SMISubEditForm, SMISubFormGroup
 from .form.smi import SMITableForm, SMISubTableForm
 from .form.smi import SMIFormPortlets
+from .form.smi import ConfigurationForm, ComposedConfigurationForm
 
 from .form.public import PublicViewletForm
 from .form.public import PublicContentProviderForm
