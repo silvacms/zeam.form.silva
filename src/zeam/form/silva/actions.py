@@ -7,7 +7,7 @@ from Acquisition import aq_inner, aq_parent
 from five import grok
 from zope.interface import Interface
 
-from silva.core.interfaces import IRoot, ISilvaService
+from silva.core.interfaces import IRoot, IZMIObject
 from silva.core.interfaces.errors import ContentError
 from silva.translations import translate as _
 
@@ -133,7 +133,7 @@ class CancelConfigurationAction(CancelAction):
 
     def getRedirectedContent(self, form):
         content = form.context
-        if ISilvaService.providedBy(content):
+        if IZMIObject.providedBy(content):
             return aq_parent(aq_inner(content))
         return content
 

@@ -46,12 +46,18 @@ class IconDisplayWidget(FieldWidget):
 class IconEditDisplayWidget(IconDisplayWidget):
     grok.name('silva.icon.edit')
 
-    def update(self):
-        super(IconEditDisplayWidget, self).update()
-        self.path = None
+    screen = 'content'
+
+    def get_smi_form(self):
         form = self.form
         while form is not None and not ISMIForm.providedBy(form):
             form = getattr(form, 'parent', None)
+        return form
+
+    def update(self):
+        super(IconEditDisplayWidget, self).update()
+        self.path = None
+        form = self.get_smi_form()
         if form is not None:
             self.path = form.get_content_path(self._content)
 
