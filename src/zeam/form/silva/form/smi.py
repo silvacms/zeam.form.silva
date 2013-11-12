@@ -127,6 +127,11 @@ class ConfigurationForm(SMIForm):
     def get_menu_title(self):
         return self.label
 
+    def get_menu_parent(self):
+        parent = super(ConfigurationForm, self).get_menu_parent()
+        parent['screen'] = 'admin'
+        return parent
+
 
 class SMITableForm(SMIForm, table.TableForm):
     """SMI table forms.
@@ -187,6 +192,11 @@ class ComposedConfigurationForm(SMIComposedForm):
 
     def get_menu_title(self):
         return self.label
+
+    def get_menu_parent(self):
+        parent = super(ComposedConfigurationForm, self).get_menu_parent()
+        parent['screen'] = 'admin'
+        return parent
 
 
 class SMISubForm(SilvaFormData, composed.SubForm):
