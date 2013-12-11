@@ -13,7 +13,7 @@ tests_require = [
 
 setup(name='zeam.form.silva',
       version=version,
-      description="Integration of the Grok-based form system into Silva",
+      description="Integration of the Grok-based Zeam Form system into Silva",
       long_description=open("README.txt").read() + "\n" +
                        open(os.path.join("docs", "HISTORY.txt")).read(),
 
@@ -24,7 +24,7 @@ setup(name='zeam.form.silva',
       keywords='grok form framework silva',
       author='Sylvain Viollon',
       author_email='thefunny@gmail.com',
-      url='http://infrae.com/products/silva',
+      url='https://github.com/silvacms/zeam.form.silva',
       license='BSD',
       package_dir={'': 'src'},
       packages=find_packages('src'),
