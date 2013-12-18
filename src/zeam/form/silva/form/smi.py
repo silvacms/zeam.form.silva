@@ -268,6 +268,9 @@ class SMISubTableForm(SilvaFormData, table.SubTableForm):
     grok.baseclass()
     grok.implements(ISMIForm)
 
+    def get_content_path(self, content):
+        return self.parent.get_content_path(content)
+
 
 class SMISubTableFormTemplate(pt.PageTemplate):
     pt.view(SMISubTableForm)
