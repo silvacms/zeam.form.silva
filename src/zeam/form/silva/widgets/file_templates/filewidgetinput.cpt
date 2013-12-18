@@ -24,6 +24,10 @@
   <div style="display:none"
        class="upload-progress">
   </div>
+  <div class="upload-file-input">
+    <input type="file" name="${widget.htmlId()}.upload"
+           class="upload-file-input" />
+  </div>
   <a onclick="return false"
      title="Upload a new file in Silva"
      class="form-button upload-trigger ui-state-default"
@@ -43,8 +47,6 @@
     <ins class="ui-icon ui-icon-circle-close"></ins>
     <tal:msg i18n:translate="">Cancel</tal:msg>
   </a>
-  <input type="file" name="${widget.htmlId()}.upload"
-         class="upload-file-input" />
   <input type="hidden"
          id="${widget.htmlId()}"
          name="${widget.identifier}"

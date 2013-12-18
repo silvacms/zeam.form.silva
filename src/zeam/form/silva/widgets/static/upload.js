@@ -438,7 +438,7 @@
     var UploadField = DONT_NEED_POPUP ?
             function ($field, set_objection) {
         var $trigger = $field.children('.upload-trigger'),
-            $file = $field.children('.upload-file-input'),
+            $file = $field.find('input.upload-file-input'),
             ui = UploadUI($field, set_objection, function() {
                 return UploadForm($file, $field.data('upload-identifier'), $field.data('upload-url')).register({
                     start: function() {
@@ -456,7 +456,7 @@
         });
     } : function($field, set_objection) {
         var $trigger = $field.children('.upload-trigger'),
-            $file = $field.children('.upload-file-input'),
+            $file = $field.find('input.upload-file-input'),
             ui = UploadUI($field, set_objection, function() {
                 return UploadPopup($field.data('upload-identifier'), $field.data('upload-url')).register({
                     start: function() {
