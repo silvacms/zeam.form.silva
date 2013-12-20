@@ -1,10 +1,12 @@
 Changes
 =======
 
-2.0.5 (unreleased)
+2.0.5 (2013/12/20)
 ------------------
 
-* ...
+* Add classes to create forms for Silva services in SMI.
+
+* Improve the upload widget when a clear button is displayed.
 
 2.0.4 (2013/10/09)
 ------------------
